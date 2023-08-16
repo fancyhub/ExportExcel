@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "ExportExcel": {
+      "commandName": "Project",
+      "commandLineArgs": "watch",
+      "workingDirectory": "../TestData/2_loc_auto_key"
+    }
+  }
+}

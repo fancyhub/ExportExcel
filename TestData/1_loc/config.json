@@ -1,0 +1,50 @@
+{
+  "config_dirs": [
+	"../0_no_loc/config"
+  ],
+  "excel_paths": [
+    "../0_no_loc/data",
+	"data"
+  ],  
+  "validation": {
+    "search_file_root": "../../Client/Resources",
+    "sheet_name_reg": "^[A-Z][a-zA-Z0-9]*$",
+    "col_name_reg": "^[A-Z][a-zA-Z0-9]*$",
+    "enum_name_reg": "^E[A-Z][A-Za-z0-9_]*$",
+    "enum_field_name_reg": "^[A-Z][a-zA-Z0-9_]*$",
+  },
+  "loc": {
+    "sheet_name": "Loc",
+    "default_lang": "zh-Hans",
+    "client_loc_id_prefix": "TC_", //哪个开头的需要导出
+	"use_hash_id":true,
+	"auto_gen_key":
+	{
+		"trans_sheet_name":"",  //"LocTrans"
+		"trans_sheet_export_dir":"Output",  
+	}
+  },
+
+  "csv": {
+    "export_dir_client": "Output/Client/Data",
+    "export_dir_svr": "Output/Server/Data",
+  },
+    "bin":{
+		"export_dir_client": "Output/Client/Data",
+  },
+  "csharp": {
+    "namespace": "Test",
+    "class_prefix": "T",
+    "export_dir_client": "Output/Client/CS",
+    "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
+  },
+  "lua": {
+	"class_prefix":"",
+    "export_dir_client": "Output/Client/Lua" 
+  },
+  "go": {
+    "package_name": "csvData",
+    "class_prefix": "T",
+    "export_dir_svr": "Output/Server/Go", 
+  }
+}
