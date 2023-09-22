@@ -56,8 +56,8 @@
 |string||
 |locstr|会自动生成多语言表, 内容填写 指定默认语言,默认语言在配置里面指定|
 
-## pair 类型
-pair 用 冒号 | 作为连接符, 比如 int_float   3|3.5
+## Tuple 类型
+Tuple 用 冒号 | 作为连接符, 比如 int_float   3|3.5
 所有的类型都可以相互组合, 只有LocStr 不允许和任何其他类型组合
 
 ||bool, int,uint,int64,uint64,float,double,string|locstr|
@@ -67,7 +67,7 @@ pair 用 冒号 | 作为连接符, 比如 int_float   3|3.5
 
 
 ## list类型
-list 用 分号 ; 作为连接符, 和pair 类似, 任意类型都可以, 就是locstr 不允许
+list 用 分号 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locstr 不允许
 比如 list_int:  3;4;5
 比如 int_bool:  3:true;4:false
 
@@ -80,8 +80,8 @@ list 用 分号 ; 作为连接符, 和pair 类似, 任意类型都可以, 就是
 |double|list_double|
 |string|list_string|
 |locstr|list_locstr|
-|{x}_{y} (pair类型)|list_{x}_{y}, 比如 list_int_bool|
-|{x}_{y}_{z} (pair类型)|list_{x}_{y}_{z}|
+|x_y (tuple类型)|list_x_y, 比如 list_int_bool|
+|x_y_z (tuple类型)|list_x_y_z|
 
 # 约束
  多个约束之间 用 换行 或者 | 分割

@@ -144,7 +144,7 @@ type CsvDataMgr struct {
                 foreach (var p2 in p._header)
                 {
                     DataType t = p2.Item1.DataType;
-                    if (!t.IsPair)
+                    if (!t.IsTuple)
                         continue;
 
                     t.IsList = false;

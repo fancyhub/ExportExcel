@@ -60,8 +60,8 @@ namespace ExportExcel
             _dict.Add(EDataType.UInt32, new DataRangeUInt());
             _dict.Add(EDataType.Int64, new DataRangeInt64());
             _dict.Add(EDataType.UInt64, new DataRangeUInt64());
-            _dict.Add(EDataType.Float, new DataRangeFloat());
-            _dict.Add(EDataType.Double, new DataRangeDouble());
+            _dict.Add(EDataType.Float32, new DataRangeFloat());
+            _dict.Add(EDataType.Float64, new DataRangeDouble());
         }
 
         public bool SetCol(TableHeaderItem col)

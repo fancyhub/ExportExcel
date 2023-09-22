@@ -18,8 +18,8 @@ namespace ExportExcel
         UInt32,
         Int64,
         UInt64,
-        Float,
-        Double,
+        Float32,
+        Float64,
         String,
         LocStr,
         LocId,
@@ -34,7 +34,7 @@ namespace ExportExcel
         public EDataType type3;
         public EDataType type4;
         public int Count;
-        public bool IsPair => Count > 1;
+        public bool IsTuple => Count > 1;
         public bool IsList;
         public EnumType enum_type;
 

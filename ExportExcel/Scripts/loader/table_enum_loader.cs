@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -67,14 +67,14 @@ namespace ExportExcel
                 var rslt = data_base.EnumDB.AddEnumField(enum_name, enum_field_name, excel_val, enum_val);
                 switch (rslt)
                 {
-                    case E_EnumAddError.DuplicateExcelVal:
+                    case EEnumAddError.DuplicateExcelVal:
                         ErrSet.E($"{sheet.SheetName} 枚举 {enum_name}.{excel_val} 该名字重复", sheet.Workbook.FilePath);
                         break;
 
-                    case E_EnumAddError.DuplicateFieldName:
+                    case EEnumAddError.DuplicateFieldName:
                         ErrSet.E($"{sheet.SheetName} 枚举 {enum_name}.{enum_field_name} 该名字重复", sheet.Workbook.FilePath);
                         break;
-                    case E_EnumAddError.Succ:
+                    case EEnumAddError.Succ:
                         break;
                 }
             }

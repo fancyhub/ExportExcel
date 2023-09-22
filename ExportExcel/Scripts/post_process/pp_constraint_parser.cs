@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace ExportExcel
@@ -91,7 +91,7 @@ namespace ExportExcel
             {
                 if (data_type1.IsList || data_type2.IsList)
                     return false;
-                if (data_type1.IsPair || data_type2.IsList)
+                if (data_type1.IsTuple || data_type2.IsList)
                     return false;
                 if (data_type1.enum_type != null || data_type2.enum_type != null)
                     return false;
@@ -172,7 +172,7 @@ namespace ExportExcel
                     return false;
 
                 //如果是pair 也不支持
-                if (data_type.IsPair)
+                if (data_type.IsTuple)
                     return false;
 
                 //List 不支持
@@ -205,7 +205,7 @@ namespace ExportExcel
                 if (data_type.IsList)
                     return false;
 
-                if (data_type.IsPair)
+                if (data_type.IsTuple)
                     return false;
 
                 if (data_type.type0 != EDataType.Int32
@@ -304,7 +304,7 @@ namespace ExportExcel
             //只能 string 或者 List<string>
             public static bool _is_data_type_valid(DataType data_type)
             {
-                if (data_type.IsPair)
+                if (data_type.IsTuple)
                     return false;
 
                 if (data_type.type0 != EDataType.String)
@@ -367,7 +367,7 @@ namespace ExportExcel
                 if (data_type.enum_type != null)
                     return false;
 
-                if (data_type.IsPair)
+                if (data_type.IsTuple)
                     return false;
 
                 if (data_type.type0 != EDataType.Int32
@@ -419,13 +419,13 @@ namespace ExportExcel
                 if (data_type.enum_type != null)
                     return false;
 
-                if (data_type.IsPair)
+                if (data_type.IsTuple)
                     return false;
 
                 if (data_type.type0 != EDataType.Int32
                     && data_type.type0 != EDataType.Int64
-                    && data_type.type0 != EDataType.Float
-                    && data_type.type0 != EDataType.Double)
+                    && data_type.type0 != EDataType.Float32
+                    && data_type.type0 != EDataType.Float64)
                     return false;
                 return true;
             }

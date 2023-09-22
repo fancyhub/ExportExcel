@@ -20,8 +20,8 @@ namespace ExportExcel
             [EDataType.Int32] = "int",
             [EDataType.Int64] = "long",
             [EDataType.UInt64] = "ulong",
-            [EDataType.Float] = "float",
-            [EDataType.Double] = "double",
+            [EDataType.Float32] = "float",
+            [EDataType.Float64] = "double",
             [EDataType.String] = "string",
             [EDataType.LocStr] = "LocStr",
             [EDataType.LocId] = "LocId",
@@ -31,7 +31,7 @@ namespace ExportExcel
         public static string ToCSharpStr(this DataType type)
         {
             _sb.Clear();
-            if (type.IsPair)
+            if (type.IsTuple)
             {
                 _sb.Append("(");
                 _sb.Append(_data_type_2_csharp_str[type.type0]);

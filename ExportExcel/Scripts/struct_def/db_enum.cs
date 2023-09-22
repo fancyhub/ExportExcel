@@ -75,7 +75,7 @@ namespace ExportExcel
         }
     }
 
-    public enum E_EnumAddError
+    public enum EEnumAddError
     {
         Succ,
         DuplicateFieldName,
@@ -92,7 +92,7 @@ namespace ExportExcel
             return ret;
         }
 
-        public E_EnumAddError AddEnumField(string enum_name, string enum_field_name, string excel_val, int enum_val)
+        public EEnumAddError AddEnumField(string enum_name, string enum_field_name, string excel_val, int enum_val)
         {
             _dict.TryGetValue(enum_name, out EnumType table);
             if (table == null)
@@ -105,12 +105,12 @@ namespace ExportExcel
             if (table.IsFieldNameExist(enum_field_name))
             {
 
-                return E_EnumAddError.DuplicateFieldName;
+                return EEnumAddError.DuplicateFieldName;
             }
 
             if (table.IsFieldStrValueExist(excel_val))
             {
-                return E_EnumAddError.DuplicateExcelVal;
+                return EEnumAddError.DuplicateExcelVal;
             }
 
             table.Add(new EnumField()
@@ -119,7 +119,7 @@ namespace ExportExcel
                 Name = enum_field_name,
                 Val = enum_val
             });
-            return E_EnumAddError.Succ;
+            return EEnumAddError.Succ;
         }
 
         public IEnumerator<KeyValuePair<string, EnumType>> GetEnumerator()

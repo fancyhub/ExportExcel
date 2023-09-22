@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -19,7 +19,7 @@ namespace ExportExcel
      *          Repated StringIndex(int)  两行
      *      Repeated Row 
      *          Row Count
-     *          BodyLen Data,  (如果是List, 第一个int描述数量,Pair当作List来写, ListPair, 数量和List一致)
+     *          BodyLen Data,  (如果是List, 第一个int描述数量,Tuple当作List来写, ListTuple, 数量和List一致)
      *      
      */
     public class Exporter_BinData : I_ProcessNode
@@ -303,11 +303,11 @@ namespace ExportExcel
                         string[] list = cell.Split(ConstDef.C_LIST_SPLIT);
                         _bw.Write7BitEncodedInt(list.Length);
 
-                        if (data_type.IsPair)
+                        if (data_type.IsTuple)
                         {
                             foreach (var v in list)
                             {
-                                string[] pair = v.Split(ConstDef.C_PAIR_SPLIT);
+                                string[] pair = v.Split(ConstDef.C_TUPLE_SPLIT);
                                 for (int i = 0; i < data_type.Count; i++)
                                 {
                                     _WriteVal(data_type.Get(i), pair[i], str_dict);
@@ -323,7 +323,7 @@ namespace ExportExcel
                         }
                     }
                 }
-                else if (data_type.IsPair)
+                else if (data_type.IsTuple)
                 {
                     if (string.IsNullOrEmpty(cell))
                     {
@@ -332,7 +332,7 @@ namespace ExportExcel
                     else
                     {
                         _bw.Write7BitEncodedInt(2);
-                        string[] pair = cell.Split(ConstDef.C_PAIR_SPLIT);
+                        string[] pair = cell.Split(ConstDef.C_TUPLE_SPLIT);
                         for (int i = 0; i < data_type.Count; i++)
                         {
                             _WriteVal(data_type.Get(i), pair[i], str_dict);
@@ -369,10 +369,10 @@ namespace ExportExcel
                         case EDataType.UInt64:
                             _bw.Write7BitEncodedInt64((long)(ulong.Parse(v)));
                             break;
-                        case EDataType.Float:
+                        case EDataType.Float32:
                             _bw.Write(float.Parse(v));
                             break;
-                        case EDataType.Double:
+                        case EDataType.Float64:
                             _bw.Write(double.Parse(v));
                             break;
                         case EDataType.String:

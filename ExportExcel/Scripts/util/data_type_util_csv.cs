@@ -16,12 +16,12 @@ namespace ExportExcel
         {
             [EDataType.None] = "",
             [EDataType.Bool] = "bool",
-            [EDataType.Int32] = "int",
-            [EDataType.UInt32] = "uint",
+            [EDataType.Int32] = "int32",
+            [EDataType.UInt32] = "uint32",
             [EDataType.Int64] = "int64",
             [EDataType.UInt64] = "uint64",
-            [EDataType.Float] = "float",
-            [EDataType.Double] = "double",
+            [EDataType.Float32] = "float32",
+            [EDataType.Float64] = "float64",
             [EDataType.String] = "string",
             [EDataType.LocStr] = "locstr",
             [EDataType.LocId] = "locid",
@@ -79,9 +79,7 @@ namespace ExportExcel
                     case "bool":
                         ret.AddType(EDataType.Bool);
                         break;
-                    case "double":
-                        ret.AddType(EDataType.Double);
-                        break;
+
                     case "int":
                     case "int32":
                         ret.AddType(EDataType.Int32);
@@ -97,7 +95,12 @@ namespace ExportExcel
                         ret.AddType(EDataType.UInt64);
                         break;
                     case "float":
-                        ret.AddType(EDataType.Float);
+                    case "float32":
+                        ret.AddType(EDataType.Float32);
+                        break;
+                    case "double":
+                    case "float64":
+                        ret.AddType(EDataType.Float64);
                         break;
                     case "locstr":
                         ret.AddType(EDataType.LocStr);

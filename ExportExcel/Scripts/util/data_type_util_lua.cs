@@ -18,8 +18,8 @@ namespace ExportExcel
             [EDataType.Int64] = "int64",
             [EDataType.UInt32] = "uint32",
             [EDataType.UInt64] = "uint64",
-            [EDataType.Float] = "float32",
-            [EDataType.Double] = "float64",
+            [EDataType.Float32] = "float32",
+            [EDataType.Float64] = "float64",
             [EDataType.String] = "string",
             [EDataType.LocStr] = "LocStr",
             [EDataType.LocId] = "LocId",
@@ -32,8 +32,8 @@ namespace ExportExcel
             [EDataType.Int64] = "int64",
             [EDataType.UInt32] = "uint32",
             [EDataType.UInt64] = "uint64",
-            [EDataType.Float] = "float32",
-            [EDataType.Double] = "float64",
+            [EDataType.Float32] = "float32",
+            [EDataType.Float64] = "float64",
             [EDataType.String] = "string",
             [EDataType.LocStr] = "locstr",
             [EDataType.LocId] = "locid",
@@ -45,8 +45,8 @@ namespace ExportExcel
             string ret = _data_type_2_lua_str[data.type0];
             if (data.IsList)
             {
-                if (data.IsPair)
-                    return string.Format("table<Pair_{0}_{1}>", _data_type_2_lua_str[data.type0], _data_type_2_lua_str[data.type1]);
+                if (data.IsTuple)
+                    return string.Format("table<Tuple_{0}_{1}>", _data_type_2_lua_str[data.type0], _data_type_2_lua_str[data.type1]);
                 else if (data.enum_type == null)
                     return string.Format("table<{0}>", ret);
                 else
@@ -54,8 +54,8 @@ namespace ExportExcel
             }
             else
             {
-                if (data.IsPair)
-                    return string.Format("Pair_{0}_{1}", _data_type_2_lua_str[data.type0], _data_type_2_lua_str[data.type1]);
+                if (data.IsTuple)
+                    return string.Format("Tuple_{0}_{1}", _data_type_2_lua_str[data.type0], _data_type_2_lua_str[data.type1]);
                 else if (data.enum_type == null)
                     return ret;
                 else
@@ -69,14 +69,14 @@ namespace ExportExcel
 
             if (data.IsList)
             {
-                if (data.IsPair)
+                if (data.IsTuple)
                     return string.Format("TableUtil.Parse_list_{0}_{1}", _data_type_2_lua_parse_str[data.type0], _data_type_2_lua_parse_str[data.type1]);
                 else
                     return string.Format("TableUtil.Parse_list_{0}", _data_type_2_lua_parse_str[data.type0]);
             }
             else
             {
-                if (data.IsPair)
+                if (data.IsTuple)
                     return string.Format("TableUtil.Parse_{0}_{1}", _data_type_2_lua_parse_str[data.type0], _data_type_2_lua_parse_str[data.type1]);
                 else
                     return string.Format("TableUtil.Parse_{0}", _data_type_2_lua_parse_str[data.type0]);

@@ -61,7 +61,7 @@ namespace ExportExcel
     public class FTC_TypeGroup
     {
         public Dictionary<EDataType, I_FieldTypeCheck> _checker = new Dictionary<EDataType, I_FieldTypeCheck>();
-        public FTC_Pair _pair_checker = new FTC_Pair();
+        public FTC_Tuple _tuple_checker = new FTC_Tuple();
         public FTC_List _list_checker = new FTC_List();
 
         public I_FieldTypeCheck _cur_checker;
@@ -74,8 +74,8 @@ namespace ExportExcel
             _checker.Add(EDataType.UInt32, new FTC_UInt32());
             _checker.Add(EDataType.Int64, new FTC_Int64());
             _checker.Add(EDataType.UInt64, new FTC_UInt64());
-            _checker.Add(EDataType.Float, new FTC_Float());
-            _checker.Add(EDataType.Double, new FTC_Double());
+            _checker.Add(EDataType.Float32, new FTC_Float());
+            _checker.Add(EDataType.Float64, new FTC_Double());
             _checker.Add(EDataType.String, new FTC_String());
             _checker.Add(EDataType.LocStr, new FTC_LocStr());
         }
@@ -84,14 +84,14 @@ namespace ExportExcel
         {
             //1. 计算当前的检查 类型
             _cur_checker = _checker[col.DataType.type0];
-            if (col.DataType.IsPair)
+            if (col.DataType.IsTuple)
             {
-                _pair_checker._types.Clear();
+                _tuple_checker._types.Clear();
                 for (int i = 0; i < col.DataType.Count; i++)
                 {
-                    _pair_checker._types.Add(_checker[col.DataType.Get(i)]);
+                    _tuple_checker._types.Add(_checker[col.DataType.Get(i)]);
                 }
-                _cur_checker = _pair_checker;
+                _cur_checker = _tuple_checker;
             }
             if (col.DataType.IsList)
             {
@@ -269,7 +269,7 @@ namespace ExportExcel
     }
 
     //Pair 类型
-    public class FTC_Pair : I_FieldTypeCheck
+    public class FTC_Tuple : I_FieldTypeCheck
     {
         public List<I_FieldTypeCheck> _types = new List<I_FieldTypeCheck>(DataType.C_MAX_COUNT);
         public List<E_FTC_RESULT> _result = new List<E_FTC_RESULT>();
@@ -283,7 +283,7 @@ namespace ExportExcel
                     return E_FTC_RESULT.invalid;
             }
 
-            var temp = v.Split(ConstDef.C_PAIR_SPLIT);
+            var temp = v.Split(ConstDef.C_TUPLE_SPLIT);
             if (temp.Length != _types.Count)
             {
                 return E_FTC_RESULT.invalid;
@@ -303,7 +303,7 @@ namespace ExportExcel
             {
                 if (p != E_FTC_RESULT.valid)
                 {
-                    v = string.Join(ConstDef.C_PAIR_SPLIT, temp);
+                    v = string.Join(ConstDef.C_TUPLE_SPLIT, temp);
                     return E_FTC_RESULT.valid_modify;
                 }
             }

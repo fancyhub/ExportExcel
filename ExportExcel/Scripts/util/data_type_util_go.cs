@@ -20,8 +20,8 @@ namespace ExportExcel
             [EDataType.Int64] = "int64",
             [EDataType.UInt32] = "uint32",
             [EDataType.UInt64] = "uint64",
-            [EDataType.Float] = "float32",
-            [EDataType.Double] = "float64",
+            [EDataType.Float32] = "float32",
+            [EDataType.Float64] = "float64",
             [EDataType.String] = "string",
             [EDataType.LocStr] = "string",
             [EDataType.LocId] = "int32",
@@ -40,9 +40,9 @@ namespace ExportExcel
             if (type.IsList)
                 _sb.Append("[]");
 
-            if (type.IsPair)
+            if (type.IsTuple)
             {
-                _sb.Append("CsvPair_");
+                _sb.Append("CsvTuple_");
                 _sb.Append(_data_type_2_go_str[type.type0]);
 
                 for (int i = 1; i < type.Count; i++)
@@ -76,7 +76,7 @@ namespace ExportExcel
             if (type.IsList)
                 _sb.Append("array_");
 
-            if (type.IsPair)
+            if (type.IsTuple)
             {
                 _sb.Append(_data_type_2_go_str[type.type0]);
 

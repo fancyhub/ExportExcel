@@ -122,17 +122,17 @@ func CreateCsvDataMgr(logger *zap.Logger,reader IDataReader) (*CsvDataMgr, error
 
         public void _export_parse(StreamWriter sw, List<DataType> type_list)
         {
-            //导出Pair
+            //导出Tuple
             foreach (var p in type_list)
             {
                 DataType t = p;
-                if (!t.IsPair)
+                if (!t.IsTuple)
                     continue;
                 if (t.IsList)
                     continue;
 
                 sw.WriteLine($"func {p.ToGoParseStr()}(v string) {p.ToGoStr()} {{");
-                sw.WriteLine($"\ttemp:= strings.Split(v, \"{ConstDef.C_PAIR_SPLIT}\")");
+                sw.WriteLine($"\ttemp:= strings.Split(v, \"{ConstDef.C_TUPLE_SPLIT}\")");
                 sw.WriteLine("\tlen:= len(temp)");
                 sw.WriteLine($"\tret:= {p.ToGoStr()}{{ }}");
                 for (int i = 0; i < t.Count; i++)
@@ -385,7 +385,7 @@ func (cd *CsvDataMgr) load{sheet_name}() error {
                 foreach (var p2 in p._header)
                 {
                     DataType t = p2.Item1.DataType;
-                    if (!t.IsPair && !t.IsList)
+                    if (!t.IsTuple && !t.IsList)
                         continue;
 
                     t.IsList = false;
