@@ -1,46 +1,87 @@
-{  
-  "excel_paths": [
-    "../0_no_loc/data",		
-	"data"
-  ],  
-  "validation": {
-    "search_file_root": "../../Client/Resources",
-    "sheet_name_reg": "^[A-Z][a-zA-Z0-9]*$",
-    "col_name_reg": "^[A-Z][a-zA-Z0-9_]*$",
-    "enum_name_reg": "^E[A-Z][A-Za-z0-9_]*$",
-    "enum_field_name_reg": "[A-Z][a-zA-Z0-9_]*$",
-  },
-  "loc": {
-    "sheet_name": "Loc",
-    "default_lang": "SC",
-    "client_loc_id_prefix": "TC_",	
-	"use_hash_id":true,
-	"auto_gen_key":
-	{
-		"trans_sheet_name":"LocTrans",  //LocTrans
-		"trans_sheet_export_dir":"Output",
-	}
-  },
-  "csv": {
-    "export_dir_client": "Output/Client/Data",
-    "export_dir_svr": "Output/Server/Data",
-  },
-  "bin": {
-    "export_dir_client": "Output/Client/Data",    
-  },
-  "csharp": {
-    "namespace": "Test",
-    "class_prefix": "T",
-    "export_dir_client": "Output/Client/CS",
-    "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
-  },
-  "lua": {
-	"class_prefix":"T",
-    "export_dir_client": "Output/Client/Lua" 
-  },
-  "go": {
-    "package_name": "csvData",
-    "class_prefix": "T",
-    "export_dir_svr": "Output/Server/Go", 
-  }
+{
+    "excelPaths": [
+        "../0_no_loc/data",
+        "data"
+    ],
+    "validation": {
+        "searchFileRoot": "../../Client/Resources",
+        "sheetNameReg": "^[A-Z][a-zA-Z0-9]*$",
+        "colNameReg": "^[A-Z][a-zA-Z0-9_]*$",
+        "enumNameReg": "^E[A-Z][A-Za-z0-9_]*$",
+        "enumFieldNameReg": "[A-Z][a-zA-Z0-9_]*$",
+    },
+    "localization": {
+		"mode":"auto_gen_key", 
+		"desc":"mode: none, normal,auto_gen_key",
+		"useHashId": true,
+		
+		"modeNormal":{
+			"sheetName": "Loc",
+			"defaultLang": "zh-Hans",
+			"des":"LocStr字段 定义的是 Key, 需要一个多语言表, sheetName 对应的表名是多语言表"
+		},
+		
+		"modeAutoGenKey":{
+			"sheetName": "Loc",
+			"defaultLang": "zh-Hans",
+			"transSheetName": "LocTrans",
+			"exportTrans":true,
+			"exportTransDir":"Output",
+			"desc":"LocStr 字段定义的是 一个默认语言对应的文本, sheetName 对应的表名是多语言表,里面是空的, 用来描述几种语言, 需要一个额外的翻译表"
+		},
+    },
+    "exportClient": {
+        "csv": {
+            "enable": true,
+            "dir": "Output/Client/Data",
+        },
+        "bin": {
+            "enable": true,
+            "dir": "Output/Client/Data",
+        },
+        "csharp": {
+            "enable": true,
+            "namespaceName": "Test",
+            "classPrefix": "T",
+            "dir": "Output/Client/CS",		
+			"locIdPrefix": "",
+            "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
+        },		 
+        "lua": {
+            "enable": true,
+            "classPrefix": "T",
+			"locIdPrefix": "TC_",
+            "dir": "Output/Client/Lua"
+        },
+    },
+    "exportServer": {
+        "csv": {
+            "enable": true,
+            "dir": "Output/Server/Data",
+        },
+        "bin": {
+            "enable": true,
+            "dir": "Output/Server/Data",
+        },
+        "csharp": {
+            "enable": true,
+            "namespaceName": "Test",
+            "classPrefix": "T",
+            "dir": "Output/Server/CS",
+			"locIdPrefix": "TC_",
+            "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
+        },
+        "lua": {
+            "enable": true,
+            "classPrefix": "T",
+			"locIdPrefix": "TC_",
+            "dir": "Output/Server/Lua"
+        },
+        "go": {
+            "enable": true,
+            "packageName": "config",
+            "classPrefix": "T",
+            "dir": "Output/Server/Go",
+        }
+    }
 }

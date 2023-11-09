@@ -18,8 +18,8 @@ namespace ExportExcel
 
         public TableEnumLoader(ExeConfig config)
         {
-            S_ENUM_NAME_REGEX = new Regex(config.validation.enum_name_reg);
-            S_ENUM_FIELD_NAME_REGEX = new Regex(config.validation.enum_field_name_reg);
+            S_ENUM_NAME_REGEX = new Regex(config.validation.enumNameReg);
+            S_ENUM_FIELD_NAME_REGEX = new Regex(config.validation.enumFieldNameReg);
         }
 
         public static bool ValidEnumName(string enum_name)

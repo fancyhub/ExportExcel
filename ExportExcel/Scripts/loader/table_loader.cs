@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 *************************************************************************************/
 namespace ExportExcel
 {
-    public class TableLoader : I_ProcessNode
+    public class TableLoader : IProcessNode
     {
         public enum ETableNameType
         {
@@ -32,7 +32,7 @@ namespace ExportExcel
 
         public TableLoader(ExeConfig config)
         {
-            S_SHEET_NAME_REGEX = new Regex(config.validation.sheet_name_reg);
+            S_SHEET_NAME_REGEX = new Regex(config.validation.sheetNameReg);
             _ref_loader = new TableRefLoader();
             _enum_loader = new TableEnumLoader(config);
             _data_loader = new TableDataLoader(config);
@@ -45,7 +45,7 @@ namespace ExportExcel
 
         public void Process(DataBase data_base)
         {
-            List<string> files = ExcelUtil.CollectExcelFiles(data_base.Config.excel_paths);
+            List<string> files = ExcelUtil.CollectExcelFiles(data_base.Config.excelPaths);
 
             foreach (string file_path in files)
             {

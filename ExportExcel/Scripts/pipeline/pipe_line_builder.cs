@@ -41,7 +41,7 @@ namespace ExportExcel
                 ret.Add(new PPConstraint_Unique_LoopUp_BlankForbid());
                 ret.Add(new PPFieldTypeChecker());
                 ret.Add(new PPConstraintRange());
-                ret.Add(new PPConstraintFilePath(config.validation.search_file_root));
+                ret.Add(new PPConstraintFilePath(config.validation.searchFileRoot));
             }
 
             //5. 多语言到LocId
@@ -53,27 +53,34 @@ namespace ExportExcel
             {
                 ProcessNodeList node_list = new ProcessNodeList("导出");
                 ret.Add(node_list);
-                node_list.Add(new Exporter_CSStruct());
-                node_list.Add(new Exporter_CSLoader());
-                node_list.Add(new Exporter_CSIds());
+                _AddExporter(node_list, E_EXPORT_FLAG.client, config.exportClient);
+                _AddExporter(node_list, E_EXPORT_FLAG.svr, config.exportServer);
 
-                node_list.Add(new Exporter_LuaIds());
-                node_list.Add(new Exporter_LuaStruct());
-                node_list.Add(new Exporter_LuaLoader());
-                node_list.Add(new Exporter_LuaStructDef());
-
-                node_list.Add(new ExporterGOStruct());
-                node_list.Add(new ExporterGOLoader());
-
-                node_list.Add(new ExporterCSV(E_EXPORT_FLAG.client));
-                node_list.Add(new ExporterCSV(E_EXPORT_FLAG.svr));
-                node_list.Add(new Exporter_BinData());
 
                 node_list.Add(new Exporter_LangTrans());
 
                 //node_list.Add(new Exporter_Rule(@"D:\work\p4_dev\Trunk\Design\rules"));
             }
             return ret;
+        }
+
+        private static void _AddExporter(ProcessNodeList node_list, E_EXPORT_FLAG flag, ExeConfig.ExportConfig config)
+        {
+            node_list.Add(new Exporter_CSStruct(flag, config.csharp));
+            node_list.Add(new Exporter_CSLoader(flag, config.csharp));
+            node_list.Add(new Exporter_CSIds(flag, config.csharp));
+
+            node_list.Add(new Exporter_LuaIds(flag, config.lua));
+            node_list.Add(new Exporter_LuaStruct(flag, config.lua));
+            node_list.Add(new Exporter_LuaLoader(flag, config.lua));
+            node_list.Add(new Exporter_LuaStructDef(flag, config.lua));
+
+            node_list.Add(new ExporterCSV(flag, config.csv));
+            node_list.Add(new Exporter_BinData(flag, config.bin));
+
+            node_list.Add(new ExporterGOStruct(flag, config.go));
+            node_list.Add(new ExporterGOLoader(flag, config.go));
+
         }
     }
 }

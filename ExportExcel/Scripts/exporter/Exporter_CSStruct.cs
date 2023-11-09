@@ -12,14 +12,19 @@ using System.Linq;
 namespace ExportExcel
 {
     //导出 csharp的数据结构
-    public class Exporter_CSStruct : I_ProcessNode
+    public class Exporter_CSStruct : IProcessNode
     {
         public const string C_FILE_NAME = "cs_struct.cs";
         public StringFormater _formater = new StringFormater();
+        public ExeConfig.CSharpConfig _config;
+        public E_EXPORT_FLAG _flag;
 
-        public Exporter_CSStruct()
+        public Exporter_CSStruct(E_EXPORT_FLAG flag, ExeConfig.CSharpConfig config)
         {
+            _flag = flag;
+            _config = config;
         }
+
         public string GetName()
         {
             return "Export CS";
@@ -27,15 +32,18 @@ namespace ExportExcel
 
         public void Process(DataBase data)
         {
-            _formater["class_prefix"] = data.Config.csharp.class_prefix;
+            if (_config == null || !_config.enable)
+                return;
 
-            string name_space = data.Config.csharp.@namespace;
-            List<FilterTable> tables = FilterTable.Filter(data, E_EXPORT_FLAG.client);
-            string dest_file_path = System.IO.Path.Combine(data.Config.csharp.export_dir_client, C_FILE_NAME);
+            _formater["class_prefix"] = _config.classPrefix;
+
+            string name_space = _config.namespaceName;
+            List<FilterTable> tables = FilterTable.Filter(data, _flag);
+            string dest_file_path = System.IO.Path.Combine(_config.dir, C_FILE_NAME);
             FileUtil.CreateFileDir(dest_file_path);
             StreamWriter sw = new StreamWriter(dest_file_path);
             sw.WriteLine("//自动生成的");
-            sw.WriteLine(data.Config.csharp.header);
+            sw.WriteLine(_config.header);
 
             if (!string.IsNullOrEmpty(name_space))
                 sw.WriteLine("namespace " + name_space + "{");

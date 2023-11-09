@@ -38,14 +38,14 @@ namespace Test
             }
             bool head_rst = true;
 
-            head_rst &= ((header[0] == "Id") && (header[0 + 8] == "int"));
+            head_rst &= ((header[0] == "Id") && (header[0 + 8] == "int32"));
             head_rst &= ((header[1] == "Name") && (header[1 + 8] == "locid"));
-            head_rst &= ((header[2] == "Type") && (header[2 + 8] == "int"));
-            head_rst &= ((header[3] == "SubType") && (header[3 + 8] == "int"));
-            head_rst &= ((header[4] == "Quality") && (header[4 + 8] == "int"));
-            head_rst &= ((header[5] == "PairField") && (header[5 + 8] == "int_bool"));
-            head_rst &= ((header[6] == "PairFieldList") && (header[6 + 8] == "list_int_int64"));
-            head_rst &= ((header[7] == "ListField") && (header[7 + 8] == "list_int"));
+            head_rst &= ((header[2] == "Type") && (header[2 + 8] == "int32"));
+            head_rst &= ((header[3] == "SubType") && (header[3 + 8] == "int32"));
+            head_rst &= ((header[4] == "Quality") && (header[4 + 8] == "int32"));
+            head_rst &= ((header[5] == "PairField") && (header[5 + 8] == "int32_bool"));
+            head_rst &= ((header[6] == "PairFieldList") && (header[6 + 8] == "list_int32_int64"));
+            head_rst &= ((header[7] == "ListField") && (header[7 + 8] == "list_int32"));
 
             if (!head_rst)
             {
@@ -130,10 +130,10 @@ namespace Test
             }
             bool head_rst = true;
 
-            head_rst &= ((header[0] == "Id") && (header[0 + 4] == "uint"));
-            head_rst &= ((header[1] == "Level") && (header[1 + 4] == "int"));
+            head_rst &= ((header[0] == "Id") && (header[0 + 4] == "uint32"));
+            head_rst &= ((header[1] == "Level") && (header[1 + 4] == "int32"));
             head_rst &= ((header[2] == "Name") && (header[2 + 4] == "locid"));
-            head_rst &= ((header[3] == "Pos") && (header[3 + 4] == "float_float_float"));
+            head_rst &= ((header[3] == "Pos") && (header[3 + 4] == "float32_float32_float32"));
 
             if (!head_rst)
             {
@@ -215,7 +215,7 @@ namespace Test
             }
             bool head_rst = true;
 
-            head_rst &= ((header[0] == "Id") && (header[0 + 2] == "int"));
+            head_rst &= ((header[0] == "Id") && (header[0 + 2] == "int32"));
             head_rst &= ((header[1] == "Val") && (header[1 + 2] == "string"));
 
             if (!head_rst)

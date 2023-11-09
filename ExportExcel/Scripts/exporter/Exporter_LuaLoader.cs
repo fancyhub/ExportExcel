@@ -10,8 +10,17 @@ using System.IO;
 *************************************************************************************/
 namespace ExportExcel
 {
-    public class Exporter_LuaLoader : I_ProcessNode
+    public class Exporter_LuaLoader : IProcessNode
     {
+        public ExeConfig.LuaConfig _config;
+        public E_EXPORT_FLAG _flag;
+
+        public Exporter_LuaLoader(E_EXPORT_FLAG flag, ExeConfig.LuaConfig config)
+        {
+            _flag = flag;
+            _config = config;
+        }
+
         public string GetName()
         {
             return "Export";
@@ -20,13 +29,13 @@ namespace ExportExcel
         public StringFormater _formater = new StringFormater();
         public void Process(DataBase data)
         {
-            if (string.IsNullOrEmpty(data.Config.lua.export_dir_client))
+            if (_config == null || !_config.enable)
                 return;
 
-            _formater["class_prefix"] = data.Config.lua.class_prefix;
+            _formater["class_prefix"] = _config.classPrefix;
 
-            List<FilterTable> tables = FilterTable.Filter(data, E_EXPORT_FLAG.client);
-            string dest_file_path = System.IO.Path.Combine(data.Config.lua.export_dir_client, C_FILE_NAME);
+            List<FilterTable> tables = FilterTable.Filter(data, _flag);
+            string dest_file_path = System.IO.Path.Combine(_config.dir, C_FILE_NAME);
             FileUtil.CreateFileDir(dest_file_path);
             StreamWriter sw = new StreamWriter(dest_file_path);
             sw.WriteLine(@"
@@ -37,7 +46,7 @@ this._name_2_map = {}
 ");
             foreach (var p in tables)
             {
-                if (p.SheetName == data.Config.loc.sheet_name)
+                if (data.Config.localization.IsLocalizationSheet(p.SheetName ))
                     continue;
 
                 _export_load_func(p, sw);

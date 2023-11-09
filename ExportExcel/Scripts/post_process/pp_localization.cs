@@ -10,7 +10,7 @@ using System.Collections.Generic;
 namespace ExportExcel
 {
     //多语言处理
-    public class PPLocalization : I_ProcessNode
+    public class PPLocalization : IProcessNode
     {
         public PPLocalization()
         {
@@ -25,10 +25,9 @@ namespace ExportExcel
         public void Process(DataBase data_base)
         {
             //1. 如果 Loc 的表没有, 直接不处理了
-            var config_loc = data_base.Config.loc;
-            var config_auto_key = config_loc.auto_gen_key;
-            string loc_sheet_name = config_loc.sheet_name;
-            string default_lang_name = config_loc.default_lang;
+            var config_loc = data_base.Config.localization;
+            string loc_sheet_name = config_loc.GetLocSheetName();
+            string default_lang_name = config_loc.GetDefaultLang();
 
             if (string.IsNullOrEmpty(loc_sheet_name))
                 return;
@@ -68,103 +67,108 @@ namespace ExportExcel
             }
 
             //3. 翻译表不存在, 直接分表
-            string trans_sheet_name = config_auto_key.trans_sheet_name;
-            if (string.IsNullOrEmpty(trans_sheet_name)) //翻译表不存在, 就简单处理 Loc表            
+
+            switch(config_loc.EMode)
             {
-                Dictionary<string, string[,]> multi_lang_body = _gen_loc_array(table_loc);
-                _split_table_loc_to_multi(table_loc, default_lang_name, multi_lang_body);
-                data_base.LangDefault = _convert(multi_lang_body[default_lang_name], 1);
-
-                data_base.LangList.Clear();
-                foreach (var p in multi_lang_body)
-                    data_base.LangList.Add(p.Key);
-
-
-                //做检查
-                data_base.ForeachCol((col) =>
-                {
-                    if (col.Col.DataType.type0 != EDataType.LocStr)
-                        return;
-
-                    col.ForeachCell((cell) =>
+                case ExeConfig.ELocalizationMode.Normal:
                     {
-                        string v = cell.Value;
-                        if (v == string.Empty)
+                        Dictionary<string, string[,]> multi_lang_body = _gen_loc_array(table_loc);
+                        _split_table_loc_to_multi(table_loc, default_lang_name, multi_lang_body);
+                        data_base.LangDefault = _convert(multi_lang_body[default_lang_name], 1);
+
+                        data_base.LangList.Clear();
+                        foreach (var p in multi_lang_body)
+                            data_base.LangList.Add(p.Key);
+
+
+                        //做检查
+                        data_base.ForeachCol((col) =>
+                        {
+                            if (col.Col.DataType.type0 != EDataType.LocStr)
+                                return;
+
+                            col.ForeachCell((cell) =>
+                            {
+                                string v = cell.Value;
+                                if (v == string.Empty)
+                                    return;
+
+                                bool contain = data_base.LangDefault.ContainsKey(v);
+                                if (!contain)
+                                    ErrSet.E(col, $"没有找到对应的多语言 Key {v}");
+                            });
+                        });
+                    }
+                    break;
+
+                case ExeConfig.ELocalizationMode.AutoGenKey:
+                    {
+                        string trans_sheet_name = config_loc.modeAutoGenKey.transSheetName;
+                        //3.1 检查
+                        if (trans_sheet_name == loc_sheet_name)
+                        {
+                            ErrSet.E($"多语言表和翻译表的名字不能一样");
                             return;
+                        }
 
-                        bool contain = data_base.LangDefault.ContainsKey(v);
-                        if (!contain)
-                            ErrSet.E(col,$"没有找到对应的多语言 Key {v}");
-                    });
-                });
-                return;
-            }
+                        Table table_trans = data_base.Tables[trans_sheet_name];
+                        if (table_trans == null)
+                        {
+                            ErrSet.E($"找不到多语言的翻译表 {trans_sheet_name}");
+                            return;
+                        }
 
-            else if (!string.IsNullOrEmpty(trans_sheet_name)) //需要自动生成 LocKey
-            {
-                //3.1 检查
-                if (trans_sheet_name == loc_sheet_name)
-                {
-                    ErrSet.E($"多语言表和翻译表的名字不能一样");
-                    return;
-                }
+                        if (table_trans.Header.Pk == null)
+                        {
+                            ErrSet.E($"翻译表 {trans_sheet_name}, 没有主Key");
+                            return;
+                        }
 
-                Table table_trans = data_base.Tables[trans_sheet_name];
-                if (table_trans == null)
-                {
-                    ErrSet.E($"找不到多语言的翻译表 {trans_sheet_name}");
-                    return;
-                }
+                        if (table_trans.Header.Pk != table_trans.Header[0])
+                        {
+                            ErrSet.E($"翻译表 {trans_sheet_name}, 主Key不是第一个");
+                            return;
+                        }
 
-                if (table_trans.Header.Pk == null)
-                {
-                    ErrSet.E($"翻译表 {trans_sheet_name}, 没有主Key");
-                    return;
-                }
+                        //3.2 生成Loc的key
+                        Dictionary<string, string> default_lang_dict = _auto_gen_lang_dict(data_base);
+                        data_base.LangDefault = default_lang_dict;
 
-                if (table_trans.Header.Pk != table_trans.Header[0])
-                {
-                    ErrSet.E($"翻译表 {trans_sheet_name}, 主Key不是第一个");
-                    return;
-                }
+                        //3.3 生成多语言的 MultiLangBody
+                        Dictionary<string, Dictionary<string, string>> loc_trans_dict = _gen_loc_dict(table_trans);
+                        Dictionary<string, string[,]> multi_lang_body = new Dictionary<string, string[,]>();
 
-                //3.2 生成Loc的key
-                Dictionary<string, string> default_lang_dict = _auto_gen_lang_dict(data_base);
-                data_base.LangDefault = default_lang_dict;
+                        for (int i = 1; i < table_loc.Header.List.Count; i++)
+                        {
+                            string lang_name = table_trans.Header[i].Name;
+                            if (lang_name == default_lang_name)
+                            {
+                                multi_lang_body.Add(lang_name, _convert(default_lang_dict));
+                            }
+                            else
+                            {
+                                string[,] lang_body = _trans(default_lang_dict, loc_trans_dict[lang_name]);
+                                multi_lang_body.Add(lang_name, lang_body);
+                            }
+                        }
 
-                //3.3 生成多语言的 MultiLangBody
-                Dictionary<string, Dictionary<string, string>> loc_trans_dict = _gen_loc_dict(table_trans);
-                Dictionary<string, string[,]> multi_lang_body = new Dictionary<string, string[,]>();
+                        //3.6  先创建翻译表
+                        if (!config_loc.modeAutoGenKey.exportTrans) //需要导出 翻译表
+                        {
+                            var new_table_trans = _create_new_table_trans(table_loc, default_lang_name, default_lang_dict, loc_trans_dict);
+                            new_table_trans.SheetName = trans_sheet_name;
+                            data_base.Tables[trans_sheet_name] = new_table_trans;
+                        }
 
-                for (int i = 1; i < table_loc.Header.List.Count; i++)
-                {
-                    string lang_name = table_trans.Header[i].Name;
-                    if (lang_name == default_lang_name)
-                    {
-                        multi_lang_body.Add(lang_name, _convert(default_lang_dict));
+                        //3.5 重新生成 TableLoc                
+                        _split_table_loc_to_multi(table_loc, default_lang_name, multi_lang_body);
+
+
+                        data_base.LangList.Clear();
+                        foreach (var p in multi_lang_body)
+                            data_base.LangList.Add(p.Key);
                     }
-                    else
-                    {
-                        string[,] lang_body = _trans(default_lang_dict, loc_trans_dict[lang_name]);
-                        multi_lang_body.Add(lang_name, lang_body);
-                    }
-                }
-
-                //3.6  先创建翻译表
-                if (!string.IsNullOrEmpty(config_auto_key.trans_sheet_export_dir)) //需要导出 翻译表
-                {
-                    var new_table_trans = _create_new_table_trans(table_loc, default_lang_name, default_lang_dict, loc_trans_dict);
-                    new_table_trans.SheetName = trans_sheet_name;
-                    data_base.Tables[trans_sheet_name] = new_table_trans;
-                }
-
-                //3.5 重新生成 TableLoc                
-                _split_table_loc_to_multi(table_loc, default_lang_name, multi_lang_body);
-
-
-                data_base.LangList.Clear();
-                foreach (var p in multi_lang_body)
-                    data_base.LangList.Add(p.Key);
+                    break;
             }
         }
 

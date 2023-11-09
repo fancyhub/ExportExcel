@@ -9,7 +9,7 @@ using System.Collections.Generic;
 *************************************************************************************/
 namespace ExportExcel
 {
-    public class PPConstraintEnum : I_ProcessNode
+    public class PPConstraintEnum : IProcessNode
     {
         public string GetName()
         {

@@ -12,14 +12,16 @@ using System.Text;
 namespace ExportExcel
 {
     //导出 CSV 结构
-    public class ExporterCSV : I_ProcessNode
+    public class ExporterCSV : IProcessNode
     {
         public Encoding _encoding = new UTF8Encoding(true);
         public E_EXPORT_FLAG _flag;
+        public ExeConfig.CsvConfig _config;
 
-        public ExporterCSV(E_EXPORT_FLAG flag)
+        public ExporterCSV(E_EXPORT_FLAG flag, ExeConfig.CsvConfig config)
         {
             _flag = flag;
+            _config = config;
         }
         public string GetName()
         {
@@ -27,9 +29,8 @@ namespace ExportExcel
         }
         public void Process(DataBase data)
         {
-            string dir = data.Config.csv.export_dir_client;
-            if (_flag == E_EXPORT_FLAG.svr)
-                dir = data.Config.csv.export_dir_svr;
+            if (_config == null || !_config.enable)
+                return;
 
             foreach (var p in data.Tables)
             {
@@ -42,7 +43,7 @@ namespace ExportExcel
                 foreach (var table in multi_lang_tables)
                 {
                     List<TableHeaderItem> header = table.Header;
-                    string out_file_path = Path.Combine(dir, table.SheetName + ".csv");
+                    string out_file_path = Path.Combine(_config.dir, table.SheetName + ".csv");
                     FileUtil.CreateFileDir(out_file_path);
                     using (StreamWriter sw = new StreamWriter(out_file_path, false, _encoding))
                     {

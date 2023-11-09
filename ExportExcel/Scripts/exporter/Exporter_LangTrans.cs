@@ -10,7 +10,7 @@ using System.Collections.Generic;
 namespace ExportExcel
 {
     //导出 翻译语言表
-    public class Exporter_LangTrans : I_ProcessNode
+    public class Exporter_LangTrans : IProcessNode
     {
         public string GetName()
         {
@@ -19,21 +19,22 @@ namespace ExportExcel
         public void Process(DataBase data_base)
         {
             //1. 检查, 并创建对应的dir
-            var loc_config = data_base.Config.loc;
-            var trans_config = loc_config.auto_gen_key;
-            if (string.IsNullOrEmpty(trans_config.trans_sheet_name) || string.IsNullOrEmpty(trans_config.trans_sheet_export_dir))
+            var loc_config = data_base.Config.localization;
+            if (loc_config.EMode != ExeConfig.ELocalizationMode.AutoGenKey || !loc_config.modeAutoGenKey.exportTrans)
                 return;
 
-            Table table_trans = data_base.Tables[trans_config.trans_sheet_name];
+            var trans_config = loc_config.modeAutoGenKey;
+
+            Table table_trans = data_base.Tables[trans_config.transSheetName];
             if (table_trans == null)
                 return;
 
-            string file_path = System.IO.Path.Combine(trans_config.trans_sheet_export_dir, trans_config.trans_sheet_name + "_New.xlsx");
+            string file_path = System.IO.Path.Combine(trans_config.exportTransDir, trans_config.transSheetName + "_New.xlsx");
             FileUtil.CreateFileDir(file_path);
 
             //2. 创建新的
             IWorkbook work_book = ExcelUtil.CreateWorkBook();
-            ISheet work_sheet = work_book.CreateSheet(trans_config.trans_sheet_name);
+            ISheet work_sheet = work_book.CreateSheet(trans_config.transSheetName);
 
             //3. 写表头
             foreach (var p in table_trans.Header.List)

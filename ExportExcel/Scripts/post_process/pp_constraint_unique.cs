@@ -13,7 +13,7 @@ namespace ExportExcel
     /// <summary>
     /// unique & look up的检查 & empty的检查
     /// </summary>
-    public class PPConstraint_Unique_LoopUp_BlankForbid : I_ProcessNode
+    public class PPConstraint_Unique_LoopUp_BlankForbid : IProcessNode
     {
         [StructLayout(LayoutKind.Explicit)]
         public struct ValUnion

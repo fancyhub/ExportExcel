@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 
@@ -55,7 +55,7 @@ namespace Test
         {
             v = self.ReadInt32();
         }
-        public static void ExRead<T>(this ITableReader self, ref T v) where T : Enum
+        public static void ExRead<T>(this ITableReader self, ref T v) where T : struct
         {
             if (!TableEnumConverterMgr.Convert(self.ReadInt32(), ref v))
             {

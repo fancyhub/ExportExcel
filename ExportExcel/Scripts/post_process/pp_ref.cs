@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace ExportExcel
 {
     //处理 数字引用的替换
-    public class PostProcessRef : I_ProcessNode
+    public class PostProcessRef : IProcessNode
     {
         public string GetName()
         {

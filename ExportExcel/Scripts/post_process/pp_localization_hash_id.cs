@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace ExportExcel
 {
-    public class PPLocalizationHashId : I_ProcessNode
+    public class PPLocalizationHashId : IProcessNode
     {
         public string GetName()
         {
@@ -13,10 +13,10 @@ namespace ExportExcel
         public void Process(DataBase data_base)
         {
             //1. 检查
-            string loc_sheet_name = data_base.Config.loc.sheet_name;
+            string loc_sheet_name = data_base.Config.localization.GetLocSheetName();
             if (string.IsNullOrEmpty(loc_sheet_name))
                 return;
-            if (!data_base.Config.loc.use_hash_id)
+            if (!data_base.Config.localization.useHashId)
                 return;
 
 

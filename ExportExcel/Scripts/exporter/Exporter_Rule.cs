@@ -9,7 +9,7 @@ using System.Collections.Generic;
 *************************************************************************************/
 namespace ExportExcel
 {
-    public class Exporter_Rule : I_ProcessNode
+    public class Exporter_Rule : IProcessNode
     {
         public string _dir;
         public Exporter_Rule(string dir)

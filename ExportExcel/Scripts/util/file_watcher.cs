@@ -60,7 +60,7 @@ namespace ExportExcel
         {
             FileWatcher watcher = new FileWatcher();
 
-            foreach (var file_path in setting.excel_paths)
+            foreach (var file_path in setting.excelPaths)
             {
                 var full_path = Path.GetFullPath(file_path);
                 if (File.Exists(full_path))

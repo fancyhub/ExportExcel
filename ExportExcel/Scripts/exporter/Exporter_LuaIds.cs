@@ -10,22 +10,29 @@ using System.IO;
 *************************************************************************************/
 namespace ExportExcel
 {
-    public class Exporter_LuaIds : I_ProcessNode
+    public class Exporter_LuaIds : IProcessNode
     {
+        public ExeConfig.LuaConfig _config;
+        public E_EXPORT_FLAG _flag;
+
+        public Exporter_LuaIds(E_EXPORT_FLAG flag, ExeConfig.LuaConfig config)
+        {
+            _flag = flag;
+            _config = config;
+        }
+
         public string GetName()
         {
             return "Export";
         }
         public void Process(DataBase data)
         {
-            if (string.IsNullOrEmpty(data.Config.loc.client_loc_id_prefix)
-               || string.IsNullOrEmpty(data.Config.loc.sheet_name))
+            if (_config == null || !_config.enable || string.IsNullOrEmpty(_config.locIdPrefix))
+                return;
+            if (data.Config.localization.EMode == ExeConfig.ELocalizationMode.None)
                 return;
 
-            if (string.IsNullOrEmpty(data.Config.lua.export_dir_client))
-                return;
-
-            string dest_file_path = System.IO.Path.Combine(data.Config.lua.export_dir_client, "LocDef.lua");
+            string dest_file_path = System.IO.Path.Combine(_config.dir, "LocDef.lua");
             FileUtil.CreateFileDir(dest_file_path);
 
             using (StreamWriter sw = new StreamWriter(dest_file_path))
@@ -41,7 +48,7 @@ namespace ExportExcel
             sw.WriteLine("LocDef = {");
             foreach (var p in dict)
             {
-                if (!p.Key.StartsWith(data.Config.loc.client_loc_id_prefix))
+                if (!p.Key.StartsWith(_config.locIdPrefix))
                     continue;
 
                 //写注释

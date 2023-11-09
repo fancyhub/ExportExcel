@@ -9,7 +9,7 @@ using System.Collections.Generic;
 *************************************************************************************/
 namespace ExportExcel
 {
-    public class PPFieldTypeChecker : I_ProcessNode
+    public class PPFieldTypeChecker : IProcessNode
     {
         public FTC_TypeGroup _type_group;
         public PPFieldTypeChecker()

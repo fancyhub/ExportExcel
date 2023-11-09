@@ -11,22 +11,31 @@ using System.Linq;
 *************************************************************************************/
 namespace ExportExcel
 {
-    public class Exporter_LuaStruct : I_ProcessNode
+    public class Exporter_LuaStruct : IProcessNode
     {
         public const string C_FILE_NAME = "Lua_Struct.lua";
         public StringFormater _formater = new StringFormater();
+        public ExeConfig.LuaConfig _config;
+        public E_EXPORT_FLAG _flag;
+
+        public Exporter_LuaStruct(E_EXPORT_FLAG flag, ExeConfig.LuaConfig config)
+        {
+            _flag = flag;
+            _config = config;
+        }
+
         public string GetName()
         {
             return "Export";
         }
         public void Process(DataBase data)
         {
-            if (string.IsNullOrEmpty(data.Config.lua.export_dir_client))
+            if (_config == null || !_config.enable)
                 return;
 
-            _formater["class_prefix"] = data.Config.lua.class_prefix;
-            List<FilterTable> tables = FilterTable.Filter(data, E_EXPORT_FLAG.client);
-            string dest_file_path = System.IO.Path.Combine(data.Config.lua.export_dir_client, C_FILE_NAME);
+            _formater["class_prefix"] = _config.classPrefix;
+            List<FilterTable> tables = FilterTable.Filter(data, _flag);
+            string dest_file_path = System.IO.Path.Combine(_config.dir, C_FILE_NAME);
             FileUtil.CreateFileDir(dest_file_path);
             StreamWriter sw = new StreamWriter(dest_file_path);
             sw.WriteLine("-- 此文件由工具自动生成，请勿手动修改");
@@ -54,7 +63,7 @@ namespace ExportExcel
 
             foreach (var table in tables)
             {
-                if (table.SheetName == data.Config.loc.sheet_name)
+                if (data.Config.localization.IsLocalizationSheet(table.SheetName))
                     continue;
 
                 var pk = table.PK;

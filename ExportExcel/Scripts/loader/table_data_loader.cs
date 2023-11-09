@@ -14,18 +14,16 @@ namespace ExportExcel
     public class TableDataLoader
     {
         //列名的检查
-        private static Regex S_COL_NAME_REGEX = new Regex("^[a-zA-Z][a-zA-Z0-9_]*$");
-        private static string C_Loc_Sheet_Name;
-        private static string C_LocTran_Sheet_Name;
+        private static Regex S_COL_NAME_REGEX = new Regex("^[a-zA-Z][a-zA-Z0-9_]*$");        
 
         public TableHeaderCompareResult _header_compare_result = new TableHeaderCompareResult();
         public List<List<string>> _temp_data = new List<List<string>>(100000);
+        public ExeConfig _config;
         public TableDataLoader(ExeConfig config)
         {
-            C_Loc_Sheet_Name = config.loc.sheet_name;
-            C_LocTran_Sheet_Name = config.loc.auto_gen_key.trans_sheet_name;
+            _config = config;
 
-            S_COL_NAME_REGEX = new Regex(config.validation.col_name_reg);
+            S_COL_NAME_REGEX = new Regex(config.validation.colNameReg);
         }
 
         public void Load(DataBase data_base, ISheet sheet, string sheet_name, E_EXPORT_FLAG export_flag)
@@ -84,7 +82,7 @@ namespace ExportExcel
             }
         }
 
-        public static Table _create_rule_table(ISheet sheet, string sheet_name, E_EXPORT_FLAG export_flag)
+        public Table _create_rule_table(ISheet sheet, string sheet_name, E_EXPORT_FLAG export_flag)
         {
             //1. 先生成表格
             Table rule_table = new Table();
@@ -107,7 +105,7 @@ namespace ExportExcel
                     continue;
 
                 //5.2 检查名字是否合法, 多语言表的字段名不检查
-                if (sheet_name != C_LocTran_Sheet_Name && sheet_name != C_Loc_Sheet_Name && !S_COL_NAME_REGEX.IsMatch(field_name))
+                if (!_config.localization.IsLocalizationSheet(sheet_name)  && !S_COL_NAME_REGEX.IsMatch(field_name))
                 {
                     ErrSet.E($"{rule_table.SheetName}.{field_name} 规则表该字段不符合命名规范");
                     continue;

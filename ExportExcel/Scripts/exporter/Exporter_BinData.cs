@@ -22,22 +22,25 @@ namespace ExportExcel
      *          BodyLen Data,  (如果是List, 第一个int描述数量,Tuple当作List来写, ListTuple, 数量和List一致)
      *      
      */
-    public class Exporter_BinData : I_ProcessNode
+    public class Exporter_BinData : IProcessNode
     {
         public const string C_SIGN = "ABAB";
         public const string C_FILE_NAME = "data.bin";
         public const string C_FILE_LANG_NAME = "data_{0}.bin";
         public static uint S_SIGN;
-        public E_EXPORT_FLAG _export_flag;
-        public Exporter_BinData()
+        public E_EXPORT_FLAG _flag;
+        public ExeConfig.BinConfig _config;
+
+        public Exporter_BinData(E_EXPORT_FLAG flag, ExeConfig.BinConfig config)
         {
+            _flag = flag;
+            _config = config;
             S_SIGN = 0;
             foreach (var p in C_SIGN)
             {
                 S_SIGN = S_SIGN << 8;
                 S_SIGN |= (uint)(p);
-            }
-            _export_flag = E_EXPORT_FLAG.client;
+            }            
         }
         public string GetName()
         {
@@ -46,18 +49,17 @@ namespace ExportExcel
 
         public void Process(DataBase data_base)
         {
-            string dir = data_base.Config.bin.export_dir_client;
-            if (string.IsNullOrEmpty(dir))
-                return;
+            if (_config == null || !_config.enable)
+                return;            
 
-            string path = Path.Combine(dir, C_FILE_NAME);
+            string path = Path.Combine(_config.dir, C_FILE_NAME);
             FileUtil.CreateFileDir(path);
 
             _WriteBin(path, data_base, null);
 
             foreach (var p in data_base.LangList)
             {
-                path = Path.Combine(dir, string.Format(C_FILE_LANG_NAME, p));
+                path = Path.Combine(_config.dir, string.Format(C_FILE_LANG_NAME, p));
                 _WriteBin(path, data_base, p);
             }
         }
@@ -68,18 +70,18 @@ namespace ExportExcel
             List<BinTable> bin_table_list = new List<BinTable>();
             data_base.ForeachTable((table) =>
             {
-                if ((table.TableExportFlag & _export_flag) == E_EXPORT_FLAG.none)
+                if ((table.TableExportFlag & _flag) == E_EXPORT_FLAG.none)
                     return;
 
                 if (table.MultiLangBody == null && lang == null)
                 {
-                    BinTable bin_table = new BinTable(str_dict, table, table.Body, _export_flag);
+                    BinTable bin_table = new BinTable(str_dict, table, table.Body, _flag);
                     bin_table.GenBuff();
                     bin_table_list.Add(bin_table);
                 }
                 else if (lang != null && table.MultiLangBody != null && table.MultiLangBody.ContainsKey(lang))
                 {
-                    BinTable bin_table = new BinTable(str_dict, table, table.MultiLangBody[lang], _export_flag);
+                    BinTable bin_table = new BinTable(str_dict, table, table.MultiLangBody[lang], _flag);
                     bin_table.GenBuff();
                     bin_table_list.Add(bin_table);
                 }

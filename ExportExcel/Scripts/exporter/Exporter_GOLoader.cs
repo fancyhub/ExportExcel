@@ -11,12 +11,17 @@ using System.Collections.Generic;
 *************************************************************************************/
 namespace ExportExcel
 {
-    public class ExporterGOLoader : I_ProcessNode
+    public class ExporterGOLoader : IProcessNode
     {
         public const string C_FILE_NAME = "go_loader.go";
         public StringFormater _formater = new StringFormater();
-        public ExporterGOLoader()
+        public E_EXPORT_FLAG _flag;
+        public ExeConfig.GoConfig _config;
+
+        public ExporterGOLoader(E_EXPORT_FLAG flag, ExeConfig.GoConfig config)
         {
+            _flag = flag;
+            _config = config;
         }
         public string GetName()
         {
@@ -24,14 +29,15 @@ namespace ExportExcel
         }
         public void Process(DataBase data)
         {
-            if (string.IsNullOrEmpty(data.Config.go.export_dir_svr))
+            if (_config == null || !_config.enable)
                 return;
 
-            _formater["class_prefix"] = data.Config.go.class_prefix;
-            string package_name = data.Config.go.package_name;
-            string dest_file_path = System.IO.Path.Combine(data.Config.go.export_dir_svr, C_FILE_NAME);
+
+            _formater["class_prefix"] = _config.classPrefix;
+            string package_name = _config.packageName;
+            string dest_file_path = System.IO.Path.Combine(_config.dir, C_FILE_NAME);
             FileUtil.CreateFileDir(dest_file_path);
-            List<FilterTable> tables = FilterTable.Filter(data, E_EXPORT_FLAG.svr);
+            List<FilterTable> tables = FilterTable.Filter(data, _flag);
             StreamWriter sw = new StreamWriter(dest_file_path);
             sw.WriteLine("package " + package_name);
             sw.WriteLine(@"

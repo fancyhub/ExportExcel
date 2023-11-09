@@ -25,16 +25,12 @@ namespace ExportExcel
             return Path.Combine(dir, C_FILE_NAME);
         }
 
-        public List<string> excel_paths = new List<string>();
-
+        public List<string> excelPaths = new List<string>();
         public ValidationConfig validation = new ValidationConfig();
-        public LocalizationConfig loc = new LocalizationConfig();
+        public LocalizationConfig localization = new LocalizationConfig();
+        public ExportConfig exportClient = new ExportConfig();
+        public ExportConfig exportServer = new ExportConfig();
 
-        public CsvConfig csv = new CsvConfig();
-        public BinConfig bin = new BinConfig();
-        public CSharpConfig csharp = new CSharpConfig();
-        public LuaConfig lua = new LuaConfig();
-        public GoConfig go = new GoConfig();
 
         public static ExeConfig Load()
         {
@@ -48,7 +44,9 @@ namespace ExportExcel
             try
             {
                 string text = File.ReadAllText(file_path, System.Text.Encoding.UTF8);
-                return JsonConvert.DeserializeObject<ExeConfig>(text);
+                ExeConfig ret = JsonConvert.DeserializeObject<ExeConfig>(text);
+                ret.localization.Validate();
+                return ret;
             }
             catch (Exception ex)
             {
@@ -64,69 +62,171 @@ namespace ExportExcel
             File.WriteAllText(file_path, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
 
+        public enum ELocalizationMode
+        {
+            None,
+            Normal,
+            AutoGenKey,
+        }
+
         public class LocalizationConfig
         {
-            public string sheet_name;
-            public string default_lang = "SC";
-            public string client_loc_id_prefix; //要导出代码的前缀
-            public bool use_hash_id = true;
+            public ELocalizationMode EMode;
 
-            public AutoGenKeyConfig auto_gen_key = new AutoGenKeyConfig();
+            public string mode;
+            public bool useHashId = true;
+            public LocalizationModeNormalConfig modeNormal = new LocalizationModeNormalConfig();
+            public LocalizationModeAutoGenKeyConfig modeAutoGenKey = new LocalizationModeAutoGenKeyConfig();
 
-            public class AutoGenKeyConfig
+
+            public bool IsLocalizationSheet(string sheetName)
             {
-                public string trans_sheet_name;
-                public string trans_sheet_export_dir;
+                switch (EMode)
+                {
+                    case ELocalizationMode.Normal:
+                        return modeNormal.sheetName == sheetName;
+                    case ELocalizationMode.AutoGenKey:
+                        if (sheetName == modeAutoGenKey.sheetName || sheetName == modeAutoGenKey.transSheetName)
+                            return true;
+                        return false;
+                    default:
+                        return false;
+                }
+            }
+
+            public string GetDefaultLang()
+            {
+                switch (EMode)
+                {
+                    case ELocalizationMode.Normal:
+                        return modeNormal.defaultLang;
+                    case ELocalizationMode.AutoGenKey:
+                        return modeAutoGenKey.defaultLang;
+                    default:
+                        return null;
+                }
+            }
+
+            public string GetLocSheetName()
+            {
+                switch (EMode)
+                {
+                    case ELocalizationMode.Normal:
+                        return modeNormal.sheetName ;
+                    case ELocalizationMode.AutoGenKey:
+                        return modeAutoGenKey.sheetName;
+                    default:
+                        return null;
+                }
+            }
+
+            public void Validate()
+            {
+                if (mode == "normal")
+                {
+                    if (string.IsNullOrEmpty(modeNormal.sheetName))                    
+                        throw new Exception("Config.json localization/modeNormal/sheetName is null");                    
+                    if (string.IsNullOrEmpty(modeNormal.defaultLang))
+                        throw new Exception("Config.json localization/modeNormal/defaultLang is null");
+
+                    EMode = ELocalizationMode.Normal;
+                }
+                else if (mode == "auto_gen_key")
+                {
+                    if (string.IsNullOrEmpty(modeAutoGenKey.sheetName))
+                        throw new Exception("Config.json localization/modeAutoGenKey/sheetName is null");
+                    if (string.IsNullOrEmpty(modeAutoGenKey.defaultLang))
+                        throw new Exception("Config.json localization/modeAutoGenKey/defaultLang is null");
+                    if (string.IsNullOrEmpty(modeAutoGenKey.transSheetName))
+                        throw new Exception("Config.json localization/modeAutoGenKey/transSheetName is null");
+                    if(modeAutoGenKey.sheetName == modeAutoGenKey.transSheetName)
+                        throw new Exception("Config.json localization/modeAutoGenKey/sheetName  == localization/modeAutoGenKey/transSheetName ");
+
+                    EMode = ELocalizationMode.AutoGenKey;
+                }
+                else
+                    EMode = ELocalizationMode.None;
             }
         }
 
+        public class LocalizationModeNormalConfig
+        {
+            public string sheetName = "";
+            public string defaultLang = "";
+        }
+
+        public class LocalizationModeAutoGenKeyConfig
+        {
+            public string sheetName = "";
+            public string defaultLang = "";
+            public string transSheetName = "";
+            public bool exportTrans;
+            public string exportTransDir = "";
+        }
+
+
+
         public class ValidationConfig
         {
-            public string sheet_name_reg;
-            public string col_name_reg;
-            public string enum_name_reg;
-            public string enum_field_name_reg;
-            public string search_file_root = "./";
+            public string sheetNameReg;
+            public string colNameReg;
+            public string enumNameReg;
+            public string enumFieldNameReg;
+            public string searchFileRoot = "./";
+        }
+
+        public class ExportConfig
+        {
+            public CsvConfig csv = new CsvConfig();
+            public BinConfig bin = new BinConfig();
+            public CSharpConfig csharp = new CSharpConfig();
+            public LuaConfig lua = new LuaConfig();
+            public GoConfig go = new GoConfig();
         }
 
         public class CSharpConfig
         {
-            public string @namespace;
-            public string class_prefix;
-            public string export_dir_client;
+            public bool enable;
+            public string namespaceName;
+            public string classPrefix;
+            public string dir;
             public string header;
+            public string locIdPrefix;
 
             public string GetClassName(string sheet_name)
             {
-                if (string.IsNullOrEmpty(class_prefix))
+                if (string.IsNullOrEmpty(classPrefix))
                     return sheet_name;
-                return class_prefix + sheet_name;
+                return classPrefix + sheet_name;
             }
         }
 
         public class BinConfig
         {
-            public string export_dir_client;
+            public bool enable;
+            public string dir;
         }
 
         public class CsvConfig
         {
-            public string export_dir_client;
-            public string export_dir_svr;
+            public bool enable;
+            public string dir;
         }
 
         public class LuaConfig
         {
-            public string class_prefix;
-            public string export_dir_client;
+            public bool enable;
+            public string classPrefix;
+            public string dir;
+            public string locIdPrefix;
         }
-
 
         public class GoConfig
         {
-            public string package_name;
-            public string class_prefix;
-            public string export_dir_svr;
+            public bool enable;
+            public string packageName;
+            public string classPrefix;
+            public string dir;
         }
     }
 }

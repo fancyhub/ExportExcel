@@ -9,13 +9,13 @@ using System.Collections.Generic;
 *************************************************************************************/
 namespace ExportExcel
 {
-    public interface I_ProcessNode
+    public interface IProcessNode
     {
         public string GetName();
         void Process(DataBase data_base);
     }
 
-    public class ProcessNodeList : I_ProcessNode
+    public class ProcessNodeList : IProcessNode
     {
         public string _name;
         public ProcessNodeList(string name)
@@ -26,9 +26,9 @@ namespace ExportExcel
         {
             return _name;
         }
-        public List<I_ProcessNode> _all_child_nodes = new List<I_ProcessNode>();
+        public List<IProcessNode> _all_child_nodes = new List<IProcessNode>();
 
-        public void Add(I_ProcessNode node)
+        public void Add(IProcessNode node)
         {
             _all_child_nodes.Add(node);
         }
@@ -44,14 +44,14 @@ namespace ExportExcel
 
     public class PipeLine
     {
-        public List<I_ProcessNode> _node_list = new List<I_ProcessNode>();
+        public List<IProcessNode> _node_list = new List<IProcessNode>();
         public ExeConfig _config;
         public PipeLine(ExeConfig conf)
         {
             _config = conf;
         }
 
-        public void Add(I_ProcessNode node)
+        public void Add(IProcessNode node)
         {
             _node_list.Add(node);
         }

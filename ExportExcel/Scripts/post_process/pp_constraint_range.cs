@@ -9,7 +9,7 @@ using System.Collections.Generic;
 *************************************************************************************/
 namespace ExportExcel
 {
-    public class PPConstraintRange : I_ProcessNode
+    public class PPConstraintRange : IProcessNode
     {
         public DataRange _range = new DataRange();
         public void Process(DataBase data_base)
