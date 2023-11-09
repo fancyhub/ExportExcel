@@ -144,65 +144,97 @@ list 用 分号 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就�
 # 配置描述
 
 ```json
-{   
-  "excel_paths": [
-    "../0_no_loc/data",    
-    "data"
-  ],  
-  "validation": {
-    "search_file_root": "../../Client/Resources",
-    "sheet_name_reg": "^[A-Z][a-zA-Z0-9]*$",
-    "col_name_reg": "^[a-zA-Z][a-zA-Z0-9_]*$",
-    "enum_name_reg": "^[A-Z][A-Za-z0-9_]*$",
-    "enum_field_name_reg": "^[a-zA-Z][a-zA-Z0-9_]*$",
-  },
-  "loc": {
-    "sheet_name": "Loc",
-    "default_lang": "SC",
-    "client_loc_id_prefix": "TC_",    
-    "auto_gen_key":
-    {
-        "trans_sheet_name":"LocTrans",
-        "trans_sheet_export_dir":"Output",
-    }
-  },
-  "csv": {
-    "export_dir_client": "Output/Client/Data",
-    "export_dir_svr": "Output/Server/Data",
-  },
-  "bin": {
-    "export_dir_client": "Output/Client/Data",
-  },
-  "csharp": {
-    "namespace": "COW",
-    "class_prefix": "",
-    "export_dir_client": "Output/Client/CS",
-    "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
-  },
-  "lua": {
-    "class_prefix":"",
-    "export_dir_client": "Output/Client/Lua"
-  },
-  "go": {
-    "package_name": "main",
-    "class_prefix": "csv",
-    "export_dir_svr": "Output/Server/Go",
-  }
-}
+{
+    "excelPaths": [
+        "../0_no_loc/data",
+        "data"
+    ],
+    "validation": { 
+        "searchFileRoot": "../../Client/Resources",
+        "sheetNameReg": "^[A-Z][a-zA-Z0-9]*$",
+        "colNameReg": "^[A-Z][a-zA-Z0-9_]*$",
+        "enumNameReg": "^E[A-Z][A-Za-z0-9_]*$",
+        "enumFieldNameReg": "[A-Z][a-zA-Z0-9_]*$",
+    },
+    "localization": { //多语言配置
+        "mode": "normal", //模式: none, normal,auto_gen_key
+        "useHashId": true,  //使用 hashId作为Key
 
+        "modeNormal": {
+            "sheetName": "Loc",   //多语言表的名字
+            "defaultLang": "zh-Hans", //默认语言, 生成代码注释用的, 不能为空
+            "des": "LocStr字段 定义的是 Key, 需要一个多语言表, sheetName 对应的表名是多语言表"
+        },
+
+        "modeAutoGenKey": {
+            "sheetName": "Loc",
+            "defaultLang": "zh-Hans",
+            "transSheetName": "LocTrans",
+            "exportTrans": true,
+            "exportTransDir": "Output",
+            "desc": "LocStr 字段定义的是 一个默认语言对应的文本, sheetName 对应的表名是多语言表,里面是空的, 用来描述几种语言, 需要一个额外的翻译表"
+        },
+    },
+    "exportClient": {
+        "csv": {
+            "enable": true,
+            "dir": "Output/Client/Data",
+        },
+        "bin": {
+            "enable": true,
+            "dir": "Output/Client/Data",
+        },
+        "csharp": {
+            "enable": true,
+            "namespaceName": "Test",
+            "classPrefix": "T",
+            "dir": "Output/Client/CS",
+            "locIdPrefix": "TC_", //多语言的Key 前缀相同,就会导出代码
+            "header": "using System;",
+        },
+        "lua": {
+            "enable": true,
+            "classPrefix": "T",
+            "locIdPrefix": "TC_",
+            "dir": "Output/Client/Lua"
+        },
+    },
+    "exportServer": {
+        "csv": {
+            "enable": true,
+            "dir": "Output/Server/Data",
+        },
+        "bin": {
+            "enable": true,
+            "dir": "Output/Server/Data",
+        },
+        "csharp": {
+            "enable": true,
+            "namespaceName": "Test",
+            "classPrefix": "T",
+            "dir": "Output/Server/CS",
+            "locIdPrefix": "TC_", 
+            "header": "using System;",
+        },
+        "lua": {
+            "enable": true,
+            "classPrefix": "T",
+            "locIdPrefix": "TC_",
+            "dir": "Output/Server/Lua"
+        },
+        "go": {
+            "enable": true,
+            "packageName": "config",
+            "classPrefix": "T",
+            "dir": "Output/Server/Go",
+        }
+    }
+}
 ```
 
 |字段名|格式要求|描述|
 |---|---|---|
-|excel_paths|文件/文件夹 列表|是数据 <br/>RefTable 放在这里面|
+|excelPaths|文件/文件夹 列表|是数据 <br/>RefTable 放在这里面|
 |validation||是验证相关的配置|
-|validation.search_file_root|路径|约束FilePath 用的根目录|
-|loc||多语言相关的配置|
-|loc.sheet_name|多语言表的表名|如果为空, 说明不需要处理多语言<br>整个Loc节点都不再处理|
-|loc.default_lang|string |默认语言名字 大小写敏感|
-|loc.client_loc_id_prefix|string|如果多语言的Key 以这个为前缀, 会生成代码<br>CS/Lua 会生成多语言相关的代码<br>不要在代码里面硬写 LocKey|
-|loc.auto_gen_key| |自动生成LocKey的节点配置|
-|loc.auto_gen_key.trans_sheet_name|多语言的翻译表的表名|这个不能和loc.sheet_name 相同<br>但是表结构和loc.sheet_name 相同<br/>如果为空: 说明不需要自动生成LocKey<br/>如果不等于空:  loc.sheet_name 里面的所有数据都无效, 所有的多语言都<br>从 其他表里面自动收集并生成LocKey<br>同时在里面找多语言的翻译|
-|loc.auto_gen_key.trans_sheet_export_dir|目录路径|因为多语言需要人工翻译, 我们生成一个多语言的翻译表, 方便后续翻译<br>为空,说明不需要导出|
-|CS/lua/go|对应的多语言翻译|如果里面 export_dir_client 或者 export_dir_svr 为空,说明不需要导出代码|
-
+|validation.searchFileRoot|路径|约束FilePath 用的根目录|
+ 
