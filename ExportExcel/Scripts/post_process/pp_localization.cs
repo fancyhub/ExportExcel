@@ -14,7 +14,6 @@ namespace ExportExcel
     {
         public PPLocalization()
         {
-
         }
 
         public string GetName()
@@ -59,23 +58,26 @@ namespace ExportExcel
                     return;
                 }
 
-                foreach(var p in table_loc.Header.List)
+                foreach (var p in table_loc.Header.List)
                 {
-                    if(p.DataType.type0!= EDataType.String || p.DataType.IsTuple || p.DataType.IsList)
+                    if (p.DataType.type0 != EDataType.String || p.DataType.IsTuple || p.DataType.IsList)
                     {
                         ErrSet.E($"多语言表格 {loc_sheet_name}, {p.Name} 不是 String类型");
                         return;
                     }
-                }                
+                }
             }
 
             //3. 翻译表不存在, 直接分表
-            switch(config_loc.EMode)
+            switch (config_loc.EMode)
             {
                 case ExeConfig.ELocalizationMode.Normal:
                     {
                         Dictionary<string, string[,]> multi_lang_body = _gen_loc_array(table_loc);
-                        _split_table_loc_to_multi(table_loc, default_lang_name, multi_lang_body);
+
+                        data_base.TableLocOld = table_loc;
+                        table_loc = _split_table_loc_to_multi(table_loc, default_lang_name, multi_lang_body);
+                        data_base.Tables[loc_sheet_name] = table_loc;
                         data_base.LangDefault = _convert(multi_lang_body[default_lang_name], 1);
 
                         data_base.LangList.Clear();
@@ -127,15 +129,17 @@ namespace ExportExcel
                         }
 
                         //3.3  创建新的翻译表, 用来后续的导出, 方便翻译, 有新旧的比较
-                        if (data_base.Config.exportLocTrans!=null && data_base.Config.exportLocTrans.enable) //需要导出 翻译表
+                        if (data_base.Config.exportLocTrans != null && data_base.Config.exportLocTrans.enable) //需要导出 翻译表
                         {
                             var new_table_trans = _create_new_table_trans(table_loc, default_lang_name, default_lang_dict, loc_trans_dict);
-                            new_table_trans.SheetName = "#"+loc_sheet_name;
-                            data_base.Tables[new_table_trans.SheetName] = new_table_trans;
+                            new_table_trans.SheetName = loc_sheet_name;
+                            data_base.TableLocTrans = new_table_trans;
                         }
 
                         //3.4 重新生成 TableLoc
-                        _split_table_loc_to_multi(table_loc, default_lang_name, multi_lang_body);
+                        data_base.TableLocOld = table_loc;
+                        table_loc = _split_table_loc_to_multi(table_loc, default_lang_name, multi_lang_body);
+                        data_base.Tables[loc_sheet_name] = table_loc;
 
 
                         data_base.LangList.Clear();
@@ -215,17 +219,24 @@ namespace ExportExcel
             return table_trans;
         }
 
-        private static void _split_table_loc_to_multi(Table table_loc, string default_lang_name, Dictionary<string, string[,]> multi_body)
+        private static Table _split_table_loc_to_multi(Table table_loc, string default_lang_name, Dictionary<string, string[,]> multi_body)
         {
-            TableHeader header = new TableHeader();
+            Table newTable = new Table();
+            newTable.SheetName = table_loc.SheetName;
+            newTable.TableExportFlag = table_loc.TableExportFlag;
+            newTable.FilePath = table_loc.FilePath;
+
+            TableHeader header = newTable.Header;
             header.Add(table_loc.Header.Pk.Clone());
             TableHeaderItem val_col = table_loc.Header[default_lang_name].Clone();
             val_col.Name = "Val";
             header.Add(val_col);
 
-            table_loc.Body = new string[0, 0];
-            table_loc.Header = header;
-            table_loc.MultiLangBody = multi_body;
+            newTable.Body = new string[0, 0];
+            newTable.Header = header;
+            newTable.MultiLangBody = multi_body;            
+
+            return newTable;
         }
 
         private static Dictionary<string, string[,]> _gen_loc_array(Table table_loc)

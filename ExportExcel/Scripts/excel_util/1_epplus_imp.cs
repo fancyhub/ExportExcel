@@ -1,4 +1,4 @@
-﻿#define EPPLUS
+#define EPPLUS
 
 using System;
 using System.IO;
@@ -79,7 +79,7 @@ namespace ExportExcel.ExcelEPPlus
 
         public void Write(System.IO.Stream stream, bool level_open)
         {
-            _work_book.SaveAs(stream);
+            _work_book.SaveAs(stream);            
         }
 
         public int SheetCount
@@ -97,7 +97,7 @@ namespace ExportExcel.ExcelEPPlus
         }
 
         public void Close()
-        {
+        {            
             _work_book.Dispose();
         }
     }

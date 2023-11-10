@@ -15,9 +15,13 @@ namespace ExportExcel
 
         public DBRef RefDB;
         public DBEnum EnumDB;
+        public Dictionary<string, Table> Tables;
+
+        public Table TableLocTrans;
+        public Table TableLocOld;
         public Dictionary<string, string> LangDefault;
         public List<string> LangList;
-        public Dictionary<string, Table> Tables;
+
 
         public DataBase(ExeConfig config)
         {

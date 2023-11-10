@@ -28,7 +28,7 @@ namespace ExportExcel
                 return;
             var loc_config = data_base.Config.localization;
 
-            Table table_trans = data_base.Tables["#"+loc_config.sheetName];
+            Table table_trans = data_base.TableLocTrans;
             if (table_trans == null)
                 return;
 
@@ -68,6 +68,7 @@ namespace ExportExcel
             using (var fs_out = System.IO.File.OpenWrite(file_path))
             {
                 work_book.Write(fs_out);
+                work_book.Close();
             };
         }
 

@@ -26,11 +26,20 @@ namespace ExportExcel
             if (_config == null || !_config.enable)
                 return;
 
+            List<Table> tables = new List<Table>();
             foreach (var p in data.Tables)
             {
-                //1. 获取数据
-                Table table = p.Value;
+                if (data.Config.localization.IsLocalizationSheet(p.Key))
+                    continue;
+                tables.Add(p.Value);
+            }
+            if (data.TableLocOld != null)
+            {
+                tables.Add(data.TableLocOld);
+            }
 
+            foreach (var table in tables)
+            {
                 //2. 创建内存里面的表格
                 IWorkbook work_book = ExcelUtil.CreateWorkBook();
                 var sheet_name = _build_sheet_name(table);
@@ -61,6 +70,7 @@ namespace ExportExcel
                 string file_path = System.IO.Path.Combine(_config.dir, "R_" + table.SheetName + ".xlsx");
                 FileUtil.CreateFileDir(file_path);
                 work_book.Write(System.IO.File.OpenWrite(file_path), false);
+                work_book.Close();
             }
         }
 
