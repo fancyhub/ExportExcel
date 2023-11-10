@@ -12,6 +12,11 @@ namespace ExportExcel
     //导出 翻译语言表
     public class Exporter_LangTrans : IProcessNode
     {
+        public ExeConfig.LocTransConfig _config;
+        public Exporter_LangTrans(ExeConfig.LocTransConfig config)
+        {
+            _config = config;
+        }
         public string GetName()
         {
             return "Export";
@@ -19,22 +24,20 @@ namespace ExportExcel
         public void Process(DataBase data_base)
         {
             //1. 检查, 并创建对应的dir
-            var loc_config = data_base.Config.localization;
-            if (loc_config.EMode != ExeConfig.ELocalizationMode.AutoGenKey || !loc_config.modeAutoGenKey.exportTrans)
+            if (_config == null || !_config.enable || data_base.Config.localization.EMode != ExeConfig.ELocalizationMode.AutoGenKey)
                 return;
+            var loc_config = data_base.Config.localization;
 
-            var trans_config = loc_config.modeAutoGenKey;
-
-            Table table_trans = data_base.Tables[trans_config.transSheetName];
+            Table table_trans = data_base.Tables["#"+loc_config.sheetName];
             if (table_trans == null)
                 return;
 
-            string file_path = System.IO.Path.Combine(trans_config.exportTransDir, trans_config.transSheetName + "_New.xlsx");
+            string file_path = System.IO.Path.Combine(_config.dir, loc_config.sheetName+ "_New.xlsx");
             FileUtil.CreateFileDir(file_path);
 
             //2. 创建新的
             IWorkbook work_book = ExcelUtil.CreateWorkBook();
-            ISheet work_sheet = work_book.CreateSheet(trans_config.transSheetName);
+            ISheet work_sheet = work_book.CreateSheet(loc_config.sheetName);
 
             //3. 写表头
             foreach (var p in table_trans.Header.List)

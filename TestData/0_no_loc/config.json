@@ -10,25 +10,20 @@
         "enumFieldNameReg": "[A-Z][a-zA-Z0-9_]*$",
     },
     "localization": {
-        "mode":"none", 
-		"desc":"mode: none, normal,auto_gen_key",
-		"useHashId": true,
-		
-		"modeNormal":{
-			"sheetName": "Loc",
-			"defaultLang": "zh-Hans",
-			"des":"LocStr字段 定义的是 Key, 需要一个多语言表, sheetName 对应的表名是多语言表"
-		},
-		
-		"modeAutoGenKey":{
-			"sheetName": "Loc",
-			"defaultLang": "zh-Hans",
-			"transSheetName": "LocTrans",
-			"exportTrans":true,
-			"exportTransDir":"Output",
-			"desc":"LocStr 字段定义的是 一个默认语言对应的文本, sheetName 对应的表名是多语言表,里面是空的, 用来描述几种语言, 需要一个额外的翻译表"
-		},
+		"mode":"none", 
+		"sheetName": "Loc",
+		"defaultLang": "zh-Hans",
+		"useHashId": true,		
+		"desc":"mode: none, normal,auto_gen_key",		 
     },
+	"exportRule":{
+		"enable": true,
+		"dir": "Output/Rule",
+	},
+	"exportLocTrans":{
+		"enable": true,
+		"dir": "Output",
+	},
     "exportClient": {
         "csv": {
             "enable": true,
@@ -43,9 +38,9 @@
             "namespaceName": "Test",
             "classPrefix": "T",
             "dir": "Output/Client/CS",		
-			"locIdPrefix": "TC_",
+			"locIdPrefix": "",
             "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
-        },	 
+        },		 
         "lua": {
             "enable": true,
             "classPrefix": "T",

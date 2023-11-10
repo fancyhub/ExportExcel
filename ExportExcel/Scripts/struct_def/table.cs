@@ -30,7 +30,6 @@ namespace ExportExcel
             RowFileMap = new List<(int, int, string)>();
         }
 
-
         public string FindDataPath(int row_idx)
         {
             foreach (var p in RowFileMap)

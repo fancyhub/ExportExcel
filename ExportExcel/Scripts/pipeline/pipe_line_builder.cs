@@ -57,7 +57,7 @@ namespace ExportExcel
                 _AddExporter(node_list, EExportFlag.svr, config.exportServer);
 
 
-                node_list.Add(new Exporter_LangTrans());
+                node_list.Add(new Exporter_LangTrans(config.exportLocTrans));
                 node_list.Add(new Exporter_Rule(config.exportRule));
                 
 

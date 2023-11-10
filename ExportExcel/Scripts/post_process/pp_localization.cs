@@ -53,21 +53,23 @@ namespace ExportExcel
                     return;
                 }
 
-                if (table_loc.Header.Pk.DataType.type0 != EDataType.String)
-                {
-                    ErrSet.E($"多语言表格 {loc_sheet_name}, 主Key 不是 String类型");
-                    return;
-                }
-
                 if (table_loc.Header.Pk != table_loc.Header[0])
                 {
                     ErrSet.E($"多语言表格 {loc_sheet_name}, 主Key不是第一个");
                     return;
                 }
+
+                foreach(var p in table_loc.Header.List)
+                {
+                    if(p.DataType.type0!= EDataType.String || p.DataType.IsTuple || p.DataType.IsList)
+                    {
+                        ErrSet.E($"多语言表格 {loc_sheet_name}, {p.Name} 不是 String类型");
+                        return;
+                    }
+                }                
             }
 
             //3. 翻译表不存在, 直接分表
-
             switch(config_loc.EMode)
             {
                 case ExeConfig.ELocalizationMode.Normal:
@@ -103,44 +105,16 @@ namespace ExportExcel
 
                 case ExeConfig.ELocalizationMode.AutoGenKey:
                     {
-                        string trans_sheet_name = config_loc.modeAutoGenKey.transSheetName;
-                        //3.1 检查
-                        if (trans_sheet_name == loc_sheet_name)
-                        {
-                            ErrSet.E($"多语言表和翻译表的名字不能一样");
-                            return;
-                        }
-
-                        Table table_trans = data_base.Tables[trans_sheet_name];
-                        if (table_trans == null)
-                        {
-                            ErrSet.E($"找不到多语言的翻译表 {trans_sheet_name}");
-                            return;
-                        }
-
-                        if (table_trans.Header.Pk == null)
-                        {
-                            ErrSet.E($"翻译表 {trans_sheet_name}, 没有主Key");
-                            return;
-                        }
-
-                        if (table_trans.Header.Pk != table_trans.Header[0])
-                        {
-                            ErrSet.E($"翻译表 {trans_sheet_name}, 主Key不是第一个");
-                            return;
-                        }
-
-                        //3.2 生成Loc的key
+                        //3.1 生成Loc的key
                         Dictionary<string, string> default_lang_dict = _auto_gen_lang_dict(data_base);
                         data_base.LangDefault = default_lang_dict;
 
-                        //3.3 生成多语言的 MultiLangBody
-                        Dictionary<string, Dictionary<string, string>> loc_trans_dict = _gen_loc_dict(table_trans);
+                        //3.2 生成多语言的 MultiLangBody
+                        Dictionary<string, Dictionary<string, string>> loc_trans_dict = _gen_loc_dict(table_loc);
                         Dictionary<string, string[,]> multi_lang_body = new Dictionary<string, string[,]>();
-
                         for (int i = 1; i < table_loc.Header.List.Count; i++)
                         {
-                            string lang_name = table_trans.Header[i].Name;
+                            string lang_name = table_loc.Header[i].Name;
                             if (lang_name == default_lang_name)
                             {
                                 multi_lang_body.Add(lang_name, _convert(default_lang_dict));
@@ -152,15 +126,15 @@ namespace ExportExcel
                             }
                         }
 
-                        //3.6  先创建翻译表
-                        if (!config_loc.modeAutoGenKey.exportTrans) //需要导出 翻译表
+                        //3.3  创建新的翻译表, 用来后续的导出, 方便翻译, 有新旧的比较
+                        if (data_base.Config.exportLocTrans!=null && data_base.Config.exportLocTrans.enable) //需要导出 翻译表
                         {
                             var new_table_trans = _create_new_table_trans(table_loc, default_lang_name, default_lang_dict, loc_trans_dict);
-                            new_table_trans.SheetName = trans_sheet_name;
-                            data_base.Tables[trans_sheet_name] = new_table_trans;
+                            new_table_trans.SheetName = "#"+loc_sheet_name;
+                            data_base.Tables[new_table_trans.SheetName] = new_table_trans;
                         }
 
-                        //3.5 重新生成 TableLoc                
+                        //3.4 重新生成 TableLoc
                         _split_table_loc_to_multi(table_loc, default_lang_name, multi_lang_body);
 
 

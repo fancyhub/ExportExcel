@@ -28,6 +28,7 @@ namespace ExportExcel
         public List<string> excelPaths = new List<string>();
         public ValidationConfig validation = new ValidationConfig();
         public LocalizationConfig localization = new LocalizationConfig();
+        public LocTransConfig exportLocTrans= new LocTransConfig();
         public RuleConfig exportRule = new RuleConfig();
         public ExportConfig exportClient = new ExportConfig();
         public ExportConfig exportServer = new ExportConfig();
@@ -75,21 +76,17 @@ namespace ExportExcel
             public ELocalizationMode EMode;
 
             public string mode;
+            public string sheetName = "";
+            public string defaultLang = "";
             public bool useHashId = true;
-            public LocalizationModeNormalConfig modeNormal = new LocalizationModeNormalConfig();
-            public LocalizationModeAutoGenKeyConfig modeAutoGenKey = new LocalizationModeAutoGenKeyConfig();
-
 
             public bool IsLocalizationSheet(string sheetName)
             {
                 switch (EMode)
                 {
                     case ELocalizationMode.Normal:
-                        return modeNormal.sheetName == sheetName;
                     case ELocalizationMode.AutoGenKey:
-                        if (sheetName == modeAutoGenKey.sheetName || sheetName == modeAutoGenKey.transSheetName)
-                            return true;
-                        return false;
+                        return this.sheetName == sheetName;                        
                     default:
                         return false;
                 }
@@ -100,9 +97,8 @@ namespace ExportExcel
                 switch (EMode)
                 {
                     case ELocalizationMode.Normal:
-                        return modeNormal.defaultLang;
                     case ELocalizationMode.AutoGenKey:
-                        return modeAutoGenKey.defaultLang;
+                        return defaultLang;
                     default:
                         return null;
                 }
@@ -113,9 +109,8 @@ namespace ExportExcel
                 switch (EMode)
                 {
                     case ELocalizationMode.Normal:
-                        return modeNormal.sheetName ;
                     case ELocalizationMode.AutoGenKey:
-                        return modeAutoGenKey.sheetName;
+                        return sheetName;
                     default:
                         return null;
                 }
@@ -123,48 +118,27 @@ namespace ExportExcel
 
             public void Validate()
             {
-                if (mode == "normal")
-                {
-                    if (string.IsNullOrEmpty(modeNormal.sheetName))                    
-                        throw new Exception("Config.json localization/modeNormal/sheetName is null");                    
-                    if (string.IsNullOrEmpty(modeNormal.defaultLang))
-                        throw new Exception("Config.json localization/modeNormal/defaultLang is null");
+                EMode = ELocalizationMode.None;
+                if (mode != "normal" && mode != "auto_gen_key")
+                    return;
 
+                if (string.IsNullOrEmpty(sheetName))
+                    throw new Exception("Config.json localization/sheetName is null");
+                if (string.IsNullOrEmpty(defaultLang))
+                    throw new Exception("Config.json localization/defaultLang is null");
+
+                if (mode == "normal")
+                {   
                     EMode = ELocalizationMode.Normal;
                 }
                 else if (mode == "auto_gen_key")
-                {
-                    if (string.IsNullOrEmpty(modeAutoGenKey.sheetName))
-                        throw new Exception("Config.json localization/modeAutoGenKey/sheetName is null");
-                    if (string.IsNullOrEmpty(modeAutoGenKey.defaultLang))
-                        throw new Exception("Config.json localization/modeAutoGenKey/defaultLang is null");
-                    if (string.IsNullOrEmpty(modeAutoGenKey.transSheetName))
-                        throw new Exception("Config.json localization/modeAutoGenKey/transSheetName is null");
-                    if(modeAutoGenKey.sheetName == modeAutoGenKey.transSheetName)
-                        throw new Exception("Config.json localization/modeAutoGenKey/sheetName  == localization/modeAutoGenKey/transSheetName ");
-
+                {                    
                     EMode = ELocalizationMode.AutoGenKey;
-                }
-                else
-                    EMode = ELocalizationMode.None;
+                }   
             }
         }
 
-        public class LocalizationModeNormalConfig
-        {
-            public string sheetName = "";
-            public string defaultLang = "";
-        }
-
-        public class LocalizationModeAutoGenKeyConfig
-        {
-            public string sheetName = "";
-            public string defaultLang = "";
-            public string transSheetName = "";
-            public bool exportTrans;
-            public string exportTransDir = "";
-        }
-
+     
         public class ValidationConfig
         {
             public string sheetNameReg;
@@ -198,6 +172,13 @@ namespace ExportExcel
                     return sheet_name;
                 return classPrefix + sheet_name;
             }
+        }
+
+
+        public class LocTransConfig
+        {        
+            public bool enable;
+            public string dir;
         }
 
         public class RuleConfig
