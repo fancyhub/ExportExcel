@@ -11,17 +11,21 @@ namespace ExportExcel
 {
     public class Exporter_Rule : IProcessNode
     {
-        public string _dir;
-        public Exporter_Rule(string dir)
+        public ExeConfig.RuleConfig _config;
+        public Exporter_Rule(ExeConfig.RuleConfig config)
         {
-            _dir = dir;
+            _config = config;
         }
+
         public string GetName()
         {
             return "Export";
         }
         public void Process(DataBase data)
         {
+            if (_config == null || !_config.enable)
+                return;
+
             foreach (var p in data.Tables)
             {
                 //1. 获取数据
@@ -43,7 +47,7 @@ namespace ExportExcel
 
                     //3.2 写类型 & 约束
                     List<string> constraint_list = _build_constraint(col);
-                    constraint_list.Insert(0, col.DataType.ToCsvStr());
+                    constraint_list.Insert(0, col.DataType.ToRuleStr());
                     var cell = _set_value(work_sheet, 1, col_index, string.Join("\n", constraint_list));
                     cell.CellStyle = cell_style;
 
@@ -54,7 +58,8 @@ namespace ExportExcel
                 }
 
                 //4. 保存
-                string file_path = System.IO.Path.Combine(_dir, "R_" + table.SheetName + ".xlsx");
+                string file_path = System.IO.Path.Combine(_config.dir, "R_" + table.SheetName + ".xlsx");
+                FileUtil.CreateFileDir(file_path);
                 work_book.Write(System.IO.File.OpenWrite(file_path), false);
             }
         }
@@ -62,15 +67,15 @@ namespace ExportExcel
         public string _build_sheet_name(Table table)
         {
             string ret = table.SheetName;
-            if (table.TableExportFlag == E_EXPORT_FLAG.client)
+            if (table.TableExportFlag == EExportFlag.client)
             {
                 ret = ret + " | Export_Client";
             }
-            else if (table.TableExportFlag == E_EXPORT_FLAG.svr)
+            else if (table.TableExportFlag == EExportFlag.svr)
             {
                 ret = ret + " | Export_Svr";
             }
-            else if (table.TableExportFlag == E_EXPORT_FLAG.none)
+            else if (table.TableExportFlag == EExportFlag.none)
             {
                 ret = ret + " | Export_None";
             }
@@ -84,11 +89,11 @@ namespace ExportExcel
             {
                 ret.Add(col.AttrPK.ToString());
             }
-            if (col.ExportFlag == E_EXPORT_FLAG.client)
+            if (col.ExportFlag == EExportFlag.client)
             {
                 ret.Add("Export[Client]");
             }
-            else if (col.ExportFlag == E_EXPORT_FLAG.svr)
+            else if (col.ExportFlag == EExportFlag.svr)
             {
                 ret.Add("Export[Svr]");
             }

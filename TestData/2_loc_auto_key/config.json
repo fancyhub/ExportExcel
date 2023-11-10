@@ -30,6 +30,10 @@
 			"desc":"LocStr 字段定义的是 一个默认语言对应的文本, sheetName 对应的表名是多语言表,里面是空的, 用来描述几种语言, 需要一个额外的翻译表"
 		},
     },
+	"exportRule":{
+		"enable": true,
+		"dir": "Output/Rule",
+	},
     "exportClient": {
         "csv": {
             "enable": true,

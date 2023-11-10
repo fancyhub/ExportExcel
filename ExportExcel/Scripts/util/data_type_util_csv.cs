@@ -27,7 +27,38 @@ namespace ExportExcel
             [EDataType.LocId] = "locid",
         };
 
+        private static Dictionary<EDataType, string> _data_type_2_rule_str = new Dictionary<EDataType, string>()
+        {
+            [EDataType.None] = "",
+            [EDataType.Bool] = "bool",
+            [EDataType.Int32] = "int32",
+            [EDataType.UInt32] = "uint32",
+            [EDataType.Int64] = "int64",
+            [EDataType.UInt64] = "uint64",
+            [EDataType.Float32] = "float32",
+            [EDataType.Float64] = "float64",
+            [EDataType.String] = "string",
+            [EDataType.LocStr] = "locstr",
+            [EDataType.LocId] = "LocStr",
+        };
+
         private static StringBuilder _sb = new StringBuilder();
+
+        public static string ToRuleStr(this DataType data)
+        {
+            string ret = _data_type_2_rule_str[data.type0];
+            _sb.Clear();
+            if (data.IsList)
+                _sb.Append("list_");
+            _sb.Append(_data_type_2_rule_str[data.type0]);
+            for (int i = 1; i < data.Count; i++)
+            {
+                _sb.Append("_");
+                _sb.Append(_data_type_2_rule_str[data.Get(i)]);
+            }
+
+            return _sb.ToString();
+        }
 
         public static string ToCsvStr(this DataType data)
         {

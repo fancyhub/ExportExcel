@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Test
 {
     public static class LocLang
     {
-        public const string C_DEFAULT = "SC";
+        public const string C_DEFAULT = "";
         private static string _Lang = C_DEFAULT;
         private static bool _ShowKey = false;
 

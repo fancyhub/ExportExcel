@@ -60,7 +60,7 @@ namespace ExportExcel
                 for (int i = 0; i < sheet_count; i++)
                 {
                     ISheet sheet = wk.GetSheetAt(i);
-                    ETableNameType sheet_name_type = _ParseSheetName(sheet, out string sheet_name, out E_EXPORT_FLAG flag);
+                    ETableNameType sheet_name_type = _ParseSheetName(sheet, out string sheet_name, out EExportFlag flag);
                     switch (sheet_name_type)
                     {
                         case ETableNameType.RefTable:
@@ -96,10 +96,10 @@ namespace ExportExcel
         }
 
 
-        private static ETableNameType _ParseSheetName(ISheet sheet, out string sheet_name, out E_EXPORT_FLAG flag)
+        private static ETableNameType _ParseSheetName(ISheet sheet, out string sheet_name, out EExportFlag flag)
         {
             sheet_name = null;
-            flag = E_EXPORT_FLAG.all;
+            flag = EExportFlag.all;
 
             if (sheet == null || !sheet.IsVisible())
                 return ETableNameType.Ignore;
@@ -135,7 +135,7 @@ namespace ExportExcel
             }
         }
 
-        private static E_EXPORT_FLAG _ParseTableExportFlag(string[] sheet_name_array)
+        private static EExportFlag _ParseTableExportFlag(string[] sheet_name_array)
         {
             for (int i = 1; i < sheet_name_array.Length; i++)
             {
@@ -143,16 +143,16 @@ namespace ExportExcel
                 switch (temp)
                 {
                     case "export_client":
-                        return E_EXPORT_FLAG.client;
+                        return EExportFlag.client;
                     case "export_svr":
-                        return E_EXPORT_FLAG.svr;
+                        return EExportFlag.svr;
                     case "export_none":
-                        return E_EXPORT_FLAG.none;
+                        return EExportFlag.none;
                     default:
                         break;
                 }
             }
-            return E_EXPORT_FLAG.all;
+            return EExportFlag.all;
         }
 
     }

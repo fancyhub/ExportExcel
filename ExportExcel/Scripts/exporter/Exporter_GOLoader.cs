@@ -15,10 +15,10 @@ namespace ExportExcel
     {
         public const string C_FILE_NAME = "go_loader.go";
         public StringFormater _formater = new StringFormater();
-        public E_EXPORT_FLAG _flag;
+        public EExportFlag _flag;
         public ExeConfig.GoConfig _config;
 
-        public ExporterGOLoader(E_EXPORT_FLAG flag, ExeConfig.GoConfig config)
+        public ExporterGOLoader(EExportFlag flag, ExeConfig.GoConfig config)
         {
             _flag = flag;
             _config = config;
@@ -45,8 +45,7 @@ import (
     ""errors""
 	""fmt""
 	""strconv""
-	""strings""
-	""go.uber.org/zap""
+	""strings""	
 )
 const (	
 "
@@ -71,11 +70,11 @@ func (p* CsvDataMgr) LoadAll(){
 	}
 }
 
-func CreateCsvDataMgr(logger *zap.Logger,reader IDataReader) (*CsvDataMgr, error) {
+func CreateCsvDataMgr(logger ILogger,reader IDataReader) (*CsvDataMgr, error) {
     cd := CsvDataMgr{
         logger:     logger,
         reader:     reader,
-        FileName2Func: make(map[string]csvLoader, {table_count}),
+        FileName2Func: make(map[string]CsvLoader, {table_count}),
         FileName2ListData: make(map[string]interface{}, {table_count}),
         FileName2MapData: make(map[string]interface{}, {table_count}),
 ");
@@ -172,12 +171,12 @@ func CreateCsvDataMgr(logger *zap.Logger,reader IDataReader) (*CsvDataMgr, error
         {
             string msg = @"                        
             
-func parse_bool(v string) bool {
+func parseBool(v string) bool {
 	lowerStr := strings.ToLower(v)
 	return lowerStr == ""1"" || lowerStr == ""true""
 }
 
-func parse_int32(v string) int32 {
+func parseInt32(v string) int32 {
 	i, err := strconv.ParseInt(v, 10, 32)
 	if err != nil {
 		return 0
@@ -185,7 +184,7 @@ func parse_int32(v string) int32 {
 	return int32(i)
 }
 
-func parse_uint32(v string) uint32 {
+func parseUint32(v string) uint32 {
 	i, err := strconv.ParseUint(v, 10, 32)
 	if err != nil {
 		return 0
@@ -193,7 +192,7 @@ func parse_uint32(v string) uint32 {
 	return uint32(i)
 }
 
-func parse_uint64(v string) uint64 {
+func parseUint64(v string) uint64 {
 	i, err := strconv.ParseUint(v, 10, 64)
 	if err != nil {
 		return 0
@@ -201,14 +200,14 @@ func parse_uint64(v string) uint64 {
 	return i
 }
 
-func parse_int64(v string) int64 {
+func parseInt64(v string) int64 {
 	i, err := strconv.ParseInt(v, 10, 64)
 	if err != nil {
 		return 0
 	}
 	return i
 }
-func parse_float32(v string) float32 {
+func parseFloat32(v string) float32 {
 	f, err := strconv.ParseFloat(v, 32)
 	if err != nil {
 		return 0
@@ -216,14 +215,14 @@ func parse_float32(v string) float32 {
 	return float32(f)
 }
 
-func parse_float64(v string) float64 {
+func parseFloat64(v string) float64 {
 	f, err := strconv.ParseFloat(v, 64)
 	if err != nil {
 		return 0
 	}
 	return f
 }            
-func parse_string(v string) string {
+func parseString(v string) string {
 	return v
 }
 ";
@@ -247,11 +246,11 @@ func (cd *CsvDataMgr) load{sheet_name}() error {
 	//2. read file content	 
     all_rows, err := cd.reader.Read2Array(file_name)
 	if err != nil {
-		cd.logger.Debug(""Read Csv Error "" + file_name)
+		cd.logger.Error(""Read Csv Error "" + file_name)
 		return err
     }
 	if len(all_rows) <2 {
-		cd.logger.Debug(""csv data row count < 2 "" + file_name)
+		cd.logger.Error(""csv data row count < 2 "" + file_name)
 		return err
     }
 
@@ -259,7 +258,7 @@ func (cd *CsvDataMgr) load{sheet_name}() error {
     row_ids:= all_rows[0]
     row_types:= all_rows[1]
     if len(row_ids) != len(row_types) || len(row_ids) != {col_count} {
-		cd.logger.Debug(""csv data col count error"" + file_name)
+		cd.logger.Error(""csv data col count error"" + file_name)
         return err
     }
 ");
@@ -276,7 +275,7 @@ func (cd *CsvDataMgr) load{sheet_name}() error {
                     @"
     if row_ids[{col_idx}] != ""{col_name}"" || row_types[{col_idx}] != ""{col_type}"" {
         err:= errors.New(""Col fomrat error {col_idx} in "" + file_name)
-        cd.logger.Debug(err.Error())
+        cd.logger.Error(err.Error())
         return err
     }");
             }
@@ -292,7 +291,7 @@ func (cd *CsvDataMgr) load{sheet_name}() error {
 		row_data := all_rows[i+2]
 		if len(row_data) != {col_count} {
 			err := errors.New(""CSV  error "" + fmt.Sprint(i) + "" in "" + file_name)
-            cd.logger.Debug(err.Error())
+            cd.logger.Error(err.Error())
             return err
         }
         row_struct := {class_name}{}
@@ -330,7 +329,7 @@ func (cd *CsvDataMgr) load{sheet_name}() error {
 		_, exist := map_data[map_id]
 		if exist {
 			err := errors.New(""CSV  Mulit Key  "" + fmt.Sprint(map_id) + "" in "" + file_name)
-            cd.logger.Debug(err.Error())
+            cd.logger.Error(err.Error())
             return err
         }
         map_data[map_id] = &list_data[i]
@@ -359,7 +358,7 @@ func (cd *CsvDataMgr) load{sheet_name}() error {
 		_, exist = sub_map_data[sub_map_id]
 		if exist {
 			err := errors.New(""CSV  Mulit Key  "" + fmt.Sprint(map_id) + "":"" + fmt.Sprint(sub_map_id) + "" in "" + file_name)
-			cd.logger.Debug(err.Error())
+			cd.logger.Error(err.Error())
 			return err
 		}
 		sub_map_data[sub_map_id] = &list_data[i] 

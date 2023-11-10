@@ -17,9 +17,9 @@ namespace ExportExcel
         public const string C_FILE_NAME = "cs_struct.cs";
         public StringFormater _formater = new StringFormater();
         public ExeConfig.CSharpConfig _config;
-        public E_EXPORT_FLAG _flag;
+        public EExportFlag _flag;
 
-        public Exporter_CSStruct(E_EXPORT_FLAG flag, ExeConfig.CSharpConfig config)
+        public Exporter_CSStruct(EExportFlag flag, ExeConfig.CSharpConfig config)
         {
             _flag = flag;
             _config = config;

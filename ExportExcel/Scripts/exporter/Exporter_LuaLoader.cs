@@ -13,9 +13,9 @@ namespace ExportExcel
     public class Exporter_LuaLoader : IProcessNode
     {
         public ExeConfig.LuaConfig _config;
-        public E_EXPORT_FLAG _flag;
+        public EExportFlag _flag;
 
-        public Exporter_LuaLoader(E_EXPORT_FLAG flag, ExeConfig.LuaConfig config)
+        public Exporter_LuaLoader(EExportFlag flag, ExeConfig.LuaConfig config)
         {
             _flag = flag;
             _config = config;

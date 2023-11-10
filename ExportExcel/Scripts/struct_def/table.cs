@@ -17,7 +17,7 @@ namespace ExportExcel
         public Dictionary<string, string[,]> MultiLangBody;
         public string[,] Body;
 
-        public E_EXPORT_FLAG TableExportFlag = E_EXPORT_FLAG.all; //默认全部导出
+        public EExportFlag TableExportFlag = EExportFlag.all; //默认全部导出
         public TableHeader Header;
         public string FilePath;
 

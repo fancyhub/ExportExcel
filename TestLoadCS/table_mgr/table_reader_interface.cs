@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +8,7 @@ namespace Test
 {
     public enum ETableReaderType
     {
+        None,
         Csv,
         Bin,
     }
@@ -25,7 +26,7 @@ namespace Test
     }
 
     public interface ITableReader : ITableDataReader
-    {
+    {        
         public ETableReaderType ReaderType { get; }
         public List<Str> ReadHeader();
         public bool NextRow();

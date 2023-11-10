@@ -265,7 +265,7 @@ namespace ExportExcel
 
             // 格式: Export[Client], Export[Svr], Export[None]
             // 不填写 默认all
-            public static E_EXPORT_FLAG ParseExport(TableHeaderItem col)
+            public static EExportFlag ParseExport(TableHeaderItem col)
             {
                 foreach (var str in col.StrConstraints)
                 {
@@ -273,18 +273,18 @@ namespace ExportExcel
                     switch (temp)
                     {
                         case "export[client]":
-                            return E_EXPORT_FLAG.client;
+                            return EExportFlag.client;
                         case "export[svr]":
-                            return E_EXPORT_FLAG.svr;
+                            return EExportFlag.svr;
                         case "export[none]":
-                            return E_EXPORT_FLAG.none;
+                            return EExportFlag.none;
                         case "export[all]":
-                            return E_EXPORT_FLAG.all;
+                            return EExportFlag.all;
                         default:
                             continue;
                     }
                 }
-                return E_EXPORT_FLAG.all;
+                return EExportFlag.all;
             }
         }
 

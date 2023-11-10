@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -7,9 +7,10 @@ namespace Test
     public delegate Table TableLoader(string lang);
     public delegate void TableLoaded(Table table);
 
-    
     public partial class TableMgr
     {
+
+
         private static TableMgr _;
         public static TableMgr Inst
         {
@@ -43,12 +44,13 @@ namespace Test
             foreach (Type type in _lang_set)
                 _LoadTable(type, false);
 
-            _csv_reader?.Reset(null);
-            _bin_reader?.Reset(null);
+            _CloseReader();
         }
 
-        public void LoadAllTable()
+        public void LoadAllTable(ETableReaderType readType,string baseDir)
         {
+            _ReaderType = readType;
+            _BaseDir = baseDir;
             bool is_empty = _all.Count == 0;
 
             //先加载语言
@@ -59,8 +61,7 @@ namespace Test
             foreach (var p in _loader_dict)
                 _LoadTable(p.Key, false);
 
-            _csv_reader?.Reset(null);
-            _bin_reader?.Reset(null);
+            _CloseReader();
 
             if (is_empty)
                 OnAllLoaded();
@@ -148,31 +149,38 @@ namespace Test
             return ret;
         }
 
+        private static ETableReaderType _ReaderType = ETableReaderType.Csv;
+        private static string _BaseDir = "";
         private static bool _CreateReader(string sheet_name, string lang_name, out ITableReader reader)
         {
-            return _CreateCsvReader(sheet_name, lang_name, out reader);
+            switch (_ReaderType)
+            {
+                default:
+                    reader = null;
+                    return false;
+                case ETableReaderType.Csv:
+                    reader = _CreateCsvReader(_BaseDir,sheet_name, lang_name);
+                    return reader != null;
+                case ETableReaderType.Bin:
+                    reader = _CreateBinReader(_BaseDir,sheet_name, lang_name);
+                    return reader != null;
+            }
         }
 
         private static TableReaderBin _bin_reader;
-        private static bool _CreateBinReader(string sheet_name, string lang_name, out ITableReader reader)
+        private static ITableReader _CreateBinReader(string base_dir,string sheet_name, string lang_name)
         {
             if (_bin_reader != null && _bin_reader.CurLang == lang_name)
             {
                 if (_bin_reader.Start(sheet_name))
-                {
-                    reader = _bin_reader;
-                    return true;
-                }
-                reader = null;
-                return false;
+                    return _bin_reader;
+                return null;
             }
 
-            byte[] buff = LoadResBin(lang_name);
+            byte[] buff = _LoadResBin(base_dir,lang_name);
             if (buff == null)
-            {
-                reader = null;
-                return false;
-            }
+                return null;
+
             if (_bin_reader == null)
                 _bin_reader = new TableReaderBin();
             _bin_reader.CurLang = lang_name;
@@ -181,31 +189,30 @@ namespace Test
 
             if (_bin_reader.Start(sheet_name))
             {
-                reader = _bin_reader;
-                return true;
+                return _bin_reader;
             }
-            reader = null;
-            return false;
+            return null;
         }
 
         private static TableReaderCsv _csv_reader;
-        private static bool _CreateCsvReader(string sheet_name, string lang_name, out ITableReader reader)
+        private static ITableReader _CreateCsvReader(string base_dir,string sheet_name, string lang_name)
         {
-            if (lang_name != null)
-                sheet_name = sheet_name + "_" + lang_name;
-            byte[] buff = LoadResCsv(sheet_name);
+            
+            byte[] buff = _LoadResCsv(base_dir,sheet_name, lang_name);
             if (buff == null)
             {
-                reader = null;
-                return false;
+                return null;
             }
             if (_csv_reader == null)
                 _csv_reader = new TableReaderCsv();
             _csv_reader.Reset(buff);
-            reader = _csv_reader;
-            return true;
+            return _csv_reader;
         }
-
+        private static void _CloseReader()
+        {
+            _bin_reader?.Reset(null);
+            _csv_reader?.Reset(null);
+        }
         #endregion
 
         #region Common Get

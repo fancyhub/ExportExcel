@@ -10,7 +10,7 @@ using System.Collections.Generic;
 namespace ExportExcel
 {
     [Flags]
-    public enum E_EXPORT_FLAG
+    public enum EExportFlag
     {
         none = 0,
         client = 1 << 0,
@@ -26,7 +26,7 @@ namespace ExportExcel
         public int ExcelColIdx;
         public string[] StrConstraints;
 
-        public E_EXPORT_FLAG ExportFlag = E_EXPORT_FLAG.all; //默认全部导出
+        public EExportFlag ExportFlag = EExportFlag.all; //默认全部导出
         public DataType DataType;
 
         public ConAttrPK AttrPK; //主key

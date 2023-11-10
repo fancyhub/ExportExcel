@@ -209,7 +209,7 @@ namespace ExportExcel
 
             //3. 生成表头
             Table table_trans = new Table();
-            table_trans.TableExportFlag = E_EXPORT_FLAG.none;
+            table_trans.TableExportFlag = EExportFlag.none;
             table_trans.Header.Add(table_loc.Header.Pk.Clone());
             TableHeaderItem header_col = table_loc.Header[default_lang_name];
             for (int i = 0; i < lang_list.Count; i++)

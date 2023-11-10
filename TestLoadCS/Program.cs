@@ -1,9 +1,11 @@
-﻿// See https://aka.ms/new-console-template for more information
+// See https://aka.ms/new-console-template for more information
 using Test;
 
+const string dirPath0 = "../../../../TestData/0_no_loc/Output/Client/Data";
+const string dirPath1 = "../../../../TestData/1_loc/Output/Client/Data";
+const string dirPath2 = "../../../../TestData/2_loc_auto_key/Output/Client/Data";
 
-
-TableMgr.Inst.LoadAllTable();
+TableMgr.Inst.LoadAllTable(ETableReaderType.Bin, dirPath2);
 TableMgr.Get(1, 2, out TTestComposeKey v);
 v = TableMgr.GetTTestComposeKey(1, 2);
 Console.WriteLine("Hello, World! " + v.Name);

@@ -28,10 +28,10 @@ namespace ExportExcel
         public const string C_FILE_NAME = "data.bin";
         public const string C_FILE_LANG_NAME = "data_{0}.bin";
         public static uint S_SIGN;
-        public E_EXPORT_FLAG _flag;
+        public EExportFlag _flag;
         public ExeConfig.BinConfig _config;
 
-        public Exporter_BinData(E_EXPORT_FLAG flag, ExeConfig.BinConfig config)
+        public Exporter_BinData(EExportFlag flag, ExeConfig.BinConfig config)
         {
             _flag = flag;
             _config = config;
@@ -70,7 +70,7 @@ namespace ExportExcel
             List<BinTable> bin_table_list = new List<BinTable>();
             data_base.ForeachTable((table) =>
             {
-                if ((table.TableExportFlag & _flag) == E_EXPORT_FLAG.none)
+                if ((table.TableExportFlag & _flag) == EExportFlag.none)
                     return;
 
                 if (table.MultiLangBody == null && lang == null)
@@ -215,8 +215,8 @@ namespace ExportExcel
             public string[,] _body;
             public byte[] Buffer;
             public int Offset = 0;
-            public E_EXPORT_FLAG _flag;
-            public BinTable(StrDict str_dict, Table table, string[,] body, E_EXPORT_FLAG flag)
+            public EExportFlag _flag;
+            public BinTable(StrDict str_dict, Table table, string[,] body, EExportFlag flag)
             {
                 _str_dict = str_dict;
                 Table = table;
@@ -233,20 +233,20 @@ namespace ExportExcel
                 int count = 0;
                 foreach (var p in Table.Header.List)
                 {
-                    if ((p.ExportFlag & _flag) == E_EXPORT_FLAG.none)
+                    if ((p.ExportFlag & _flag) == EExportFlag.none)
                         continue;
                     count++;
                 }
                 bw.Write7BitEncodedInt(count * 2);
                 foreach (var p in Table.Header.List)
                 {
-                    if ((p.ExportFlag & _flag) == E_EXPORT_FLAG.none)
+                    if ((p.ExportFlag & _flag) == EExportFlag.none)
                         continue;
                     bw.Write7BitEncodedInt(_str_dict.GetIndex(p.Name));
                 }
                 foreach (var p in Table.Header.List)
                 {
-                    if ((p.ExportFlag & _flag) == E_EXPORT_FLAG.none)
+                    if ((p.ExportFlag & _flag) == EExportFlag.none)
                         continue;
                     bw.Write7BitEncodedInt(_str_dict.GetIndex(p.DataType.ToCsvStr()));
                 }
@@ -276,13 +276,13 @@ namespace ExportExcel
                 _bw = new BinaryWriter(_stream);
             }
 
-            public ArraySegment<byte> GetRowBuff(TableHeader header, E_EXPORT_FLAG flag, string[,] body, int row_index, StrDict str_dict)
+            public ArraySegment<byte> GetRowBuff(TableHeader header, EExportFlag flag, string[,] body, int row_index, StrDict str_dict)
             {
                 _stream.SetLength(0);
 
                 for (int i = 0; i < header.Count; i++)
                 {
-                    if ((header[i].ExportFlag & flag) == E_EXPORT_FLAG.none)
+                    if ((header[i].ExportFlag & flag) == EExportFlag.none)
                         continue;
 
                     _WriteCell(header[i].DataType, body[row_index, i], str_dict);

@@ -1,17 +1,35 @@
 //自动生成的
 using System;
-using System.Collections;
-using System.Collections.Generic;
 namespace Test{
-	public static class LocDef
+	public enum ELocDef : int
 	{
+		/// <summary>
+		/// 测试手枪
+		/// </summary>
+		ITEMDATA_NAME_1 = 2060870989,
+		/// <summary>
+		/// 小炮
+		/// </summary>
+		ITEMDATA_NAME_2 = 1652419321,
 		/// <summary>
 		/// 测试
 		/// </summary>
-		public const string TC_VAL_TC_A="TC_VAL_TC_A";
+		TESTCOMPOSEKEY_NAME_1_1 = -311812298,
 		/// <summary>
 		/// 你好
 		/// </summary>
-		public const string TC_VAL_TC_B="TC_VAL_TC_B";
+		TESTCOMPOSEKEY_NAME_1_2 = -1414240540,
+		/// <summary>
+		/// 我好
+		/// </summary>
+		TESTCOMPOSEKEY_NAME_2_1 = -1867547319,
+		/// <summary>
+		/// 测试
+		/// </summary>
+		TC_VAL_TC_A = -545902083,
+		/// <summary>
+		/// 你好
+		/// </summary>
+		TC_VAL_TC_B = -1193183382,
 	}
 }

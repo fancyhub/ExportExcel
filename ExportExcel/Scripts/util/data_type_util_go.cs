@@ -42,13 +42,12 @@ namespace ExportExcel
 
             if (type.IsTuple)
             {
-                _sb.Append("CsvTuple_");
-                _sb.Append(_data_type_2_go_str[type.type0]);
+                _sb.Append("Tuple");
+                _sb.Append(_UpFirst(_data_type_2_go_str[type.type0]));
 
                 for (int i = 1; i < type.Count; i++)
                 {
-                    _sb.Append("_");
-                    _sb.Append(_data_type_2_go_str[type.Get(i)]);
+                    _sb.Append(_UpFirst(_data_type_2_go_str[type.Get(i)]));
                 }
             }
             else
@@ -64,34 +63,40 @@ namespace ExportExcel
 
         public static string ToGoParseStr(this EDataType type)
         {
-            return "parse_" + _data_type_2_go_str[type];
+            return "parse" + _UpFirst(_data_type_2_go_str[type]);
         }
 
 
         public static string ToGoParseStr(this DataType type)
         {
             _sb.Clear();
-            _sb.Append("parse_");
+            _sb.Append("parse");
 
             if (type.IsList)
-                _sb.Append("array_");
+                _sb.Append("Array");
 
             if (type.IsTuple)
             {
-                _sb.Append(_data_type_2_go_str[type.type0]);
+                _sb.Append(_UpFirst(_data_type_2_go_str[type.type0]));
 
                 for (int i = 1; i < type.Count; i++)
                 {
-                    _sb.Append("_");
-                    _sb.Append(_data_type_2_go_str[type.Get(i)]);
+                    _sb.Append(_UpFirst(_data_type_2_go_str[type.Get(i)]));
                 }
             }
             else
             {
-                _sb.Append(_data_type_2_go_str[type.type0]);
+                _sb.Append(_UpFirst(_data_type_2_go_str[type.type0]));
             }
 
             return _sb.ToString();
+        }
+
+        private static string _UpFirst(string s)
+        {
+            if (s == null || s.Length == 0)
+                return s;
+            return s.Substring(0,1).ToUpper() + s.Substring(1);
         }
     }
 }

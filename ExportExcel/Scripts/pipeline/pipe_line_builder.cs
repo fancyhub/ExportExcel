@@ -53,18 +53,20 @@ namespace ExportExcel
             {
                 ProcessNodeList node_list = new ProcessNodeList("导出");
                 ret.Add(node_list);
-                _AddExporter(node_list, E_EXPORT_FLAG.client, config.exportClient);
-                _AddExporter(node_list, E_EXPORT_FLAG.svr, config.exportServer);
+                _AddExporter(node_list, EExportFlag.client, config.exportClient);
+                _AddExporter(node_list, EExportFlag.svr, config.exportServer);
 
 
                 node_list.Add(new Exporter_LangTrans());
+                node_list.Add(new Exporter_Rule(config.exportRule));
+                
 
                 //node_list.Add(new Exporter_Rule(@"D:\work\p4_dev\Trunk\Design\rules"));
             }
             return ret;
         }
 
-        private static void _AddExporter(ProcessNodeList node_list, E_EXPORT_FLAG flag, ExeConfig.ExportConfig config)
+        private static void _AddExporter(ProcessNodeList node_list, EExportFlag flag, ExeConfig.ExportConfig config)
         {
             node_list.Add(new Exporter_CSStruct(flag, config.csharp));
             node_list.Add(new Exporter_CSLoader(flag, config.csharp));

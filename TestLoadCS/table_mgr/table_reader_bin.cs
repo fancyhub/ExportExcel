@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Test
@@ -10,7 +10,7 @@ namespace Test
         public ETableReaderType ReaderType => ETableReaderType.Bin;
         public Dictionary<string, (int offset, int len)> _table_dict;
         public List<string> _str_list;
-        public List<Str> _str_list_header;
+        public List<Str> _str_list_header = new List<Str>();
         public TableListReaderBin _list_reader;
         public TablePairReaderBin _pair_reader;
         public int _row_count;

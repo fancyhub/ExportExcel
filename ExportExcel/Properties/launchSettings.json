@@ -2,7 +2,7 @@
   "profiles": {
     "ExportExcel": {
       "commandName": "Project",
-      "workingDirectory": "../TestData/1_loc"
+      "workingDirectory": "../TestData/2_loc_auto_key"
     }
   }
 }

@@ -18,9 +18,9 @@ namespace ExportExcel
         public StringFormater _formater = new StringFormater();
 
         public ExeConfig.CSharpConfig _config;
-        public E_EXPORT_FLAG _flag;
+        public EExportFlag _flag;
 
-        public Exporter_CSLoader(E_EXPORT_FLAG flag, ExeConfig.CSharpConfig config)
+        public Exporter_CSLoader(EExportFlag flag, ExeConfig.CSharpConfig config)
         {
             _flag = flag;
             _config = config;

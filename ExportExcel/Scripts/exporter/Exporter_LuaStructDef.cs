@@ -16,9 +16,9 @@ namespace ExportExcel
         public const string C_FILE_NAME = "Lua_StructDef.lua";
         public StringFormater _formater = new StringFormater();
         public ExeConfig.LuaConfig _config;
-        public E_EXPORT_FLAG _flag;
+        public EExportFlag _flag;
 
-        public Exporter_LuaStructDef(E_EXPORT_FLAG flag, ExeConfig.LuaConfig config)
+        public Exporter_LuaStructDef(EExportFlag flag, ExeConfig.LuaConfig config)
         {
             _flag = flag;
             _config = config;

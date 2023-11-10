@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 //这个文件都是需要用户自己实现的
@@ -7,9 +7,11 @@ namespace Test
 {
     public partial class TableMgr
     {
-        private static byte[] LoadResCsv(string sheet_name)
+        private static byte[] _LoadResCsv(string dir, string sheet_name, string lang_name)
         {
-            string file_path = @"./Output/Client/Data/" + sheet_name + ".csv";
+            if (!string.IsNullOrEmpty(lang_name))
+                sheet_name = sheet_name + "_" + lang_name;
+            string file_path = System.IO.Path.Combine(dir, sheet_name + ".csv");
             string full_path = System.IO.Path.GetFullPath(file_path);
 
             if (!System.IO.File.Exists(full_path))
@@ -28,11 +30,11 @@ namespace Test
             }
         }
 
-        private static byte[] LoadResBin(string lang)
+        private static byte[] _LoadResBin(string dir, string lang_name)
         {
-            string file_path = @"./Output/Client/Data/data.bin";
-            if (lang != null)
-                file_path = $"./Output/Client/Data/data_{lang}.bin";
+            string file_path = System.IO.Path.Combine(dir, "data.bin");
+            if (!string.IsNullOrEmpty(lang_name))
+                file_path = System.IO.Path.Combine(dir, $"data_{lang_name}.bin");
 
 
             string full_path = System.IO.Path.GetFullPath(file_path);

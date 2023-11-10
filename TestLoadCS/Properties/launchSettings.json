@@ -1,8 +1,7 @@
 {
   "profiles": {
     "TestLoad": {
-      "commandName": "Project",
-      "workingDirectory": "../TestData/2_loc_auto_key"
+      "commandName": "Project"
     }
   }
 }

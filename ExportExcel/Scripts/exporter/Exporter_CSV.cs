@@ -15,10 +15,10 @@ namespace ExportExcel
     public class ExporterCSV : IProcessNode
     {
         public Encoding _encoding = new UTF8Encoding(true);
-        public E_EXPORT_FLAG _flag;
+        public EExportFlag _flag;
         public ExeConfig.CsvConfig _config;
 
-        public ExporterCSV(E_EXPORT_FLAG flag, ExeConfig.CsvConfig config)
+        public ExporterCSV(EExportFlag flag, ExeConfig.CsvConfig config)
         {
             _flag = flag;
             _config = config;

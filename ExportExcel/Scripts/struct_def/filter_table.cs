@@ -18,7 +18,7 @@ namespace ExportExcel
         public string SheetName;
         public bool MultiLang;
 
-        public FilterTable(Table table, E_EXPORT_FLAG flag)
+        public FilterTable(Table table, EExportFlag flag)
         {
             MultiLang = false;
             SheetName = table.SheetName;
@@ -37,7 +37,7 @@ namespace ExportExcel
                 MultiLang = true;
         }
 
-        public static List<FilterTable> Filter(DataBase data, E_EXPORT_FLAG flag)
+        public static List<FilterTable> Filter(DataBase data, EExportFlag flag)
         {
             List<FilterTable> ret = new List<FilterTable>();
             foreach (var t in data.Tables)
@@ -97,7 +97,7 @@ namespace ExportExcel
             }
         }
 
-        public List<ValueTuple<TableHeaderItem, int>> _filter_header(Table table, E_EXPORT_FLAG flag)
+        public List<ValueTuple<TableHeaderItem, int>> _filter_header(Table table, EExportFlag flag)
         {
             List<(TableHeaderItem, int)> ret = new List<(TableHeaderItem, int)>();
 

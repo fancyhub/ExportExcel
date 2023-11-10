@@ -13,8 +13,8 @@ namespace ExportExcel
     public class Exporter_CSIds : IProcessNode
     {
         public ExeConfig.CSharpConfig _config;
-        public E_EXPORT_FLAG _flag;
-        public Exporter_CSIds(E_EXPORT_FLAG flag, ExeConfig.CSharpConfig config)
+        public EExportFlag _flag;
+        public Exporter_CSIds(EExportFlag flag, ExeConfig.CSharpConfig config)
         {
             _flag = flag;
             _config = config;

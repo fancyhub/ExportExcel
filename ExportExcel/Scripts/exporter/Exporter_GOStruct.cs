@@ -16,10 +16,10 @@ namespace ExportExcel
     {
         public const string C_FILE_NAME = "go_struct.go";
         public StringFormater _formater = new StringFormater();
-        public E_EXPORT_FLAG _flag;
+        public EExportFlag _flag;
         public ExeConfig.GoConfig _config;
 
-        public ExporterGOStruct(E_EXPORT_FLAG flag, ExeConfig.GoConfig config)
+        public ExporterGOStruct(EExportFlag flag, ExeConfig.GoConfig config)
         {
             _flag = flag;
             _config = config;
@@ -45,7 +45,6 @@ namespace ExportExcel
             sw.WriteLine(@"
 import (
     ""sync""
-    ""go.uber.org/zap""
 );");
 
             foreach (var p in data.EnumDB)
@@ -99,14 +98,17 @@ import (
 
 
             sw.WriteLine(@"
-type csvLoader func() error
+type ILogger interface {
+	Error(msg string)
+}
+type CsvLoader func() error
 type IDataReader interface {
 	Read2Array(file_name string) ([][]string, error)	 
 }
 type CsvDataMgr struct {
-    logger *zap.Logger
+    logger ILogger
     reader IDataReader
-    FileName2Func map[string]csvLoader
+    FileName2Func map[string]CsvLoader
     FileName2ListData map[string]interface{}
     FileName2MapData map[string]interface{}
     

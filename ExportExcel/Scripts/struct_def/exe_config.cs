@@ -28,6 +28,7 @@ namespace ExportExcel
         public List<string> excelPaths = new List<string>();
         public ValidationConfig validation = new ValidationConfig();
         public LocalizationConfig localization = new LocalizationConfig();
+        public RuleConfig exportRule = new RuleConfig();
         public ExportConfig exportClient = new ExportConfig();
         public ExportConfig exportServer = new ExportConfig();
 
@@ -164,8 +165,6 @@ namespace ExportExcel
             public string exportTransDir = "";
         }
 
-
-
         public class ValidationConfig
         {
             public string sheetNameReg;
@@ -199,6 +198,12 @@ namespace ExportExcel
                     return sheet_name;
                 return classPrefix + sheet_name;
             }
+        }
+
+        public class RuleConfig
+        {
+            public bool enable;
+            public string dir;
         }
 
         public class BinConfig
