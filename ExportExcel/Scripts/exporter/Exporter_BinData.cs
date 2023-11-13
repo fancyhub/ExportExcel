@@ -333,7 +333,7 @@ namespace ExportExcel
                     }
                     else
                     {
-                        _bw.Write7BitEncodedInt(2);
+                        _bw.Write7BitEncodedInt(data_type.Count);
                         string[] pair = cell.Split(ConstDef.C_TUPLE_SPLIT);
                         for (int i = 0; i < data_type.Count; i++)
                         {

@@ -65,13 +65,13 @@ type TItemData struct {
 	// 品质
 	Quality EItemQuality
 
-	// 
+	// 测试Pair
 	PairField TupleInt32Bool
 
-	// 
+	// 测试PairList
 	PairFieldList []TupleInt32Int64
 
-	// 
+	// 测试List
 	ListField []int32
 
 }

@@ -14,131 +14,54 @@ namespace Test
         }
 
         #region Base
-        public static void ExRead(this ITableReader self, ref bool v)
+        public static void ExRead(this ITableDataReader self, ref bool v)
         {
             v = self.ReadBool();
         }
-        public static void ExRead(this ITableReader self, ref int v)
+        public static void ExRead(this ITableDataReader self, ref int v)
         {
             v = self.ReadInt32();
         }
-        public static void ExRead(this ITableReader self, ref uint v)
+        public static void ExRead(this ITableDataReader self, ref uint v)
         {
             v = self.ReadUInt32();
         }
-        public static void ExRead(this ITableReader self, ref long v)
+        public static void ExRead(this ITableDataReader self, ref long v)
         {
             v = self.ReadInt64();
         }
-        public static void ExRead(this ITableReader self, ref ulong v)
+        public static void ExRead(this ITableDataReader self, ref ulong v)
         {
             v = self.ReadUInt64();
         }
-        public static void ExRead(this ITableReader self, ref float v)
+        public static void ExRead(this ITableDataReader self, ref float v)
         {
             v = self.ReadF32();
         }
-        public static void ExRead(this ITableReader self, ref double v)
+        public static void ExRead(this ITableDataReader self, ref double v)
         {
             v = self.ReadF64();
         }
-        public static void ExRead(this ITableReader self, ref string v)
+        public static void ExRead(this ITableDataReader self, ref string v)
         {
             v = self.ReadString();
         }
-        public static void ExRead(this ITableReader self, ref LocStr v)
+        public static void ExRead(this ITableDataReader self, ref LocStr v)
         {
             string s = self.ReadString();
             v = s;
         }
-        public static void ExRead(this ITableReader self, ref LocId v)
+        public static void ExRead(this ITableDataReader self, ref LocId v)
         {
             v = self.ReadInt32();
         }
-        public static void ExRead<T>(this ITableReader self, ref T v) where T : struct
+        public static void ExRead<T>(this ITableDataReader self, ref T v) where T : struct
         {
             if (!TableEnumConverterMgr.Convert(self.ReadInt32(), ref v))
             {
                 Log.E("没有找到类型 {0} 的转换", typeof(T));
             }
-        }
-
-
-        private static void ExRead(this ITablePairReader self, ref bool v)
-        {
-            v = self.ReadBool();
-        }
-        private static void ExRead(this ITablePairReader self, ref int v)
-        {
-            v = self.ReadInt32();
-        }
-        private static void ExRead(this ITablePairReader self, ref uint v)
-        {
-            v = self.ReadUInt32();
-        }
-        private static void ExRead(this ITablePairReader self, ref long v)
-        {
-            v = self.ReadInt64();
-        }
-        private static void ExRead(this ITablePairReader self, ref ulong v)
-        {
-            v = self.ReadUInt64();
-        }
-        private static void ExRead(this ITablePairReader self, ref float v)
-        {
-            v = self.ReadF32();
-        }
-        private static void ExRead(this ITablePairReader self, ref double v)
-        {
-            v = self.ReadF64();
-        }
-        private static void ExRead(this ITablePairReader self, ref string v)
-        {
-            v = self.ReadString();
-        }
-        private static void ExRead(this ITablePairReader self, ref LocStr v)
-        {
-            string s = self.ReadString();
-            v = s;
-        }
-
-        private static void ExRead(this ITableListReader self, ref bool v)
-        {
-            v = self.ReadBool();
-        }
-        private static void ExRead(this ITableListReader self, ref int v)
-        {
-            v = self.ReadInt32();
-        }
-        private static void ExRead(this ITableListReader self, ref uint v)
-        {
-            v = self.ReadUInt32();
-        }
-        private static void ExRead(this ITableListReader self, ref long v)
-        {
-            v = self.ReadInt64();
-        }
-        private static void ExRead(this ITableListReader self, ref ulong v)
-        {
-            v = self.ReadUInt64();
-        }
-        private static void ExRead(this ITableListReader self, ref float v)
-        {
-            v = self.ReadF32();
-        }
-        private static void ExRead(this ITableListReader self, ref double v)
-        {
-            v = self.ReadF64();
-        }
-        private static void ExRead(this ITableListReader self, ref string v)
-        {
-            v = self.ReadString();
-        }
-        private static void ExRead(this ITableListReader self, ref LocStr v)
-        {
-            string s = self.ReadString();
-            v = s;
-        }
+        }         
         #endregion
 
         #region Pair
