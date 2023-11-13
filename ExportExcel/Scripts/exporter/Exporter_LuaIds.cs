@@ -29,7 +29,7 @@ namespace ExportExcel
         {
             if (_config == null || !_config.enable || string.IsNullOrEmpty(_config.locIdPrefix))
                 return;
-            if (data.Config.localization.EMode == ExeConfig.ELocalizationMode.None)
+            if (data.Config.localization.Mode == ExeConfig.ELocalizationMode.None)
                 return;
 
             string dest_file_path = System.IO.Path.Combine(_config.dir, "LocDef.lua");

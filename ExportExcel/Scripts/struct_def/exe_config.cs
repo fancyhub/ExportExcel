@@ -28,7 +28,7 @@ namespace ExportExcel
         public List<string> excelPaths = new List<string>();
         public ValidationConfig validation = new ValidationConfig();
         public LocalizationConfig localization = new LocalizationConfig();
-        public LocTransConfig exportLocTrans= new LocTransConfig();
+        public LocTransConfig exportLocTrans = new LocTransConfig();
         public RuleConfig exportRule = new RuleConfig();
         public ExportConfig exportClient = new ExportConfig();
         public ExportConfig exportServer = new ExportConfig();
@@ -73,20 +73,21 @@ namespace ExportExcel
 
         public class LocalizationConfig
         {
-            public ELocalizationMode EMode;
+            public ELocalizationMode Mode;
 
-            public string mode;
+            public bool enable = false;
             public string sheetName = "";
             public string defaultLang = "";
             public bool useHashId = true;
+            public bool autoGenKey = false;
 
             public bool IsLocalizationSheet(string sheetName)
             {
-                switch (EMode)
+                switch (Mode)
                 {
                     case ELocalizationMode.Normal:
                     case ELocalizationMode.AutoGenKey:
-                        return this.sheetName == sheetName;                        
+                        return this.sheetName == sheetName;
                     default:
                         return false;
                 }
@@ -94,7 +95,7 @@ namespace ExportExcel
 
             public string GetDefaultLang()
             {
-                switch (EMode)
+                switch (Mode)
                 {
                     case ELocalizationMode.Normal:
                     case ELocalizationMode.AutoGenKey:
@@ -106,7 +107,7 @@ namespace ExportExcel
 
             public string GetLocSheetName()
             {
-                switch (EMode)
+                switch (Mode)
                 {
                     case ELocalizationMode.Normal:
                     case ELocalizationMode.AutoGenKey:
@@ -118,8 +119,8 @@ namespace ExportExcel
 
             public void Validate()
             {
-                EMode = ELocalizationMode.None;
-                if (mode != "normal" && mode != "auto_gen_key")
+                Mode = ELocalizationMode.None;
+                if (!enable)
                     return;
 
                 if (string.IsNullOrEmpty(sheetName))
@@ -127,18 +128,14 @@ namespace ExportExcel
                 if (string.IsNullOrEmpty(defaultLang))
                     throw new Exception("Config.json localization/defaultLang is null");
 
-                if (mode == "normal")
-                {   
-                    EMode = ELocalizationMode.Normal;
-                }
-                else if (mode == "auto_gen_key")
-                {                    
-                    EMode = ELocalizationMode.AutoGenKey;
-                }   
+                if (!autoGenKey)
+                    Mode = ELocalizationMode.Normal;
+                else
+                    Mode = ELocalizationMode.AutoGenKey;
             }
         }
 
-     
+
         public class ValidationConfig
         {
             public string sheetNameReg;
@@ -176,7 +173,7 @@ namespace ExportExcel
 
 
         public class LocTransConfig
-        {        
+        {
             public bool enable;
             public string dir;
         }

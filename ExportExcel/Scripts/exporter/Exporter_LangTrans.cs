@@ -24,7 +24,7 @@ namespace ExportExcel
         public void Process(DataBase data_base)
         {
             //1. 检查, 并创建对应的dir
-            if (_config == null || !_config.enable || data_base.Config.localization.EMode != ExeConfig.ELocalizationMode.AutoGenKey)
+            if (_config == null || !_config.enable || data_base.Config.localization.Mode != ExeConfig.ELocalizationMode.AutoGenKey)
                 return;
             var loc_config = data_base.Config.localization;
 

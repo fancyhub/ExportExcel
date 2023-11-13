@@ -32,7 +32,7 @@ namespace ExportExcel
 
             //3. 处理多语言
             {
-                ret.Add(new PPLocalization());                
+                ret.Add(new PPLocalization());
             }
 
             //4. 检查
@@ -59,9 +59,6 @@ namespace ExportExcel
 
                 node_list.Add(new Exporter_LangTrans(config.exportLocTrans));
                 node_list.Add(new Exporter_Rule(config.exportRule));
-                
-
-                //node_list.Add(new Exporter_Rule(@"D:\work\p4_dev\Trunk\Design\rules"));
             }
             return ret;
         }

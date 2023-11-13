@@ -25,14 +25,13 @@ namespace ExportExcel
         {
             //1. 如果 Loc 的表没有, 直接不处理了
             var config_loc = data_base.Config.localization;
+            if (config_loc.Mode == ExeConfig.ELocalizationMode.None)
+                return;
+
             string loc_sheet_name = config_loc.GetLocSheetName();
             string default_lang_name = config_loc.GetDefaultLang();
+            data_base.Tables.TryGetValue(loc_sheet_name, out Table table_loc);
 
-            if (string.IsNullOrEmpty(loc_sheet_name))
-                return;
-            //2. 检查Table Loc
-
-            Table table_loc = data_base.Tables[loc_sheet_name];
             //检查 TableLoc
             {
                 if (table_loc == null)
@@ -68,21 +67,24 @@ namespace ExportExcel
                 }
             }
 
+            Table newLocTable = _CreateNewLocTableForMultiExport(table_loc);
+            data_base.TableLocOld = table_loc;
+            data_base.Tables[loc_sheet_name] = newLocTable;
+            data_base.LangList.Clear();
+            for(int i=1;i< table_loc.Header.Count;i++)
+            {
+                data_base.LangList.Add(table_loc.Header[i].Name);
+            }                
+
             //3. 翻译表不存在, 直接分表
-            switch (config_loc.EMode)
+            switch (config_loc.Mode)
             {
                 case ExeConfig.ELocalizationMode.Normal:
                     {
-                        Dictionary<string, string[,]> multi_lang_body = _gen_loc_array(table_loc);
+                        Dictionary<string, string[,]> multi_lang_body = _SplitBody2MultiLangBody(table_loc);
+                        newLocTable.MultiLangBody = multi_lang_body;
 
-                        data_base.TableLocOld = table_loc;
-                        table_loc = _split_table_loc_to_multi(table_loc, default_lang_name, multi_lang_body);
-                        data_base.Tables[loc_sheet_name] = table_loc;
-                        data_base.LangDefault = _convert(multi_lang_body[default_lang_name], 1);
-
-                        data_base.LangList.Clear();
-                        foreach (var p in multi_lang_body)
-                            data_base.LangList.Add(p.Key);
+                        data_base.LangDefault = _ConvertArray2Dict(multi_lang_body[default_lang_name], 1);
 
 
                         //做检查
@@ -108,49 +110,42 @@ namespace ExportExcel
                 case ExeConfig.ELocalizationMode.AutoGenKey:
                     {
                         //3.1 生成Loc的key
-                        Dictionary<string, string> default_lang_dict = _auto_gen_lang_dict(data_base);
+                        Dictionary<string, string> default_lang_dict = _GenAutoLangDict(data_base);
                         data_base.LangDefault = default_lang_dict;
 
                         //3.2 生成多语言的 MultiLangBody
-                        Dictionary<string, Dictionary<string, string>> loc_trans_dict = _gen_loc_dict(table_loc);
                         Dictionary<string, string[,]> multi_lang_body = new Dictionary<string, string[,]>();
+                        newLocTable.MultiLangBody = multi_lang_body;
+                        Dictionary<string, Dictionary<string, string>> loc_trans_dict = new Dictionary<string, Dictionary<string, string>>();
                         for (int i = 1; i < table_loc.Header.List.Count; i++)
                         {
                             string lang_name = table_loc.Header[i].Name;
+                            Dictionary<string, string> lang_dict = _ConvertArray2Dict(table_loc.Body, i);
+                            loc_trans_dict.Add(lang_name, lang_dict);
+
                             if (lang_name == default_lang_name)
                             {
-                                multi_lang_body.Add(lang_name, _convert(default_lang_dict));
+                                multi_lang_body.Add(lang_name, _ConvertDict2Arrary(default_lang_dict));
                             }
                             else
-                            {
-                                string[,] lang_body = _trans(default_lang_dict, loc_trans_dict[lang_name]);
+                            {                                
+                                string[,] lang_body = _LangTrans(default_lang_dict, lang_dict);
                                 multi_lang_body.Add(lang_name, lang_body);
                             }
                         }
+                        
 
                         //3.3  创建新的翻译表, 用来后续的导出, 方便翻译, 有新旧的比较
                         if (data_base.Config.exportLocTrans != null && data_base.Config.exportLocTrans.enable) //需要导出 翻译表
                         {
-                            var new_table_trans = _create_new_table_trans(table_loc, default_lang_name, default_lang_dict, loc_trans_dict);
-                            new_table_trans.SheetName = loc_sheet_name;
-                            data_base.TableLocTrans = new_table_trans;
+                            data_base.TableLocTrans = _CreateNewTableTrans(table_loc, default_lang_name, default_lang_dict, loc_trans_dict);
                         }
-
-                        //3.4 重新生成 TableLoc
-                        data_base.TableLocOld = table_loc;
-                        table_loc = _split_table_loc_to_multi(table_loc, default_lang_name, multi_lang_body);
-                        data_base.Tables[loc_sheet_name] = table_loc;
-
-
-                        data_base.LangList.Clear();
-                        foreach (var p in multi_lang_body)
-                            data_base.LangList.Add(p.Key);
                     }
                     break;
             }
         }
 
-        private static Table _create_new_table_trans(Table table_loc,
+        private static Table _CreateNewTableTrans(Table table_loc,
             string default_lang_name,
             Dictionary<string, string> default_lang_dict,
             Dictionary<string, Dictionary<string, string>> loc_trans_dict)
@@ -189,6 +184,8 @@ namespace ExportExcel
             Table table_trans = new Table();
             table_trans.TableExportFlag = EExportFlag.none;
             table_trans.Header.Add(table_loc.Header.Pk.Clone());
+            table_trans.SheetName = table_loc.SheetName;
+
             TableHeaderItem header_col = table_loc.Header[default_lang_name];
             for (int i = 0; i < lang_list.Count; i++)
             {
@@ -219,7 +216,7 @@ namespace ExportExcel
             return table_trans;
         }
 
-        private static Table _split_table_loc_to_multi(Table table_loc, string default_lang_name, Dictionary<string, string[,]> multi_body)
+        private static Table _CreateNewLocTableForMultiExport(Table table_loc)
         {
             Table newTable = new Table();
             newTable.SheetName = table_loc.SheetName;
@@ -228,18 +225,20 @@ namespace ExportExcel
 
             TableHeader header = newTable.Header;
             header.Add(table_loc.Header.Pk.Clone());
-            TableHeaderItem val_col = table_loc.Header[default_lang_name].Clone();
+            TableHeaderItem val_col = new TableHeaderItem();
             val_col.Name = "Val";
+            val_col.Desc = "";
+            val_col.DataType = new DataType();
+            val_col.DataType.AddType(EDataType.String);            
             header.Add(val_col);
 
             newTable.Body = new string[0, 0];
             newTable.Header = header;
-            newTable.MultiLangBody = multi_body;            
 
             return newTable;
         }
 
-        private static Dictionary<string, string[,]> _gen_loc_array(Table table_loc)
+        private static Dictionary<string, string[,]> _SplitBody2MultiLangBody(Table table_loc)
         {
             Dictionary<string, string[,]> ret = new Dictionary<string, string[,]>();
             string[,] body = table_loc.Body;
@@ -260,7 +259,7 @@ namespace ExportExcel
             return ret;
         }
 
-        private static string[,] _convert(Dictionary<string, string> dict)
+        private static string[,] _ConvertDict2Arrary(Dictionary<string, string> dict)
         {
             string[,] ret = new string[dict.Count, 2];
             int r = 0;
@@ -273,7 +272,7 @@ namespace ExportExcel
             return ret;
         }
 
-        private static Dictionary<string, string> _convert(string[,] body, int val_col_idx)
+        private static Dictionary<string, string> _ConvertArray2Dict(string[,] body, int val_col_idx)
         {
             int row = body.GetLength(0);
             Dictionary<string, string> ret = new Dictionary<string, string>();
@@ -284,23 +283,10 @@ namespace ExportExcel
                 ret.Add(key, v == null ? string.Empty : v);
             }
             return ret;
-        }
+        }         
 
-        private static Dictionary<string, Dictionary<string, string>> _gen_loc_dict(Table table_trans)
-        {
-            Dictionary<string, Dictionary<string, string>> ret = new Dictionary<string, Dictionary<string, string>>();
-            string[,] body = table_trans.Body;
-
-            for (int c = 1; c < table_trans.Header.Count; c++)
-            {
-                string lang_name = table_trans.Header[c].Name;
-                Dictionary<string, string> lang_dict = _convert(body, c);
-                ret.Add(lang_name, lang_dict);
-            }
-            return ret;
-        }
-
-        private string[,] _trans(Dictionary<string, string> default_lang_dict, Dictionary<string, string> other_lang)
+        //翻译
+        private string[,] _LangTrans(Dictionary<string, string> default_lang_dict, Dictionary<string, string> other_lang)
         {
             string[,] ret = new string[default_lang_dict.Count, 2];
             int row = 0;
@@ -315,7 +301,7 @@ namespace ExportExcel
             return ret;
         }
 
-        private static Dictionary<string, string> _auto_gen_lang_dict(DataBase data_base)
+        private static Dictionary<string, string> _GenAutoLangDict(DataBase data_base)
         {
             //1. 获取符合规则的col
             List<TableCol> col_list = data_base.GetAllCols((col) =>

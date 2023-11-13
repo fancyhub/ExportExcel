@@ -11,11 +11,11 @@
         "enumFieldNameReg": "[A-Z][a-zA-Z0-9_]*$",
     },
     "localization": {
-		"mode":"normal", 
+		"enable":true,
 		"sheetName": "Loc",
 		"defaultLang": "zh-Hans",
-		"useHashId": true,		
-		"desc":"mode: none, normal,auto_gen_key",		 
+		"autoGenKey":false,
+		"useHashId": true, 
     },
 	"exportRule":{
 		"enable": true,
