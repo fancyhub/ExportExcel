@@ -74,14 +74,25 @@
             "dir": "Output/Server/Data",
         },
         "csharp": {
-            "enable": true,
+           "enable": true,
             "namespaceName": "Test",
             "classPrefix": "T",
-			"classSuffix": "",
-			"classMgr": "TableMgr",
-            "dir": "Output/Server/CS",
-			"locIdPrefix": "TC_",
+			"classSuffix": "",			
+            "dir": "Output/Server/CS",					
             "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
+			
+			"loader":{
+				"enable":true,
+			},
+			"getter":{
+				"enable":true,
+				"className":"TableMgr",
+				"useStatic":false,
+			},
+			"locId":{
+				"enable":true,
+				"locIdStartWith":"",
+			}
         },
         "lua": {
             "enable": true,
