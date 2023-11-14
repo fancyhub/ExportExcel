@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExportExcel", "ExportExcel\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestLoadCs", "TestLoadCS\TestLoadCs.csproj", "{D9929CF4-7FF7-40DA-900B-7AFF6420B056}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinCmdTool", "WinCmdTool\WinCmdTool.csproj", "{63F73E2A-1A78-48DF-8240-EE983FA5BC33}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{D9929CF4-7FF7-40DA-900B-7AFF6420B056}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9929CF4-7FF7-40DA-900B-7AFF6420B056}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9929CF4-7FF7-40DA-900B-7AFF6420B056}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63F73E2A-1A78-48DF-8240-EE983FA5BC33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63F73E2A-1A78-48DF-8240-EE983FA5BC33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63F73E2A-1A78-48DF-8240-EE983FA5BC33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63F73E2A-1A78-48DF-8240-EE983FA5BC33}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

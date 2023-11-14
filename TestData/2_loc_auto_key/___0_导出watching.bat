@@ -12,6 +12,6 @@ echo.
 :: Disable Console Quick Edit Mode
 echo ===========================1.gen data and code ===============
 
-..\Tool\win_cmd_tool.exe ..\Tool\ExportExcel.exe watch
+..\Tool\WinCmdTool.exe ..\Tool\ExportExcel.exe watch
 echo.
 echo.
