@@ -5,13 +5,16 @@ const string dirPath0 = "../../../../TestData/0_no_loc/Output/Client/Data";
 const string dirPath1 = "../../../../TestData/1_loc/Output/Client/Data";
 const string dirPath2 = "../../../../TestData/2_loc_auto_key/Output/Client/Data";
 
-LocLang.Lang = "zh-Hans";
+LocLang.Lang = TableLoaderMgr.LangList[0];
+ITableReaderCreator tableReaderCreator = new TableReaderCsvCreator(dirPath2);
+//tableReaderCreator = new TableReaderBinCreator(dirPath2);
+TableMgr mgr = new TableMgr(tableReaderCreator);
 
-TableMgr.Inst.LoadAllTable(ETableReaderType.Csv, dirPath2);
-TableMgr.Get(1, 2, out TTestComposeKey v);
-List<TItemData> itemList = TableMgr.GetList<TItemData>();
-List<TTestComposeKey> composeKeyItemList = TableMgr.GetList<TTestComposeKey>();
+mgr.LoadAllTable();
+mgr.Get(1, 2, out TTestComposeKey v);
+List<TItemData> itemList = mgr.GetList<TItemData>();
+List<TTestComposeKey> composeKeyItemList = mgr.GetList<TTestComposeKey>();
 
-v = TableMgr.GetTTestComposeKey(1, 2);
+v = mgr.GetTTestComposeKey(1, 2);
 Console.WriteLine("Hello, World! " + v.Name);
 

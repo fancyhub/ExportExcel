@@ -39,11 +39,22 @@
             "enable": true,
             "namespaceName": "Test",
             "classPrefix": "T",
-			"classSuffix": "",
-			"classMgrName": "TableMgr",
-            "dir": "Output/Client/CS",		
-			"locIdPrefix": "",
+			"classSuffix": "",			
+            "dir": "Output/Client/CS",					
             "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
+			
+			"loader":{
+				"enable":true,
+			},
+			"getter":{
+				"enable":true,
+				"className":"TableMgr",
+				"useStatic":false,
+			},
+			"locId":{
+				"enable":true,
+				"locIdStartWith":"",
+			}
         },		 
         "lua": {
             "enable": true,

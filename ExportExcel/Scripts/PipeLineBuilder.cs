@@ -67,6 +67,7 @@ namespace ExportExcel
         {
             node_list.Add(new Exporter_CSStruct(flag, config.csharp));
             node_list.Add(new Exporter_CSLoader(flag, config.csharp));
+            node_list.Add(new Exporter_CSGetter(flag, config.csharp));
             node_list.Add(new Exporter_CSIds(flag, config.csharp));
 
             node_list.Add(new Exporter_LuaIds(flag, config.lua));

@@ -33,37 +33,39 @@ namespace ExportExcel
 
         public void Process(DataBase data)
         {
-            if (_config == null || !_config.enable)
+            if (_config == null || !_config.enable || !_config.loader.enable)
                 return;
+
+            _formater["class_prefix"] = _config.classPrefix;
+            _formater["class_suffix"] = _config.classSuffix;
+            List<FilterTable> tables = FilterTable.Filter(data, _flag);
 
             string name_space = _config.namespaceName;
             string dest_file_path = System.IO.Path.Combine(_config.dir, C_FILE_NAME);
-            _formater["class_prefix"] = _config.classPrefix;
-            _formater["class_suffix"] = _config.classSuffix;
-            _formater["class_mgr"] = _config.classMgrName;
-
             FileUtil.CreateFileDir(dest_file_path);
-            List<FilterTable> tables = FilterTable.Filter(data, _flag);
             StreamWriter sw = new StreamWriter(dest_file_path);
             sw.WriteLine("//自动生成的");
             sw.WriteLine(_config.header);
-
             if (!string.IsNullOrEmpty(name_space))
                 sw.WriteLine("namespace " + name_space + "{");
 
-            _export_mgr(tables, sw);
+            _ExportLoaderMgr(data, tables, sw);
+
             if (!string.IsNullOrEmpty(name_space))
                 sw.WriteLine("}");
             sw.Close();
+
         }
 
-        public void _export_mgr(List<FilterTable> tables, StreamWriter sw)
+        public void _ExportLoaderMgr(DataBase data_base, List<FilterTable> tables, StreamWriter sw)
         {
             _formater["table_count"] = tables.Count.ToString();
-            
+            _formater["lang_count"] = data_base.LangList.Count.ToString();
+
 
             sw.WriteLineExt(_formater,
                 @"
+    public delegate bool CreateTableReader(string sheet_name, string lang_name, out ITableReader reader);
     public delegate Table TableLoader(string lang);
     public struct TableInfo
     {
@@ -75,33 +77,58 @@ namespace ExportExcel
             this.MultiLang = multiLang;
         }
     }
-    public partial class {class_mgr}
+    public partial class TableLoaderMgr
     {
         private static List<System.Object> _temp = new List<System.Object>(10000);
+        public static List<string> LangList;
+
+        public CreateTableReader CreateTableReader;
         public Dictionary<Type, TableInfo> LoaderDict;
-        public {class_mgr}()
+        static TableLoaderMgr()
+        {        
+            LangList= new List<string>({lang_count});
+");
+
+            foreach (var p in data_base.LangList)
+            {
+                sw.WriteLine($"\t\t\tLangList.Add(\"{p}\");");
+            }
+
+
+            foreach (var p in data_base.EnumDB)
+            {
+                sw.WriteLine($"\t\t\tEnumConverterMgr.RegFunc((v) => ({p.Key})v, (v) => (int)v);");
+            }
+            sw.WriteLine("\t\t}");
+
+
+            sw.WriteLineExt(_formater,@"
+        public TableLoaderMgr(CreateTableReader createTableReader)
         {
-            _all = new Dictionary<Type, Table>(20+{table_count});
+            CreateTableReader = createTableReader;            
             LoaderDict = new Dictionary<Type, TableInfo>(20+{table_count});
+            
 ");
 
             foreach (var table in tables)
             {
                 var class_name = _formater["class_prefix"] + table.SheetName + _formater["class_suffix"];
-                var sheet_name = table.SheetName;                  
-                sw.WriteLine($"\t\t\tLoaderDict.Add(typeof({class_name}),new TableInfo(_Load{table.SheetName},{table.MultiLang.ToString().ToLower()}));");                
+                var sheet_name = table.SheetName;
+                sw.WriteLine($"\t\t\tLoaderDict.Add(typeof({class_name}),new TableInfo(_Load{table.SheetName},{table.MultiLang.ToString().ToLower()}));");
             }
+
+            
 
             sw.WriteLine("\t\t}");
 
             foreach (var p in tables)
             {
-                _export_load_func(p, sw);
+                _ExportLoaderFunc(p, sw);
             }
             sw.WriteLine("}");
         }
 
-        public void _export_load_func(FilterTable table, StreamWriter sw)
+        public void _ExportLoaderFunc(FilterTable table, StreamWriter sw)
         {
             List<TableHeaderItem> header = table.Header;
             string multi_name = "";
@@ -114,13 +141,13 @@ namespace ExportExcel
 
             sw.WriteLine("");
             sw.WriteLineExt(_formater, @"
-        private static Table _Load{sheet_name}(string lang)
+        private Table _Load{sheet_name}(string lang)
         {
             string sheet_name = ""{sheet_name}"";
             {sheet_name_lang}
             int col_count = {col_count};
 
-            if(!_CreateReader(sheet_name,lang,out var reader))
+            if(!CreateTableReader(sheet_name,lang,out var reader))
                 return null;
 
             //Check Header
@@ -206,7 +233,7 @@ namespace ExportExcel
             var dict = new Dictionary<ulong, {class_name}>(list.Count);
             foreach (var p in list)
             {
-                ulong key = _MakeKey((uint)p.{pk_name}, (uint)p.{pk_sec_name});
+                ulong key = Table.MakeKey((uint)p.{pk_name}, (uint)p.{pk_sec_name});
                 if (dict.ContainsKey(key))
                 {
                     Log.E(""{0} Contain Multi Id: {1},{2}, 如果允许ID重复, 修改表格"", typeof({class_name}), p.{pk_name},p.{pk_sec_name});
@@ -223,48 +250,6 @@ namespace ExportExcel
                 sw.WriteLine("return Table.Create(list);");
             }
             sw.WriteLine("\t\t}");
-
-            sw.WriteLineExt(_formater,
-                    @"      
-        public static List<{class_name}> Get{class_name}List()
-        {
-            return GetList<{class_name}>();
-        }
-        ");
-
-            if (pk != null)
-            {
-                if (!pk.AttrPK.IsCompose())
-                {
-                    sw.WriteLineExt(_formater,
-                        @"
-        public static {class_name} Get{class_name}({pk_type} {pk_name})
-        {
-            return Get<{pk_type},{class_name}>({pk_name});
-        }
-
-        public static Dictionary<{pk_type}, {class_name}> Get{class_name}Dict()
-        {
-            return GetDict<{pk_type}, {class_name}>();
-        }
-        ");
-                }
-                else
-                {
-                    sw.WriteLineExt(_formater,
-                    @"
-        public static {class_name} Get{class_name}({pk_type} {pk_name},{pk_sec_type} {pk_sec_name})
-        {        
-            return Get<{class_name}>((uint){pk_name},(uint){pk_sec_name});
-        }
-
-        public static Dictionary<ulong, {class_name}> Get{class_name}Dict()
-        {
-            return GetDict<ulong, {class_name}>();
-        }
-        ");
-                }
-            }
         }
     }
 }

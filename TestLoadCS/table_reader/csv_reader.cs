@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Test
 {
-    public enum E_CSV_TOKEN
+    public enum ECsvToken
     {
         word, //后面跟着的是 ,
         word_with_new_line, //后面跟着的是 换行符
@@ -14,7 +14,7 @@ namespace Test
         error,
     }
 
-    public class CsvToken : IEnumerable<KeyValuePair<E_CSV_TOKEN, Str>>
+    public class CsvToken : IEnumerable<KeyValuePair<ECsvToken, Str>>
     {
         public const char C_NEW_LINE = '\n';
         public const char C_RETURN = '\r';
@@ -49,14 +49,14 @@ namespace Test
 
         public bool IsEnd { get { return _offset >= _buf.Length; } }
 
-        public E_CSV_TOKEN Next(out Str word)
+        public ECsvToken Next(out Str word)
         {
             //1. 检查是否已经到了结尾
             word = Str.Empty;
 
             int buf_len = _buf.Length;
             if (_offset >= buf_len)
-                return E_CSV_TOKEN.end;
+                return ECsvToken.end;
 
             //2. 读取第一个字符
             char first_char = _buf[_offset];
@@ -68,7 +68,7 @@ namespace Test
                         if (end_index == -1)
                         {
                             _offset = buf_len;
-                            return E_CSV_TOKEN.error;
+                            return ECsvToken.error;
                         }
 
                         int start = _offset + 1;
@@ -96,7 +96,7 @@ namespace Test
                         if (end_index == -1)
                         {
                             _offset = buf_len;
-                            return E_CSV_TOKEN.error;
+                            return ECsvToken.error;
                         }
 
                         int start = _offset;
@@ -108,10 +108,10 @@ namespace Test
             }
         }
 
-        private E_CSV_TOKEN _advance_split_symb()
+        private ECsvToken _advance_split_symb()
         {
             if (_offset >= _buf.Length)
-                return E_CSV_TOKEN.word_with_end;
+                return ECsvToken.word_with_end;
 
             char c = _buf[_offset];
             switch (c)
@@ -119,45 +119,45 @@ namespace Test
                 case C_COMMAS: // ,
                     {
                         _offset++;
-                        return E_CSV_TOKEN.word;
+                        return ECsvToken.word;
                     }
                 case C_NEW_LINE:// \n
                     {
                         _offset++;
                         if (_offset >= _buf.Length)
-                            return E_CSV_TOKEN.word_with_new_line;
+                            return ECsvToken.word_with_new_line;
 
                         if (_buf[_offset] == C_RETURN) // \n\r                
                             _offset++;
 
-                        return E_CSV_TOKEN.word_with_new_line;
+                        return ECsvToken.word_with_new_line;
                     }
                 case C_RETURN: // \r
                     {
                         _offset++;
                         if (_offset >= _buf.Length)
-                            return E_CSV_TOKEN.word_with_new_line;
+                            return ECsvToken.word_with_new_line;
                         if (_buf[_offset] == C_NEW_LINE) // \r\n
                             _offset++;
-                        return E_CSV_TOKEN.word_with_new_line;
+                        return ECsvToken.word_with_new_line;
                     }
 
                 default:
-                    return E_CSV_TOKEN.error;
+                    return ECsvToken.error;
             }
         }
 
-        public struct Enumerator : IEnumerator<KeyValuePair<E_CSV_TOKEN, Str>>
+        public struct Enumerator : IEnumerator<KeyValuePair<ECsvToken, Str>>
         {
             public CsvToken _token;
-            public KeyValuePair<E_CSV_TOKEN, Str> _cur;
+            public KeyValuePair<ECsvToken, Str> _cur;
             public Enumerator(CsvToken reader)
             {
                 _token = reader;
                 _cur = default;
             }
 
-            public KeyValuePair<E_CSV_TOKEN, Str> Current => _cur;
+            public KeyValuePair<ECsvToken, Str> Current => _cur;
 
             object IEnumerator.Current => _cur;
 
@@ -168,9 +168,9 @@ namespace Test
             public bool MoveNext()
             {
                 var r = _token.Next(out Str v);
-                if (r == E_CSV_TOKEN.end)
+                if (r == ECsvToken.end)
                     return false;
-                _cur = new KeyValuePair<E_CSV_TOKEN, Str>(r, v);
+                _cur = new KeyValuePair<ECsvToken, Str>(r, v);
                 return true;
             }
 
@@ -221,7 +221,7 @@ namespace Test
             return -1;
         }
 
-        IEnumerator<KeyValuePair<E_CSV_TOKEN, Str>> IEnumerable<KeyValuePair<E_CSV_TOKEN, Str>>.GetEnumerator()
+        IEnumerator<KeyValuePair<ECsvToken, Str>> IEnumerable<KeyValuePair<ECsvToken, Str>>.GetEnumerator()
         {
             return new Enumerator(this);
         }
@@ -260,17 +260,17 @@ namespace Test
                 var r = Token.Next(out Str word);
                 switch (r)
                 {
-                    case E_CSV_TOKEN.word:
+                    case ECsvToken.word:
                         out_list.Add(word);
                         break;
 
-                    case E_CSV_TOKEN.word_with_end:
-                    case E_CSV_TOKEN.word_with_new_line:
+                    case ECsvToken.word_with_end:
+                    case ECsvToken.word_with_new_line:
                         out_list.Add(word);
                         return true;
-                    case E_CSV_TOKEN.error:
+                    case ECsvToken.error:
                         return false;
-                    case E_CSV_TOKEN.end:
+                    case ECsvToken.end:
                         return false;
                     default:
                         break;
@@ -288,13 +288,13 @@ namespace Test
                 var r = Token.Next(out word);
                 switch (r)
                 {
-                    case E_CSV_TOKEN.word:
-                    case E_CSV_TOKEN.word_with_end:
-                    case E_CSV_TOKEN.word_with_new_line:
+                    case ECsvToken.word:
+                    case ECsvToken.word_with_end:
+                    case ECsvToken.word_with_new_line:
                         return true;
-                    case E_CSV_TOKEN.end:
+                    case ECsvToken.end:
                         return false;
-                    case E_CSV_TOKEN.error:
+                    case ECsvToken.error:
                         return false;
                     default:
                         break;

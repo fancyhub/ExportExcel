@@ -5,14 +5,7 @@ using System.Data;
 namespace Test
 {
     public static class TableReaderUtil
-    {
-        static TableReaderUtil()
-        {
-            EnumConverterMgr.RegFunc((v) => (EItemType)v, (v) => (int)v);
-            EnumConverterMgr.RegFunc((v) => (EItemSubType)v, (v) => (int)v);
-            EnumConverterMgr.RegFunc((v) => (EItemQuality)v, (v) => (int)v);
-        }
-
+    { 
         #region Base
         public static void ExRead(this ITableDataReader self, ref bool v)
         {

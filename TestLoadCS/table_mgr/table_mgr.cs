@@ -4,72 +4,64 @@ using System.Collections.Generic;
 
 namespace Test
 {
-
-    public delegate void TableLoaded(Table table);
+    public delegate void EventTableLoaded(Table table);
 
     public partial class TableMgr
-    {
-
-
-        private static TableMgr _;
-        public static TableMgr Inst
-        {
-            get
-            {
-                if (_ == null)
-                {
-                    _ = new TableMgr();
-                    LocLang.EvtLangChange0 = _._OnLangChange;
-                    _.OnInstCreate();
-                }
-                return _;
-            }
-        }
-
+    { 
+        private TableLoaderMgr _LoaderMgr;
         private Dictionary<Type, Table> _all = new Dictionary<Type, Table>();
-        private Dictionary<Type, List<TableLoaded>> _post_processer = new Dictionary<Type, List<TableLoaded>>();
+        private Dictionary<Type, List<EventTableLoaded>> _post_processer = new Dictionary<Type, List<EventTableLoaded>>();
+        public ITableReaderCreator TableReaderCreator;
+
+        public TableMgr(ITableReaderCreator creator)
+        {
+            TableReaderCreator = creator;
+            _LoaderMgr = new TableLoaderMgr(creator.CreateTableReader);
+            _all = new Dictionary<Type, Table>(_LoaderMgr.LoaderDict.Count);
+
+            LocLang.EvtLangChange0 = _OnLangChange;
+            OnInstCreate();
+        }
 
         #region  Table 相关
         private void _OnLangChange()
         {
             //1. 先卸载
-            foreach (var p in LoaderDict)
+            foreach (var p in _LoaderMgr.LoaderDict)
             {
                 if (p.Value.MultiLang)
                     _all.Remove(p.Key);
             }
 
             //2. 重新加载
-            foreach (var p in LoaderDict)
+            foreach (var p in _LoaderMgr.LoaderDict)
             {
                 if (p.Value.MultiLang)
                     _LoadTable(p.Key, false);
             }
 
-            _CloseReader();
+            TableReaderCreator.CloseReader();
         }
 
-        public void LoadAllTable(ETableReaderType readType, string baseDir)
-        {
-            _ReaderType = readType;
-            _BaseDir = baseDir;
+        public void LoadAllTable()
+        {            
             bool is_empty = _all.Count == 0;
 
             //先加载语言
-            foreach (var p in LoaderDict)
+            foreach (var p in _LoaderMgr.LoaderDict)
             {
                 if (p.Value.MultiLang)
                     _LoadTable(p.Key, false);
             }
 
             //加载其他表
-            foreach (var p in LoaderDict)
+            foreach (var p in _LoaderMgr.LoaderDict)
             {
                 if (!p.Value.MultiLang)
                     _LoadTable(p.Key, false);
-            } 
+            }
 
-            _CloseReader();
+            TableReaderCreator.CloseReader();
 
             if (is_empty)
                 OnAllLoaded();
@@ -86,15 +78,15 @@ namespace Test
             return ret;
         }
 
-        public void AddPostProcesser<T>(TableLoaded loaded_action) where T : class
+        public void AddPostProcesser<T>(EventTableLoaded loaded_action) where T : class
         {
             if (loaded_action == null)
                 return;
 
-            _post_processer.TryGetValue(typeof(T), out List<TableLoaded> list);
+            _post_processer.TryGetValue(typeof(T), out List<EventTableLoaded> list);
             if (list == null)
             {
-                list = new List<TableLoaded>();
+                list = new List<EventTableLoaded>();
                 _post_processer.Add(typeof(T), list);
             }
             list.Add(loaded_action);
@@ -106,7 +98,7 @@ namespace Test
                 return;
 
             Type t = typeof(T);
-            LoaderDict.Add(typeof(T), new TableInfo(loader,is_lang_relation));            
+            _LoaderMgr.LoaderDict.Add(typeof(T), new TableInfo(loader,is_lang_relation));            
         }
 
         public bool UnloadTable<T>() where T : class
@@ -126,7 +118,7 @@ namespace Test
                 return ret;
 
             //2. 获取 loader            
-            if (!LoaderDict.TryGetValue(t, out var info) || info.Loader== null)
+            if (!_LoaderMgr.LoaderDict.TryGetValue(t, out var info) || info.Loader== null)
                 return default;            
 
             //3. 加载
@@ -142,87 +134,23 @@ namespace Test
             _all.Add(t, ret);
 
             //5. 后处理
-            _post_processer.TryGetValue(t, out List<TableLoaded> list);
+            _post_processer.TryGetValue(t, out List<EventTableLoaded> list);
             if (list != null)
             {
-                foreach (TableLoaded p in list)
+                foreach (EventTableLoaded p in list)
                 {
                     p(ret);
                 }
             }
             return ret;
         }
-
-        private static ETableReaderType _ReaderType = ETableReaderType.Csv;
-        private static string _BaseDir = "";
-        private static bool _CreateReader(string sheet_name, string lang_name, out ITableReader reader)
-        {
-            switch (_ReaderType)
-            {
-                default:
-                    reader = null;
-                    return false;
-                case ETableReaderType.Csv:
-                    reader = _CreateCsvReader(_BaseDir, sheet_name, lang_name);
-                    return reader != null;
-                case ETableReaderType.Bin:
-                    reader = _CreateBinReader(_BaseDir, sheet_name, lang_name);
-                    return reader != null;
-            }
-        }
-
-        private static TableReaderBin _bin_reader;
-        private static ITableReader _CreateBinReader(string base_dir, string sheet_name, string lang_name)
-        {
-            if (_bin_reader != null && _bin_reader.CurLang == lang_name)
-            {
-                if (_bin_reader.Start(sheet_name))
-                    return _bin_reader;
-                return null;
-            }
-
-            byte[] buff = _LoadResBin(base_dir, lang_name);
-            if (buff == null)
-                return null;
-
-            if (_bin_reader == null)
-                _bin_reader = new TableReaderBin();
-            _bin_reader.CurLang = lang_name;
-            _bin_reader.Reset(buff);
-
-
-            if (_bin_reader.Start(sheet_name))
-            {
-                return _bin_reader;
-            }
-            return null;
-        }
-
-        private static TableReaderCsv _csv_reader;
-        private static ITableReader _CreateCsvReader(string base_dir, string sheet_name, string lang_name)
-        {
-
-            byte[] buff = _LoadResCsv(base_dir, sheet_name, lang_name);
-            if (buff == null)
-            {
-                return null;
-            }
-            if (_csv_reader == null)
-                _csv_reader = new TableReaderCsv();
-            _csv_reader.Reset(buff);
-            return _csv_reader;
-        }
-        private static void _CloseReader()
-        {
-            _bin_reader?.Reset(null);
-            _csv_reader?.Reset(null);
-        }
+         
         #endregion
 
         #region Common Get
-        public static Dictionary<TKey, TVal> GetDict<TKey, TVal>() where TVal : class
+        public Dictionary<TKey, TVal> GetDict<TKey, TVal>() where TVal : class
         {
-            Table ts = Inst.FindTable<TVal>();
+            Table ts = FindTable<TVal>();
             if (ts == null || ts.Dict == null)
             {
                 Log.E("Table {0} 不存在 Dict<{1},{0}>", typeof(TVal), typeof(TKey));
@@ -238,9 +166,9 @@ namespace Test
             return dict_t;
         }
 
-        public static List<T> GetList<T>() where T : class
+        public List<T> GetList<T>() where T : class
         {
-            Table ts = Inst.FindTable<T>();
+            Table ts = FindTable<T>();
             if (ts == null || ts.List == null)
             {
                 Log.E("Table {0} 不存在", typeof(T));
@@ -255,7 +183,7 @@ namespace Test
             return list_t;
         }
 
-        public static TVal Get<TKey, TVal>(TKey id) where TVal : class
+        public TVal Get<TKey, TVal>(TKey id) where TVal : class
         {
             Dictionary<TKey, TVal> dict = GetDict<TKey, TVal>();
             if (dict == null)
@@ -265,7 +193,7 @@ namespace Test
             return ret;
         }
 
-        public static bool Get<TKey, TVal>(TKey id, out TVal v) where TVal : class
+        public bool Get<TKey, TVal>(TKey id, out TVal v) where TVal : class
         {
             v = Get<TKey, TVal>(id);
             return v != null;
@@ -273,9 +201,9 @@ namespace Test
         #endregion
 
         #region  组合key
-        public static TVal Get<TVal>(uint key1, uint key2) where TVal : class
+        public TVal Get<TVal>(uint key1, uint key2) where TVal : class
         {
-            ulong key = _MakeKey(key1, key2);
+            ulong key = Table.MakeKey(key1, key2);
 
             Dictionary<ulong, TVal> dict = GetDict<ulong, TVal>();
             if (dict == null)
@@ -288,38 +216,30 @@ namespace Test
             return ret;
         }
 
-        public static bool Get<TVal>(uint key1, uint key2, out TVal v) where TVal : class
+        public bool Get<TVal>(uint key1, uint key2, out TVal v) where TVal : class
         {
             v = Get<TVal>(key1, key2);
             return v != null;
         }
 
-        public static bool Get<TVal>(uint key1, int key2, out TVal v) where TVal : class
+        public bool Get<TVal>(uint key1, int key2, out TVal v) where TVal : class
         {
             v = Get<TVal>(key1, (uint)key2);
             return v != null;
         }
 
-        public static bool Get<TVal>(int key1, int key2, out TVal v) where TVal : class
+        public bool Get<TVal>(int key1, int key2, out TVal v) where TVal : class
         {
             v = Get<TVal>((uint)key1, (uint)key2);
             return v != null;
         }
 
-        public static bool Get<TVal>(int key1, uint key2, out TVal v) where TVal : class
+        public bool Get<TVal>(int key1, uint key2, out TVal v) where TVal : class
         {
             v = Get<TVal>((uint)key1, key2);
             return v != null;
-        }
-
-        private static ulong _MakeKey(uint k1, uint k2)
-        {
-            ulong u1 = (uint)k1;
-            ulong u2 = (uint)k2;
-            return (u1 << 32) | u2;
-        }
+        }         
         #endregion
-
 
     }
 }

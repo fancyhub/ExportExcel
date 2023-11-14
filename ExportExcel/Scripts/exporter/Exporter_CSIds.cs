@@ -27,7 +27,7 @@ namespace ExportExcel
 
         public void Process(DataBase data)
         {
-            if (_config == null || !_config.enable || _config.locIdPrefix==null)
+            if (_config == null || !_config.enable || !_config.locId.enable)
                 return;
 
             if (data.Config.localization.Mode == ExeConfig.ELocalizationMode.None)
@@ -61,7 +61,7 @@ namespace ExportExcel
             Dictionary<string, string> dict = data.LangDefault;
             foreach (var p in dict)
             {
-                if (!p.Key.StartsWith(_config.locIdPrefix))
+                if (!p.Key.StartsWith(_config.locId.locIdStartWith))
                     continue;
 
                 //写注释
@@ -80,7 +80,7 @@ namespace ExportExcel
             Dictionary<string, string> dict = data.LangDefault;
             foreach (var p in dict)
             {
-                if (!p.Key.StartsWith(_config.locIdPrefix))
+                if (!p.Key.StartsWith(_config.locId.locIdStartWith))
                     continue;
 
                 //写注释

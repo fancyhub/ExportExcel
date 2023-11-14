@@ -154,16 +154,36 @@ namespace ExportExcel
             public GoConfig go = new GoConfig();
         }
 
+        public class CSharpGetterConfig
+        {
+            public bool enable;
+            public string className = "";
+            public bool useStatic = false;
+        }
+
+        public class CSharpLoaderConfig
+        {
+            public bool enable;
+        }
+
+        public class CSharpLocIdConfig
+        {
+            public bool enable;
+            public string locIdStartWith = "";
+        }
+
         public class CSharpConfig
         {
             public bool enable;
             public string namespaceName;
             public string classPrefix = "";
             public string classSuffix = "";
-            public string classMgrName = "";
             public string dir;
             public string header;
-            public string locIdPrefix;
+
+            public CSharpLoaderConfig loader = new CSharpLoaderConfig();
+            public CSharpGetterConfig getter = new CSharpGetterConfig();
+            public CSharpLocIdConfig locId = new CSharpLocIdConfig();            
 
             public string GetClassName(string sheet_name)
             {

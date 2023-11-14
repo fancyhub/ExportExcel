@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -12,7 +12,7 @@ namespace Test
 
         public readonly Type KeyType;
         public readonly IDictionary Dict;
-        
+
         public static Table Create<T>(List<T> list) where T : class
         {
             if (list == null)
@@ -41,5 +41,12 @@ namespace Test
             this.Dict = dict;
             this.KeyType = key_type;
         }
+
+        public static ulong MakeKey(uint k1, uint k2)
+        {
+            ulong u1 = (uint)k1;
+            ulong u2 = (uint)k2;
+            return (u1 << 32) | u2;
+        }         
     }
 }

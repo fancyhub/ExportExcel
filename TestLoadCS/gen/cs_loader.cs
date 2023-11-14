@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 namespace Test{
 
+    public delegate bool CreateTableReader(string sheet_name, string lang_name, out ITableReader reader);
     public delegate Table TableLoader(string lang);
     public struct TableInfo
     {
@@ -15,14 +16,29 @@ namespace Test{
             this.MultiLang = multiLang;
         }
     }
-    public partial class TableMgr
+    public partial class TableLoaderMgr
     {
         private static List<System.Object> _temp = new List<System.Object>(10000);
+        public static List<string> LangList;
+
+        public CreateTableReader CreateTableReader;
         public Dictionary<Type, TableInfo> LoaderDict;
-        public TableMgr()
+        static TableLoaderMgr()
+        {        
+            LangList= new List<string>(2);
+
+			LangList.Add("zh-Hans");
+			LangList.Add("EN");
+			EnumConverterMgr.RegFunc((v) => (EItemType)v, (v) => (int)v);
+			EnumConverterMgr.RegFunc((v) => (EItemSubType)v, (v) => (int)v);
+			EnumConverterMgr.RegFunc((v) => (EItemQuality)v, (v) => (int)v);
+		}
+
+        public TableLoaderMgr(CreateTableReader createTableReader)
         {
-            _all = new Dictionary<Type, Table>(20+3);
+            CreateTableReader = createTableReader;            
             LoaderDict = new Dictionary<Type, TableInfo>(20+3);
+            
 
 			LoaderDict.Add(typeof(TItemData),new TableInfo(_LoadItemData,false));
 			LoaderDict.Add(typeof(TTestComposeKey),new TableInfo(_LoadTestComposeKey,false));
@@ -30,13 +46,13 @@ namespace Test{
 		}
 
 
-        private static Table _LoadItemData(string lang)
+        private Table _LoadItemData(string lang)
         {
             string sheet_name = "ItemData";
             lang = null;
             int col_count = 8;
 
-            if(!_CreateReader(sheet_name,lang,out var reader))
+            if(!CreateTableReader(sheet_name,lang,out var reader))
                 return null;
 
             //Check Header
@@ -103,32 +119,15 @@ namespace Test{
             return Table.Create(list,dict);
                 
 		}
-      
-        public static List<TItemData> GetTItemDataList()
-        {
-            return GetList<TItemData>();
-        }
-        
-
-        public static TItemData GetTItemData(int Id)
-        {
-            return Get<int,TItemData>(Id);
-        }
-
-        public static Dictionary<int, TItemData> GetTItemDataDict()
-        {
-            return GetDict<int, TItemData>();
-        }
-        
 
 
-        private static Table _LoadTestComposeKey(string lang)
+        private Table _LoadTestComposeKey(string lang)
         {
             string sheet_name = "TestComposeKey";
             lang = null;
             int col_count = 4;
 
-            if(!_CreateReader(sheet_name,lang,out var reader))
+            if(!CreateTableReader(sheet_name,lang,out var reader))
                 return null;
 
             //Check Header
@@ -177,7 +176,7 @@ namespace Test{
             var dict = new Dictionary<ulong, TTestComposeKey>(list.Count);
             foreach (var p in list)
             {
-                ulong key = _MakeKey((uint)p.Id, (uint)p.Level);
+                ulong key = Table.MakeKey((uint)p.Id, (uint)p.Level);
                 if (dict.ContainsKey(key))
                 {
                     Log.E("{0} Contain Multi Id: {1},{2}, 如果允许ID重复, 修改表格", typeof(TTestComposeKey), p.Id,p.Level);
@@ -188,32 +187,15 @@ namespace Test{
             return Table.Create(list,dict);
                 
 		}
-      
-        public static List<TTestComposeKey> GetTTestComposeKeyList()
-        {
-            return GetList<TTestComposeKey>();
-        }
-        
-
-        public static TTestComposeKey GetTTestComposeKey(uint Id,int Level)
-        {        
-            return Get<TTestComposeKey>((uint)Id,(uint)Level);
-        }
-
-        public static Dictionary<ulong, TTestComposeKey> GetTTestComposeKeyDict()
-        {
-            return GetDict<ulong, TTestComposeKey>();
-        }
-        
 
 
-        private static Table _LoadLoc(string lang)
+        private Table _LoadLoc(string lang)
         {
             string sheet_name = "Loc";
             
             int col_count = 2;
 
-            if(!_CreateReader(sheet_name,lang,out var reader))
+            if(!CreateTableReader(sheet_name,lang,out var reader))
                 return null;
 
             //Check Header
@@ -268,22 +250,5 @@ namespace Test{
             return Table.Create(list,dict);
                 
 		}
-      
-        public static List<TLoc> GetTLocList()
-        {
-            return GetList<TLoc>();
-        }
-        
-
-        public static TLoc GetTLoc(int Id)
-        {
-            return Get<int,TLoc>(Id);
-        }
-
-        public static Dictionary<int, TLoc> GetTLocDict()
-        {
-            return GetDict<int, TLoc>();
-        }
-        
 }
 }
