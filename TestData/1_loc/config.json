@@ -28,6 +28,7 @@
     "exportClient": {
         "csv": {
             "enable": true,
+			"utf8bom":true,
             "dir": "Output/Client/Data",
         },
         "bin": {
@@ -52,6 +53,7 @@
     "exportServer": {
         "csv": {
             "enable": true,
+			"utf8bom":true,
             "dir": "Output/Server/Data",
         },
         "bin": {

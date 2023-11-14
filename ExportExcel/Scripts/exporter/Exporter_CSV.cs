@@ -14,7 +14,7 @@ namespace ExportExcel
     //导出 CSV 结构
     public class ExporterCSV : IProcessNode
     {
-        public Encoding _encoding = new UTF8Encoding(true);
+        
         public EExportFlag _flag;
         public ExeConfig.CsvConfig _config;
 
@@ -32,6 +32,7 @@ namespace ExportExcel
             if (_config == null || !_config.enable)
                 return;
 
+            Encoding encoding = new UTF8Encoding(_config.utf8bom);
             foreach (var p in data.Tables)
             {
                 //判断是否需要导出
@@ -45,7 +46,7 @@ namespace ExportExcel
                     List<TableHeaderItem> header = table.Header;
                     string out_file_path = Path.Combine(_config.dir, table.SheetName + ".csv");
                     FileUtil.CreateFileDir(out_file_path);
-                    using (StreamWriter sw = new StreamWriter(out_file_path, false, _encoding))
+                    using (StreamWriter sw = new StreamWriter(out_file_path, false, encoding))
                     {
                         //写文件头
                         int count = header.Count;

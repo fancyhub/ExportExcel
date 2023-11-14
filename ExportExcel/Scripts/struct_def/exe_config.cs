@@ -193,6 +193,7 @@ namespace ExportExcel
         public class CsvConfig
         {
             public bool enable;
+            public bool utf8bom;
             public string dir;
         }
 
