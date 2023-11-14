@@ -86,6 +86,13 @@ namespace Test
         {
             return ReadRefString();
         }
+
+        public (int offset, int len) ReadSheetOffset()
+        {
+            var offset = _reader.ReadInt32();
+            var len = ReadCount();
+            return (offset, len);
+        }
     }
 
     public class TableReaderBin : ITableReader
@@ -94,7 +101,7 @@ namespace Test
         private TableRowReaderBin _row_reader = new TableRowReaderBin();
         public Dictionary<string, (int offset, int len)> _table_dict;
         public List<Str> _str_list_header = new List<Str>();
-        
+
         public int _row_count;
         public int _row_index;
 
@@ -104,6 +111,9 @@ namespace Test
         public void Reset(byte[] buff)
         {
             _base_reader.Reset(buff);
+            _table_dict?.Clear();
+            if (buff == null)
+                return;
 
             //table index
             int body_len = _base_reader.ReadCount();
@@ -112,9 +122,8 @@ namespace Test
             for (int i = 0; i < count; i++)
             {
                 string sheet_name = _base_reader.ReadRefString();
-                int offset = _base_reader.ReadInt32();
-                int len = _base_reader.ReadCount();
-                _table_dict.Add(sheet_name, (offset, len));
+                var sheetOffset = _base_reader.ReadSheetOffset();
+                _table_dict.Add(sheet_name, sheetOffset);
             }
         }
 
@@ -153,7 +162,7 @@ namespace Test
             _row_reader.Reset(_base_reader);
             rowReader = _row_reader;
             return true;
-        }       
+        }
     }
 
 
@@ -191,7 +200,10 @@ namespace Test
         {
             if (_pair_reader == null)
                 _pair_reader = new TablePairReaderBin();
-            _pair_reader.Reset(_base_reader, _base_reader.ReadCount());
+            int count = _base_reader.ReadCount();
+            _pair_reader.Reset(_base_reader, count);
+            if (count == 0)
+                return null;
             return _pair_reader;
         }
     }

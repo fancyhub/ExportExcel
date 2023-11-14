@@ -7,7 +7,7 @@ const string dirPath2 = "../../../../TestData/2_loc_auto_key/Output/Client/Data"
 
 LocLang.Lang = TableLoaderMgr.LangList[0];
 ITableReaderCreator tableReaderCreator = new TableReaderCsvCreator(dirPath2);
-//tableReaderCreator = new TableReaderBinCreator(dirPath2);
+tableReaderCreator = new TableReaderBinCreator(dirPath2);
 TableMgr mgr = new TableMgr(tableReaderCreator);
 
 mgr.LoadAllTable();

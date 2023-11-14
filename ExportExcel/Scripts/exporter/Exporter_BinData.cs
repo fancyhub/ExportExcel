@@ -6,20 +6,20 @@ namespace ExportExcel
 {
     /*
      * 结构
-     * Sign
-     * StrTable
+     *Sign
+     *StrTable
      *   BodyLen,Count
      *   Repeated String  (Len:Bytes)
-     *  TableIndex
+     *TableIndex
      *    BodyLen,Count
      *    Repeated StringIndex(int) Offset(FromHeader),BodyLen
-     *   Repeated Table      
-     *      Headers 
-     *          Count
-     *          Repated StringIndex(int)  两行
-     *      Repeated Row 
-     *          Row Count
-     *          BodyLen Data,  (如果Cell是List/List_Tuple, 第一个int描述数量, 如果cell 是 Tuple, 第一个int 0或者1)
+     *Repeated Table      
+     *    Headers 
+     *        Count
+     *        Repated StringIndex(int)  两行
+     *    Repeated Row 
+     *        Row Count
+     *        BodyLen Data,  (如果Cell是List/List_Tuple, 第一个int描述数量, 如果cell 是 Tuple, 第一个int 0或者1)
      *      
      */
     public class Exporter_BinData : IProcessNode
