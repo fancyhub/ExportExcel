@@ -2,15 +2,13 @@ using System;
 using System.Collections.Generic;
 using Test;
 
-namespace TestLoadCs.table_reader
+namespace Test
 {
     public class TableReaderCsv : ITableReader
     {
         private CsvReader _csv_reader = null;
         public List<Str> _list_str = new List<Str>();
-        public int col_index = 0;
-        public TableListReaderCsv _list_reader;
-        public TablePairReaderCsv _pair_reader;
+        public TableRowReaderCsv _row_reader;
 
         public ETableReaderType ReaderType => ETableReaderType.Csv;
 
@@ -32,70 +30,49 @@ namespace TestLoadCs.table_reader
             return _list_str;
         }
 
-        public bool NextRow()
+        public bool NextRow(out ITableRowReader rowReader)
         {
-            col_index = 0;
-            return _csv_reader.ReadRow(_list_str);
-        }
-
-        public int ReadCellLength()
-        {
-            return 0;
-        }
-
-        public float ReadF32()
-        {
-            return _list_str[col_index++].ParseFloat();
-        }
-
-        public double ReadF64()
-        {
-            return _list_str[col_index++].ParseDouble();
-        }
-
-        public int ReadInt32()
-        {
-            return _list_str[col_index++].ParseInt32();
-        }
-
-        public long ReadInt64()
-        {
-            return _list_str[col_index++].ParseInt64();
-        }
-
-        public Str ReadString()
-        {
-            return _list_str[col_index++];
-        }
-
-        public uint ReadUInt32()
-        {
-            return _list_str[col_index++].ParseUInt32();
-        }
-
-        public ulong ReadUInt64()
-        {
-            return _list_str[col_index++].ParseUInt64();
-        }
-
-        public static bool ParseBool(Str s)
-        {
-            if (s.IsEmpty())
+            rowReader = null;
+            if (!_csv_reader.ReadRow(_list_str, true))
                 return false;
-            return s != "0";
+
+            if (_row_reader == null)
+                _row_reader = new TableRowReaderCsv();
+            _row_reader.Reset(_list_str);
+            rowReader = _row_reader;
+            return true;
+        }
+    }
+
+    public class TableRowReaderCsv : ITableRowReader
+    {
+        public int col_index = 0;
+        public TableListReaderCsv _list_reader;
+        public TableTupleReaderCsv _tuple_reader;
+        public List<Str> _list_str;
+        public void Reset(List<Str> list_str)
+        {
+            _list_str = list_str;
+            col_index = 0;
         }
 
-        public bool ReadBool()
-        {
-            return ParseBool(_list_str[col_index++]);
-        }
+        public float ReadF32() { return _list_str[col_index++].ParseFloat(); }
+        public double ReadF64() { return _list_str[col_index++].ParseDouble(); }
+        public int ReadInt32() { return _list_str[col_index++].ParseInt32(); }
+        public long ReadInt64() { return _list_str[col_index++].ParseInt64(); }
+        public Str ReadString() { return _list_str[col_index++]; }
+        public uint ReadUInt32() { return _list_str[col_index++].ParseUInt32(); }
+        public ulong ReadUInt64() { return _list_str[col_index++].ParseUInt64(); }
+        public bool ReadBool() { return !_list_str[col_index++].Equals("0"); }
 
-        public ITablePairReader BeginPair()
+        public ITableTupleReader BeginTuple()
         {
-            if (_pair_reader == null)
-                _pair_reader = new TablePairReaderCsv();
-            _pair_reader.Reset(ReadString());
-            return _pair_reader;
+            if (_tuple_reader == null)
+                _tuple_reader = new TableTupleReaderCsv();
+            _tuple_reader.Reset(ReadString());
+            if (_tuple_reader.GetCount() == 0)
+                return null;
+            return _tuple_reader;
         }
 
         public ITableListReader BeginList()
@@ -107,7 +84,7 @@ namespace TestLoadCs.table_reader
         }
     }
 
-    public class TablePairReaderCsv : ITablePairReader
+    public class TableTupleReaderCsv : ITableTupleReader
     {
         private const char C_CSV_PAIR_SPLIT = '|';
         public List<Str> _str_list = new List<Str>();
@@ -127,7 +104,7 @@ namespace TestLoadCs.table_reader
         {
             return _str_list.Count;
         }
-        public bool ReadBool() { return TableReaderCsv.ParseBool(_str_list[_index++]); }
+        public bool ReadBool() { return !_str_list[_index++].Equals("0"); }
         public int ReadInt32() { return _str_list[_index++].ParseInt32(); }
         public uint ReadUInt32() { return _str_list[_index++].ParseUInt32(); }
         public long ReadInt64() { return _str_list[_index++].ParseInt64(); }
@@ -137,11 +114,10 @@ namespace TestLoadCs.table_reader
         public Str ReadString() { return _str_list[_index++]; }
     }
 
-
     public class TableListReaderCsv : ITableListReader
     {
         private const char C_CSV_LIST_SPLIT = ';';
-        public TablePairReaderCsv _pair_reader;
+        public TableTupleReaderCsv _tuple_reader;
         public List<Str> _str_list = new List<Str>();
         public int _index = 0;
         public void Reset(Str str)
@@ -155,10 +131,11 @@ namespace TestLoadCs.table_reader
 
         public int GetCount()
         {
-            return _str_list.Count;
+            if (_str_list.Count == 0) return 0;
+            return 1;
         }
 
-        public bool ReadBool() { return TableReaderCsv.ParseBool(_str_list[_index++]); }
+        public bool ReadBool() { return !_str_list[_index++].Equals("0"); }
         public int ReadInt32() { return _str_list[_index++].ParseInt32(); }
         public uint ReadUInt32() { return _str_list[_index++].ParseUInt32(); }
         public long ReadInt64() { return _str_list[_index++].ParseInt64(); }
@@ -167,12 +144,14 @@ namespace TestLoadCs.table_reader
         public double ReadF64() { return _str_list[_index++].ParseDouble(); }
         public Str ReadString() { return _str_list[_index++]; }
 
-        public ITablePairReader BeginPair()
+        public ITableTupleReader BeginTuple()
         {
-            if (_pair_reader == null)
-                _pair_reader = new TablePairReaderCsv();
-            _pair_reader.Reset(ReadString());
-            return _pair_reader;
+            if (_tuple_reader == null)
+                _tuple_reader = new TableTupleReaderCsv();
+            _tuple_reader.Reset(ReadString());
+            if (_tuple_reader.GetCount() == 0)
+                return null;
+            return _tuple_reader;
         }
     }
 }

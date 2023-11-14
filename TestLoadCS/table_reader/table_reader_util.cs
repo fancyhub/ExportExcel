@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Test;
 
-namespace TestLoadCs.table_reader
+namespace Test
 {
-    public static class TableReaderExt
+    public static class TableReaderUtil
     {
-        static TableReaderExt()
+        static TableReaderUtil()
         {
             EnumConverterMgr.RegFunc((v) => (EItemType)v, (v) => (int)v);
             EnumConverterMgr.RegFunc((v) => (EItemSubType)v, (v) => (int)v);
@@ -66,51 +65,42 @@ namespace TestLoadCs.table_reader
         #endregion
 
         #region Pair
-        public static bool ExRead(this ITableReader self, ref ValueTuple<int, float> v)
+        public static bool ExRead(this ITableRowReader self, ref ValueTuple<int, float> v)
         {
-            v = default;
-            var pair_reader = self.BeginPair();
-            int c = pair_reader != null ? pair_reader.GetCount() : 0;
-            if (c == 0)
+            v = default;            
+            var tuple_reader = self.BeginTuple();
+            if (tuple_reader == null)
                 return true;
-            if (c != 2)
-                return false;
-            pair_reader.ExRead(ref v.Item1);
-            pair_reader.ExRead(ref v.Item2);
+            tuple_reader.ExRead(ref v.Item1);
+            tuple_reader.ExRead(ref v.Item2);
             return true;
         }
-        public static bool ExRead(this ITableReader self, ref ValueTuple<int, bool> v)
+        public static bool ExRead(this ITableRowReader self, ref ValueTuple<int, bool> v)
         {
             v = default;
-            var pair_reader = self.BeginPair();
-            int c = pair_reader != null ? pair_reader.GetCount() : 0;
-            if (c == 0)
+            var tuple_reader = self.BeginTuple();
+            if (tuple_reader == null)
                 return true;
-            if (c != 2)
-                return false;
-            pair_reader.ExRead(ref v.Item1);
-            pair_reader.ExRead(ref v.Item2);
+            tuple_reader.ExRead(ref v.Item1);
+            tuple_reader.ExRead(ref v.Item2);             
             return true;
         }
-        public static bool ExRead(this ITableReader self, ref ValueTuple<float, float, float> v)
+        public static bool ExRead(this ITableRowReader self, ref ValueTuple<float, float, float> v)
         {
             v = default;
-            var pair_reader = self.BeginPair();
-            int c = pair_reader != null ? pair_reader.GetCount() : 0;
-            if (c == 0)
+            var tuple_reader = self.BeginTuple();
+            if (tuple_reader == null)
                 return true;
-            if (c != 3)
-                return false;
-            pair_reader.ExRead(ref v.Item1);
-            pair_reader.ExRead(ref v.Item2);
-            pair_reader.ExRead(ref v.Item3);
+            tuple_reader.ExRead(ref v.Item1);
+            tuple_reader.ExRead(ref v.Item2);
+            tuple_reader.ExRead(ref v.Item3);
             return true;
         }
         #endregion
 
         #region List 
 
-        public static void ExRead(this ITableReader self, ref int[] v)
+        public static void ExRead(this ITableRowReader self, ref int[] v)
         {
             var list_reader = self.BeginList();
             int count = list_reader != null ? list_reader.GetCount() : 0;
@@ -129,7 +119,7 @@ namespace TestLoadCs.table_reader
             }
         }
 
-        public static void ExRead(this ITableReader self, ref ValueTuple<int, long>[] v)
+        public static void ExRead(this ITableRowReader self, ref ValueTuple<int, long>[] v)
         {
             var list_reader = self.BeginList();
             int count = list_reader != null ? list_reader.GetCount() : 0;
@@ -142,10 +132,10 @@ namespace TestLoadCs.table_reader
 
             for (int i = 0; i < count; i++)
             {
-                var pair_reader = list_reader.BeginPair();
+                var tuple_reader = list_reader.BeginTuple();
                 var item = new ValueTuple<int, long>();
-                pair_reader.ExRead(ref item.Item1);
-                pair_reader.ExRead(ref item.Item2);
+                tuple_reader.ExRead(ref item.Item1);
+                tuple_reader.ExRead(ref item.Item2);
                 v[i] = item;
             }
         }

@@ -158,7 +158,9 @@ namespace ExportExcel
         {
             public bool enable;
             public string namespaceName;
-            public string classPrefix;
+            public string classPrefix = "";
+            public string classSuffix = "";
+            public string classMgrName = "";
             public string dir;
             public string header;
             public string locIdPrefix;
@@ -167,7 +169,7 @@ namespace ExportExcel
             {
                 if (string.IsNullOrEmpty(classPrefix))
                     return sheet_name;
-                return classPrefix + sheet_name;
+                return classPrefix + sheet_name + classSuffix;
             }
         }
 

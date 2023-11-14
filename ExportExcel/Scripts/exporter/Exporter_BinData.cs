@@ -19,7 +19,7 @@ namespace ExportExcel
      *          Repated StringIndex(int)  两行
      *      Repeated Row 
      *          Row Count
-     *          BodyLen Data,  (如果是List, 第一个int描述数量,Tuple当作List来写, ListTuple, 数量和List一致)
+     *          BodyLen Data,  (如果Cell是List/List_Tuple, 第一个int描述数量, 如果cell 是 Tuple, 第一个int 0或者1)
      *      
      */
     public class Exporter_BinData : IProcessNode
@@ -333,7 +333,7 @@ namespace ExportExcel
                     }
                     else
                     {
-                        _bw.Write7BitEncodedInt(data_type.Count);
+                        _bw.Write7BitEncodedInt(1);
                         string[] pair = cell.Split(ConstDef.C_TUPLE_SPLIT);
                         for (int i = 0; i < data_type.Count; i++)
                         {

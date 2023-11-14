@@ -1,10 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Test;
 
 
-namespace TestLoadCs.table_reader
+namespace Test
 {
     public enum E_CSV_TOKEN
     {

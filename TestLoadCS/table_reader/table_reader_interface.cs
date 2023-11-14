@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Test;
 
-namespace TestLoadCs.table_reader
+namespace Test
 {
     public enum ETableReaderType
     {
@@ -26,24 +22,27 @@ namespace TestLoadCs.table_reader
         public Str ReadString();
     }
 
-    public interface ITableReader : ITableDataReader
+    public interface ITableTupleReader : ITableDataReader
     {
-        public ETableReaderType ReaderType { get; }
-        public List<Str> ReadHeader();
-        public bool NextRow();
+    }
 
-        public ITablePairReader BeginPair();
+    public interface ITableRowReader : ITableDataReader
+    {
         public ITableListReader BeginList();
+        public ITableTupleReader BeginTuple();
     }
 
     public interface ITableListReader : ITableDataReader
     {
         public int GetCount();
-        public ITablePairReader BeginPair();
+        public ITableTupleReader BeginTuple();
     }
 
-    public interface ITablePairReader : ITableDataReader
+    public interface ITableReader
     {
-        public int GetCount();
+        public ETableReaderType ReaderType { get; }
+        public List<Str> ReadHeader();
+
+        public bool NextRow(out ITableRowReader rowReader);
     }
 }

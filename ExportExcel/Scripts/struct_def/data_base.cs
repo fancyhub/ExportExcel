@@ -22,7 +22,6 @@ namespace ExportExcel
         public Dictionary<string, string> LangDefault;
         public List<string> LangList;
 
-
         public DataBase(ExeConfig config)
         {
             Config = config;

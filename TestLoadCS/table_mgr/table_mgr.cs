@@ -1,11 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TestLoadCs.table_reader;
 
 namespace Test
 {
-    public delegate Table TableLoader(string lang);
+
     public delegate void TableLoaded(Table table);
 
     public partial class TableMgr
@@ -28,39 +27,47 @@ namespace Test
         }
 
         private Dictionary<Type, Table> _all = new Dictionary<Type, Table>();
-        private Dictionary<Type, TableLoader> _loader_dict = new Dictionary<Type, TableLoader>();
-        private HashSet<Type> _lang_set = new HashSet<Type>(); //和语言有关的表格
         private Dictionary<Type, List<TableLoaded>> _post_processer = new Dictionary<Type, List<TableLoaded>>();
 
         #region  Table 相关
         private void _OnLangChange()
         {
             //1. 先卸载
-            foreach (Type type in _lang_set)
+            foreach (var p in LoaderDict)
             {
-                _all.Remove(type);
+                if (p.Value.MultiLang)
+                    _all.Remove(p.Key);
             }
 
             //2. 重新加载
-            foreach (Type type in _lang_set)
-                _LoadTable(type, false);
+            foreach (var p in LoaderDict)
+            {
+                if (p.Value.MultiLang)
+                    _LoadTable(p.Key, false);
+            }
 
             _CloseReader();
         }
 
-        public void LoadAllTable(ETableReaderType readType,string baseDir)
+        public void LoadAllTable(ETableReaderType readType, string baseDir)
         {
             _ReaderType = readType;
             _BaseDir = baseDir;
             bool is_empty = _all.Count == 0;
 
             //先加载语言
-            foreach (Type type in _lang_set)
-                _LoadTable(type, false);
+            foreach (var p in LoaderDict)
+            {
+                if (p.Value.MultiLang)
+                    _LoadTable(p.Key, false);
+            }
 
             //加载其他表
-            foreach (var p in _loader_dict)
-                _LoadTable(p.Key, false);
+            foreach (var p in LoaderDict)
+            {
+                if (!p.Value.MultiLang)
+                    _LoadTable(p.Key, false);
+            } 
 
             _CloseReader();
 
@@ -99,10 +106,7 @@ namespace Test
                 return;
 
             Type t = typeof(T);
-            _loader_dict[t] = loader;
-
-            if (is_lang_relation)
-                _lang_set.Add(t);
+            LoaderDict.Add(typeof(T), new TableInfo(loader,is_lang_relation));            
         }
 
         public bool UnloadTable<T>() where T : class
@@ -122,12 +126,11 @@ namespace Test
                 return ret;
 
             //2. 获取 loader            
-            _loader_dict.TryGetValue(t, out TableLoader loader);
-            if (loader == null)
-                return default;
+            if (!LoaderDict.TryGetValue(t, out var info) || info.Loader== null)
+                return default;            
 
             //3. 加载
-            ret = loader(LocLang.Lang);
+            ret = info.Loader(LocLang.Lang);
             if (ret == null || ret.List == null)
             {
                 //虽然加载失败了,但是为了防止二次加载,先把空的添加进去
@@ -160,16 +163,16 @@ namespace Test
                     reader = null;
                     return false;
                 case ETableReaderType.Csv:
-                    reader = _CreateCsvReader(_BaseDir,sheet_name, lang_name);
+                    reader = _CreateCsvReader(_BaseDir, sheet_name, lang_name);
                     return reader != null;
                 case ETableReaderType.Bin:
-                    reader = _CreateBinReader(_BaseDir,sheet_name, lang_name);
+                    reader = _CreateBinReader(_BaseDir, sheet_name, lang_name);
                     return reader != null;
             }
         }
 
         private static TableReaderBin _bin_reader;
-        private static ITableReader _CreateBinReader(string base_dir,string sheet_name, string lang_name)
+        private static ITableReader _CreateBinReader(string base_dir, string sheet_name, string lang_name)
         {
             if (_bin_reader != null && _bin_reader.CurLang == lang_name)
             {
@@ -178,7 +181,7 @@ namespace Test
                 return null;
             }
 
-            byte[] buff = _LoadResBin(base_dir,lang_name);
+            byte[] buff = _LoadResBin(base_dir, lang_name);
             if (buff == null)
                 return null;
 
@@ -196,10 +199,10 @@ namespace Test
         }
 
         private static TableReaderCsv _csv_reader;
-        private static ITableReader _CreateCsvReader(string base_dir,string sheet_name, string lang_name)
+        private static ITableReader _CreateCsvReader(string base_dir, string sheet_name, string lang_name)
         {
-            
-            byte[] buff = _LoadResCsv(base_dir,sheet_name, lang_name);
+
+            byte[] buff = _LoadResCsv(base_dir, sheet_name, lang_name);
             if (buff == null)
             {
                 return null;

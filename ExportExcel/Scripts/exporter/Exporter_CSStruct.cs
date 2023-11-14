@@ -36,6 +36,7 @@ namespace ExportExcel
                 return;
 
             _formater["class_prefix"] = _config.classPrefix;
+            _formater["class_suffix"] = _config.classSuffix;
 
             string name_space = _config.namespaceName;
             List<FilterTable> tables = FilterTable.Filter(data, _flag);
@@ -75,7 +76,7 @@ namespace ExportExcel
             foreach (FilterTable table in tables)
             {
                 _formater["sheet_name"] = table.SheetName;
-                _formater["class_name"] = _formater["class_prefix"] + table.SheetName;
+                _formater["class_name"] = _formater["class_prefix"] + table.SheetName + _formater["class_suffix"];
 
                 List<TableHeaderItem> header = table.Header;
 

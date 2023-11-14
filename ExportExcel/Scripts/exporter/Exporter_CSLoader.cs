@@ -25,6 +25,7 @@ namespace ExportExcel
             _flag = flag;
             _config = config;
         }
+
         public string GetName()
         {
             return "Export";
@@ -38,6 +39,8 @@ namespace ExportExcel
             string name_space = _config.namespaceName;
             string dest_file_path = System.IO.Path.Combine(_config.dir, C_FILE_NAME);
             _formater["class_prefix"] = _config.classPrefix;
+            _formater["class_suffix"] = _config.classSuffix;
+            _formater["class_mgr"] = _config.classMgrName;
 
             FileUtil.CreateFileDir(dest_file_path);
             List<FilterTable> tables = FilterTable.Filter(data, _flag);
@@ -57,30 +60,36 @@ namespace ExportExcel
         public void _export_mgr(List<FilterTable> tables, StreamWriter sw)
         {
             _formater["table_count"] = tables.Count.ToString();
-
+            
 
             sw.WriteLineExt(_formater,
                 @"
-    public partial class TableMgr
+    public delegate Table TableLoader(string lang);
+    public struct TableInfo
+    {
+        public TableLoader Loader;
+        public bool MultiLang;
+        public TableInfo(TableLoader loader, bool multiLang)
+        {
+            this.Loader = loader;
+            this.MultiLang = multiLang;
+        }
+    }
+    public partial class {class_mgr}
     {
         private static List<System.Object> _temp = new List<System.Object>(10000);
-        public TableMgr()
+        public Dictionary<Type, TableInfo> LoaderDict;
+        public {class_mgr}()
         {
             _all = new Dictionary<Type, Table>(20+{table_count});
-            _loader_dict = new Dictionary<Type, TableLoader>(20+{table_count});
+            LoaderDict = new Dictionary<Type, TableInfo>(20+{table_count});
 ");
 
             foreach (var table in tables)
             {
-                _formater["sheet_name"] = table.SheetName;
-                _formater["class_name"] = _formater["class_prefix"] + table.SheetName;
-
-                sw.WriteLineExt(_formater, "\t\t\t_loader_dict.Add(typeof({class_name}),_Load{sheet_name});");
-
-                if (table.MultiLang)
-                {
-                    sw.WriteLineExt(_formater, "\t\t\t_lang_set.Add(typeof({class_name}));");
-                }
+                var class_name = _formater["class_prefix"] + table.SheetName + _formater["class_suffix"];
+                var sheet_name = table.SheetName;                  
+                sw.WriteLine($"\t\t\tLoaderDict.Add(typeof({class_name}),new TableInfo(_Load{table.SheetName},{table.MultiLang.ToString().ToLower()}));");                
             }
 
             sw.WriteLine("\t\t}");
@@ -101,7 +110,7 @@ namespace ExportExcel
             _formater["sheet_name_lang"] = multi_name;
             _formater["col_count"] = header.Count.ToString();
             _formater["sheet_name"] = table.SheetName;
-            _formater["class_name"] = _formater["class_prefix"] + table.SheetName;
+            _formater["class_name"] = _formater["class_prefix"] + table.SheetName + _formater["class_suffix"];
 
             sw.WriteLine("");
             sw.WriteLineExt(_formater, @"
@@ -142,13 +151,13 @@ namespace ExportExcel
             _temp.Clear();
             for (; ; )
             {
-                if (!reader.NextRow())
+                if (!reader.NextRow(out var rowReader))
                     break;                
                 var row = new {class_name}();");
 
             for (int i = 0; i < header.Count; i++)
             {
-                sw.WriteLine($"reader.ExRead(ref row.{header[i].Name});");
+                sw.WriteLine($"\t\t\t\trowReader.ExRead(ref row.{header[i].Name});");
             }
 
             sw.WriteLineExt(_formater,
