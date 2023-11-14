@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Test;
 
-namespace Test
+namespace TestLoadCs.table_reader
 {
     public enum ETableReaderType
     {
@@ -26,7 +27,7 @@ namespace Test
     }
 
     public interface ITableReader : ITableDataReader
-    {        
+    {
         public ETableReaderType ReaderType { get; }
         public List<Str> ReadHeader();
         public bool NextRow();

@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Test;
 
-namespace Test
+namespace TestLoadCs.table_reader
 {
     public class TableReaderBin : ITableReader
     {

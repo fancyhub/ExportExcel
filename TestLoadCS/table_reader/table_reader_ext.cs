@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using Test;
 
-namespace Test
+namespace TestLoadCs.table_reader
 {
     public static class TableReaderExt
     {
         static TableReaderExt()
         {
-            TableEnumConverterMgr.RegFunc((v) => (EItemType)v, (v) => (int)v);
-            TableEnumConverterMgr.RegFunc((v) => (EItemSubType)v, (v) => (int)v);
-            TableEnumConverterMgr.RegFunc((v) => (EItemQuality)v, (v) => (int)v);
+            EnumConverterMgr.RegFunc((v) => (EItemType)v, (v) => (int)v);
+            EnumConverterMgr.RegFunc((v) => (EItemSubType)v, (v) => (int)v);
+            EnumConverterMgr.RegFunc((v) => (EItemQuality)v, (v) => (int)v);
         }
 
         #region Base
@@ -57,11 +58,11 @@ namespace Test
         }
         public static void ExRead<T>(this ITableDataReader self, ref T v) where T : struct
         {
-            if (!TableEnumConverterMgr.Convert(self.ReadInt32(), ref v))
+            if (!EnumConverterMgr.Convert(self.ReadInt32(), ref v))
             {
                 Log.E("没有找到类型 {0} 的转换", typeof(T));
             }
-        }         
+        }
         #endregion
 
         #region Pair

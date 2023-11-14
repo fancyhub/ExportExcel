@@ -2,8 +2,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TestLoadCs.table_reader;
+
 namespace Test
-{   
+{
     public partial class TableMgr
     {
         private static List<System.Object> _temp = new List<System.Object>(10000);

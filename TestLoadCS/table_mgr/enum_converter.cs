@@ -4,17 +4,17 @@ using System.Collections.Generic;
 namespace Test
 {
 
-    public interface ITableEnumConverter { }
-    public interface ITableEnumConverter<T> : ITableEnumConverter where T : struct
+    public interface IEnumConverter { }
+    public interface ITableEnumConverter<T> : IEnumConverter where T : struct
     {
         public T Convert(int v);
         public int Convert(T v);
     }
 
-    public class TableEnumConverterMgr
+    public class EnumConverterMgr
     {
-        public static TableEnumConverterMgr Inst = new TableEnumConverterMgr();
-        private Dictionary<Type, ITableEnumConverter> _dict = new Dictionary<Type, ITableEnumConverter>();
+        public static EnumConverterMgr Inst = new EnumConverterMgr();
+        private Dictionary<Type, IEnumConverter> _dict = new Dictionary<Type, IEnumConverter>();
 
         public static void Reg<T>(ITableEnumConverter<T> convert) where T : struct
         {

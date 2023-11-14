@@ -1,5 +1,6 @@
 // See https://aka.ms/new-console-template for more information
 using Test;
+using TestLoadCs.table_reader;
 
 const string dirPath0 = "../../../../TestData/0_no_loc/Output/Client/Data";
 const string dirPath1 = "../../../../TestData/1_loc/Output/Client/Data";
