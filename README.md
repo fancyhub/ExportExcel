@@ -61,8 +61,8 @@
 |locstr|会自动生成多语言表, 内容填写 指定默认语言,默认语言在配置里面指定|
 
 ## Tuple 类型
-Tuple 用 冒号 | 作为连接符, 比如 int_float   3|3.5
-所有的类型都可以相互组合, 只有LocStr 不允许和任何其他类型组合
+Tuple 用 | 作为连接符, 比如 int_float   3|3.5  
+所有的类型都可以相互组合, 只有LocStr 不允许和任何其他类型组合  
 
 ||bool, int,uint,int64,uint64,float,double,string|locstr|
 | ---- | ----|----|
@@ -71,8 +71,8 @@ Tuple 用 冒号 | 作为连接符, 比如 int_float   3|3.5
 
 
 ## list类型
-list 用 分号 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locstr 不允许
-比如 list_int:  3;4;5
+list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locstr 不允许  
+比如 list_int:  3;4;5  
 比如 int_bool:  3:true;4:false
 
 |类型|对应的List类型|
