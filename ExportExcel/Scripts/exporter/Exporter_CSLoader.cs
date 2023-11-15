@@ -431,10 +431,10 @@ namespace ExportExcel
                     _formater["pk_sec_type"] = pk.AttrPK._sec_key.DataType.ToCSharpStr();
                     sw.WriteLineExt(_formater,
                        @"
-            var dict = new Dictionary<ulong, {class_name}>(list.Count);
+            var dict = new Dictionary<({pk_type},{pk_sec_type}), {class_name}>(list.Count);
             foreach (var p in list)
             {
-                ulong key = Table.MakeKey((uint)p.{pk_name}, (uint)p.{pk_sec_name});
+                ({pk_type},{pk_sec_type}) key = (p.{pk_name}, p.{pk_sec_name});
                 if (dict.ContainsKey(key))
                 {
                     Log.E(""{0} Contain Multi Id: {1},{2}, 如果允许ID重复, 修改表格"", typeof({class_name}), p.{pk_name},p.{pk_sec_name});

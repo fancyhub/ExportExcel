@@ -320,7 +320,7 @@ func (cd *CsvDataMgr) loadTestComposeKey() error {
     //3. check ids and types
     row_ids:= all_rows[0]
     row_types:= all_rows[1]
-    if len(row_ids) != len(row_types) || len(row_ids) != 4 {
+    if len(row_ids) != len(row_types) || len(row_ids) != 5 {
 		cd.logger.Error("csv data col count error" + file_name)
         return err
     }
@@ -350,12 +350,18 @@ func (cd *CsvDataMgr) loadTestComposeKey() error {
         return err
     }
 
+    if row_ids[4] != "Flags" || row_types[4] != "int32" {
+        err:= errors.New("Col fomrat error 4 in " + file_name)
+        cd.logger.Error(err.Error())
+        return err
+    }
+
     // 4.parse data to list
 	row_count := len(all_rows)
 	list_data := make([]TTestComposeKey, row_count-2)
 	for i := 0; i < row_count-2; i++ {
 		row_data := all_rows[i+2]
-		if len(row_data) != 4 {
+		if len(row_data) != 5 {
 			err := errors.New("CSV  error " + fmt.Sprint(i) + " in " + file_name)
             cd.logger.Error(err.Error())
             return err
@@ -366,6 +372,7 @@ func (cd *CsvDataMgr) loadTestComposeKey() error {
 		row_struct.Level= parseInt32(row_data[1])
 		row_struct.Name= parseInt32(row_data[2])
 		row_struct.Pos= parseFloat32Float32Float32(row_data[3])
+		row_struct.Flags= EItemFlag(parseInt32(row_data[4]))
 
         list_data[i] = row_struct
     }

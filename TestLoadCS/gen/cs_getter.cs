@@ -10,52 +10,52 @@ namespace Test{
       
         public  List<TItemData> GetTItemDataList()
         {
-            return GetList<TItemData>();
+            return FindTable<TItemData>()?.GetList<TItemData>();
         }
         
 
         public  TItemData GetTItemData(int Id)
         {
-            return Get<int,TItemData>(Id);
+            return FindTable<TItemData>()?.Get<int,TItemData>(Id);
         }
 
         public  Dictionary<int, TItemData> GetTItemDataDict()
         {
-            return GetDict<int, TItemData>();
+            return FindTable<TItemData>()?.GetDict<int, TItemData>();
         }
         
       
         public  List<TTestComposeKey> GetTTestComposeKeyList()
         {
-            return GetList<TTestComposeKey>();
+            return FindTable<TTestComposeKey>()?.GetList<TTestComposeKey>();
         }
         
 
         public  TTestComposeKey GetTTestComposeKey(uint Id,int Level)
         {        
-            return Get<TTestComposeKey>((uint)Id,(uint)Level);
+            return FindTable<TTestComposeKey>()?.Get<(uint,int), TTestComposeKey>((Id,Level));
         }
 
-        public  Dictionary<ulong, TTestComposeKey> GetTTestComposeKeyDict()
+        public  Dictionary<(uint,int), TTestComposeKey> GetTTestComposeKeyDict()
         {
-            return GetDict<ulong, TTestComposeKey>();
+            return FindTable<TTestComposeKey>()?.GetDict<(uint,int), TTestComposeKey>();            
         }
         
       
         public  List<TLoc> GetTLocList()
         {
-            return GetList<TLoc>();
+            return FindTable<TLoc>()?.GetList<TLoc>();
         }
         
 
         public  TLoc GetTLoc(int Id)
         {
-            return Get<int,TLoc>(Id);
+            return FindTable<TLoc>()?.Get<int,TLoc>(Id);
         }
 
         public  Dictionary<int, TLoc> GetTLocDict()
         {
-            return GetDict<int, TLoc>();
+            return FindTable<TLoc>()?.GetDict<int, TLoc>();
         }
         
 }

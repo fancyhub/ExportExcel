@@ -38,6 +38,17 @@ const (
 	EItemQuality_Purple EItemQuality = 4
 )
 
+// EItemFlag
+type EItemFlag int32
+const (
+	// 无
+	EItemFlag_None EItemFlag = 0
+	// 可堆叠
+	EItemFlag_Stack EItemFlag = 1
+	// 可删除
+	EItemFlag_CanDelete EItemFlag = 2
+)
+
 type TupleInt32Bool struct{
 	Item0 int32
 	Item1 bool
@@ -101,6 +112,9 @@ type TTestComposeKey struct {
 
 	// 位置
 	Pos TupleFloat32Float32Float32
+
+	// 标记位
+	Flags EItemFlag
 
 }
 

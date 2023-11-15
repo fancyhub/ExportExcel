@@ -56,6 +56,22 @@ namespace Test{
 		Purple = 4,
 	}
 
+    public enum EItemFlag
+    {
+		/// <summary>
+		/// 无
+		/// </summary>
+		None = 0,
+		/// <summary>
+		/// 可堆叠
+		/// </summary>
+		Stack = 1,
+		/// <summary>
+		/// 可删除
+		/// </summary>
+		CanDelete = 2,
+	}
+
     public sealed partial class TItemData
     {
 		/// <summary>
@@ -125,6 +141,10 @@ namespace Test{
 		/// 位置
 		/// </summary>
 		public (float,float,float) Pos;
+		/// <summary>
+		/// 标记位
+		/// </summary>
+		public EItemFlag Flags;
 
     }
 

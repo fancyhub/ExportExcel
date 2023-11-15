@@ -12,6 +12,14 @@ namespace Test{
 		/// </summary>
 		ITEMDATA_NAME_2 = 1652419321,
 		/// <summary>
+		/// 大刀
+		/// </summary>
+		ITEMDATA_NAME_4 = -1110617033,
+		/// <summary>
+		/// 长矛
+		/// </summary>
+		ITEMDATA_NAME_6 = -1524591491,
+		/// <summary>
 		/// 测试
 		/// </summary>
 		TESTCOMPOSEKEY_NAME_1_1 = -311812298,

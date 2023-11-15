@@ -94,7 +94,7 @@ namespace ExportExcel
                 @"      
         public {static_flag} List<{class_name}> Get{class_name}List()
         {
-            return GetList<{class_name}>();
+            return FindTable<{class_name}>()?.GetList<{class_name}>();
         }
         ");
 
@@ -110,12 +110,12 @@ namespace ExportExcel
                         @"
         public {static_flag} {class_name} Get{class_name}({pk_type} {pk_name})
         {
-            return Get<{pk_type},{class_name}>({pk_name});
+            return FindTable<{class_name}>()?.Get<{pk_type},{class_name}>({pk_name});
         }
 
         public {static_flag} Dictionary<{pk_type}, {class_name}> Get{class_name}Dict()
         {
-            return GetDict<{pk_type}, {class_name}>();
+            return FindTable<{class_name}>()?.GetDict<{pk_type}, {class_name}>();
         }
         ");
                 }
@@ -127,12 +127,12 @@ namespace ExportExcel
                     @"
         public {static_flag} {class_name} Get{class_name}({pk_type} {pk_name},{pk_sec_type} {pk_sec_name})
         {        
-            return Get<{class_name}>((uint){pk_name},(uint){pk_sec_name});
+            return FindTable<{class_name}>()?.Get<({pk_type},{pk_sec_type}), {class_name}>(({pk_name},{pk_sec_name}));
         }
 
-        public {static_flag} Dictionary<ulong, {class_name}> Get{class_name}Dict()
+        public {static_flag} Dictionary<({pk_type},{pk_sec_type}), {class_name}> Get{class_name}Dict()
         {
-            return GetDict<ulong, {class_name}>();
+            return FindTable<{class_name}>()?.GetDict<({pk_type},{pk_sec_type}), {class_name}>();            
         }
         ");
                 }

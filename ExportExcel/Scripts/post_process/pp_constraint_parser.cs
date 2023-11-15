@@ -84,23 +84,20 @@ namespace ExportExcel
                 attr_pk._sec_key_idx = db_col.Table.Header.IndexOfCol(sec_key_name);
                 sec_col.AttrBlankForbid = true; //不允许为空
 
-                if (!_is_data_type_valid(col.DataType, sec_col.DataType))
+                if (!_is_data_type_combine(col.DataType) || !_is_data_type_combine(sec_col.DataType))
                     ErrSet.E(db_col, $"组合PK, 只能支持 int/uint");
             }
 
-            public static bool _is_data_type_valid(DataType data_type1, DataType data_type2)
+            public static bool _is_data_type_combine(DataType data_type)
             {
-                if (data_type1.IsList || data_type2.IsList)
+                if (data_type.IsTuple || data_type.IsList)
                     return false;
-                if (data_type1.IsTuple || data_type2.IsList)
+                if (data_type.enum_type != null)
                     return false;
-                if (data_type1.enum_type != null || data_type2.enum_type != null)
-                    return false;
-                if (data_type1.type0 != EDataType.Int32 && data_type1.type0 != EDataType.UInt32)
-                    return false;
-                if (data_type2.type0 != EDataType.Int32 && data_type2.type0 != EDataType.UInt32)
-                    return false;
-                return true;
+
+                if (data_type.type0 == EDataType.Int32 || data_type.type0 == EDataType.UInt32)
+                    return true;
+                return false;
             }
 
             public static ConAttrPK _parse_pk(TableHeaderItem col)

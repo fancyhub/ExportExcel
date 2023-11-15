@@ -11,7 +11,10 @@ tableReaderCreator = new TableReaderBinCreator(dirPath2);
 TableMgr mgr = new TableMgr(tableReaderCreator);
 
 mgr.LoadAllTable();
-mgr.Get(1, 2, out TTestComposeKey v);
+var v = mgr.GetTTestComposeKey(1, 2);
+
+mgr.Get((int)1,out TableReaderBinCreator aaa);
+
 List<TItemData> itemList = mgr.GetList<TItemData>();
 List<TTestComposeKey> composeKeyItemList = mgr.GetList<TTestComposeKey>();
 

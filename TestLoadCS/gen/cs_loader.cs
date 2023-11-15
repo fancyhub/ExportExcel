@@ -32,6 +32,7 @@ namespace Test{
 			EnumConverterMgr.RegFunc((v) => (EItemType)v, (v) => (int)v);
 			EnumConverterMgr.RegFunc((v) => (EItemSubType)v, (v) => (int)v);
 			EnumConverterMgr.RegFunc((v) => (EItemQuality)v, (v) => (int)v);
+			EnumConverterMgr.RegFunc((v) => (EItemFlag)v, (v) => (int)v);
 		}
 
         public TableLoaderMgr(CreateTableReader createTableReader)
@@ -129,7 +130,7 @@ namespace Test{
         {
             string sheet_name = "TestComposeKey";
             lang = null;
-            int col_count = 4;
+            int col_count = 5;
 
             if(!CreateTableReader(sheet_name,lang,out var reader))
                 return null;
@@ -143,10 +144,11 @@ namespace Test{
             }
             bool head_rst = true;
             
-			head_rst &= ((header[0] == "Id") && (header[0+4] == "uint32"));
-			head_rst &= ((header[1] == "Level") && (header[1+4] == "int32"));
-			head_rst &= ((header[2] == "Name") && (header[2+4] == "locid"));
-			head_rst &= ((header[3] == "Pos") && (header[3+4] == "float32_float32_float32"));
+			head_rst &= ((header[0] == "Id") && (header[0+5] == "uint32"));
+			head_rst &= ((header[1] == "Level") && (header[1+5] == "int32"));
+			head_rst &= ((header[2] == "Name") && (header[2+5] == "locid"));
+			head_rst &= ((header[3] == "Pos") && (header[3+5] == "float32_float32_float32"));
+			head_rst &= ((header[4] == "Flags") && (header[4+5] == "int32"));
 
             if (!head_rst)
             {
@@ -165,6 +167,7 @@ namespace Test{
 				_Read(rowReader, ref row.Level);
 				_Read(rowReader, ref row.Name);
 				_ReadTuple(rowReader.BeginTuple(), ref row.Pos);
+				_Read(rowReader, ref row.Flags);
 
                 _temp.Add(row);
             }
@@ -177,10 +180,10 @@ namespace Test{
             }            
             
 
-            var dict = new Dictionary<ulong, TTestComposeKey>(list.Count);
+            var dict = new Dictionary<(uint,int), TTestComposeKey>(list.Count);
             foreach (var p in list)
             {
-                ulong key = Table.MakeKey((uint)p.Id, (uint)p.Level);
+                (uint,int) key = (p.Id, p.Level);
                 if (dict.ContainsKey(key))
                 {
                     Log.E("{0} Contain Multi Id: {1},{2}, 如果允许ID重复, 修改表格", typeof(TTestComposeKey), p.Id,p.Level);
