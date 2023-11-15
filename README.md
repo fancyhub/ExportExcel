@@ -1,6 +1,8 @@
 # ExportExcel
 # 数据表   
-概述: 如果数据表要分表, 以第一个读取的表格为主, 如果后面同名的表和第一个表的类型不一样,会报错
+## 概述
+如果数据表要分表, 以第一个读取的表格为主, 后面的表格只能 少列, 移动列, 不能少列,否则会报错  
+
 样例
 <table>
   <tr>
@@ -40,11 +42,13 @@
   </tr>    
 </table>
 
-## 规则表格 名字上的约束
-    用 | 分割, 前面的是 sheet name, 第二个是整张表格的导出配置, 有 export_none, export_svr, export_client 这几种, 大小写无所谓
-    比如  WeaponRandom| Export_Svr         //武器随机表, 服务器需要
-    比如 Loc | Export_Client                        //多语言表 只有客户端需要
-    比如 LocTrans | Export_None               //多语言翻译表不需要导出
+## 表格Sheet名字上的约束
+    用 | 分割, 前面的是 sheet name, 第二个是整张表格的导出配置, 有如下这几种, 大小写无所谓
+    export_none , export_svr , export_client
+
+    比如 WeaponRandom | Export_Svr         //武器随机表, 服务器需要
+    比如 Loc | Export_Client               //多语言表 只有客户端需要
+    比如 Item                              //物品表, 都需要
 
 
 # 类型
@@ -98,15 +102,14 @@ list 用 分号 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就�
  |TupleAlias[AliasName]|给Tuple类型增加别名, 目前只有CSharp的导出支持, 对应的别名需要实现对应的 静态方法 CreateInst|  
 
  # 引用表
- 表名 @RefTable, 或者 @RefTable_xxx , 可以分表
-要放在Data目录
+表名 @RefTable, 或者 @RefTable_xxx , 可以分表
 表结构如下
 
-|该cell留空|SubKeyName1|SubKeyName2|#yyy 不读取该列|
+|该cell留空|SubKeyName1|SubKeyName2|#yyy #开头不读取该列|
 |------|------|------|-----|
 |MainKeyName1|A|B|x|
 |MainKeyName2|C|D||
-|#xxx  不读取改行|||
+|#xxx #开头不读取该行|||
 
 ||伤害1|
 |------|------|
@@ -114,14 +117,15 @@ list 用 分号 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就�
 |冰|3|
 
 
-使用的表 在数据区域里面, 
-比如填写 R(MainKeyName1, SubKeyName1)  相当于填写 A
-比如填写 R(火,伤害1)  相当于填写 1
+使用的表 在数据区域里面  
+比如填写 R(MainKeyName1, SubKeyName1)  相当于填写 A  
+比如填写 R(火,伤害1)  相当于填写 1  
 
 # 枚举表
-表名 @EnumConfig  或者 @EnumConfig_xxxx  可以分表
+表名 @EnumConfig  或者 @EnumConfig_xxxx , 可以分表  
 样例:
 |EnumName|EnumFieldName|ExcelVal|Val|
+|------|------|------|-----|
 |EItemType|None|无|0|
 |EItemType|Weapon|武器|1|
 |EItemType|Cosume|消耗品|2|
@@ -131,18 +135,18 @@ list 用 分号 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就�
     第3列: ExcelVal 里面填写的内容, 
     第4列: 对应的值, 只能是int
     
-数据表里面:  可以填写 ExcelVal 里面的内容,也可以填写数字
+数据表里面:  可以填写 ExcelVal 里面的内容,也可以填写数字  
 物品表
 |Id|ItemType|
 |----|----|
-|int\|pk| int \|Enum[EItemType]|
+|int\|pk| int \| Enum[EItemType]|
 |物品Id|物品类型|
 |10001|武器|
 |10002|1|
 |10003|消耗品|
 |10004|2|
 
-# 配置描述
+# 配置文件 config.json
 
 ```json
 {
