@@ -5,7 +5,7 @@ namespace Test
 {
 
     public interface IEnumConverter { }
-    public interface ITableEnumConverter<T> : IEnumConverter where T : struct
+    public interface ITableEnumConverter<T> : IEnumConverter where T : Enum
     {
         public T Convert(int v);
         public int Convert(T v);
@@ -16,20 +16,20 @@ namespace Test
         public static EnumConverterMgr Inst = new EnumConverterMgr();
         private Dictionary<Type, IEnumConverter> _dict = new Dictionary<Type, IEnumConverter>();
 
-        public static void Reg<T>(ITableEnumConverter<T> convert) where T : struct
+        public static void Reg<T>(ITableEnumConverter<T> convert) where T : Enum
         {
             if (convert == null)
                 return;
             Inst._dict[typeof(T)] = convert;
         }
-        public static void RegFunc<T>(Func<int, T> to, Func<T, int> rev) where T : struct
+        public static void RegFunc<T>(Func<int, T> to, Func<T, int> rev) where T : Enum
         {
             if (to == null || rev == null)
                 return;
             Inst._dict[typeof(T)] = new InnerConverter<T>(to, rev);
         }
 
-        public static bool Convert<T>(int src, ref T dst) where T : struct
+        public static bool Convert<T>(int src, ref T dst) where T : Enum
         {
             dst = default(T);
             Inst._dict.TryGetValue(typeof(T), out var it);
@@ -42,7 +42,7 @@ namespace Test
             return true;
         }
 
-        public static bool Convert<T>(T src, ref int dst) where T : struct
+        public static bool Convert<T>(T src, ref int dst) where T : Enum
         {
             dst = 0;
             Inst._dict.TryGetValue(typeof(T), out var it);
@@ -55,7 +55,7 @@ namespace Test
             return true;
         }
 
-        private class InnerConverter<T> : ITableEnumConverter<T> where T : struct
+        private class InnerConverter<T> : ITableEnumConverter<T> where T : Enum
         {
             public Func<int, T> _to;
             public Func<T, int> _to2;

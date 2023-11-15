@@ -102,7 +102,7 @@ namespace ExportExcel
             sw.WriteLine("\t\t}");
 
 
-            sw.WriteLineExt(_formater,@"
+            sw.WriteLineExt(_formater, @"
         public TableLoaderMgr(CreateTableReader createTableReader)
         {
             CreateTableReader = createTableReader;            
@@ -117,7 +117,7 @@ namespace ExportExcel
                 sw.WriteLine($"\t\t\tLoaderDict.Add(typeof({class_name}),new TableInfo(_Load{table.SheetName},{table.MultiLang.ToString().ToLower()}));");
             }
 
-            
+
 
             sw.WriteLine("\t\t}");
 
@@ -125,21 +125,146 @@ namespace ExportExcel
             {
                 _ExportLoaderFunc(p, sw);
             }
-            sw.WriteLine("}");
+            _ExportReadListFunc(tables, sw);
+
+            sw.WriteLine("\t}");
+        }
+
+        public void _ExportReadListFunc(List<FilterTable> table_list, StreamWriter sw)
+        {
+            sw.Write(@"
+        #region Base Reader
+        private static void _Read(ITableDataReader reader, ref bool v)
+        {
+            v = reader.ReadBool();
+        }
+        private static void _Read(ITableDataReader reader, ref int v)
+        {
+            v = reader.ReadInt32();
+        }
+        private static void _Read(ITableDataReader reader, ref uint v)
+        {
+            v = reader.ReadUInt32();
+        }
+        private static void _Read(ITableDataReader reader, ref long v)
+        {
+            v = reader.ReadInt64();
+        }
+        private static void _Read(ITableDataReader reader, ref ulong v)
+        {
+            v = reader.ReadUInt64();
+        }
+        private static void _Read(ITableDataReader reader, ref float v)
+        {
+            v = reader.ReadF32();
+        }
+        private static void _Read(ITableDataReader reader, ref double v)
+        {
+            v = reader.ReadF64();
+        }
+        private static void _Read(ITableDataReader reader, ref string v)
+        {
+            v = reader.ReadString();
+        }
+        private static void _Read(ITableDataReader reader, ref LocStr v)
+        {
+            string s = reader.ReadString();
+            v = s;
+        }
+        private static void _Read(ITableDataReader reader, ref LocId v)
+        {
+            v = reader.ReadInt32();
+        }
+        private static void _Read<T>(ITableDataReader reader, ref T v) where T : Enum
+        {
+            if (!EnumConverterMgr.Convert(reader.ReadInt32(), ref v))
+            {
+                Log.E(""没有找到类型 {0} 的转换"", typeof(T));
+            }
+        }
+        #endregion
+");
+
+
+            Dictionary<string, bool> list_types = new Dictionary<string, bool>();
+            Dictionary<string, DataType> tuple_types = new Dictionary<string, DataType>();
+            foreach (var table in table_list)
+            {
+                List<TableHeaderItem> header_list = table.Header;
+                foreach (var header in header_list)
+                {
+                    DataType data_type = header.DataType;
+                    if (data_type.IsList)
+                    {
+                        data_type.IsList = false;
+                        list_types[data_type.ToCSharpStr()] = data_type.IsTuple;
+                    }
+
+                    if(data_type.IsTuple)
+                    {
+                        tuple_types[data_type.ToCSharpStr()] = data_type;
+                    }
+                }
+            }
+            sw.WriteLine("\t\t#region Tuple Reader");
+            foreach (var p in tuple_types)
+            {
+                _formater["data_type"] = p.Key;
+
+                sw.WriteLineExt(_formater, @"
+        private static void _ReadTuple(ITableTupleReader tupleReader, ref {data_type}v)
+        {
+            if(tupleReader==null)
+                return;
+");
+                for(int i = 0; i < p.Value.Count; i++)
+                {
+                    sw.WriteLine($"\t\t\t_Read(tupleReader,ref v.Item{i+1});");
+                }
+                sw.WriteLine("\t\t}");
+            }
+            sw.WriteLine("\t\t#endregion\n");
+            sw.WriteLine("\t\t#region List Reader");
+            foreach (var p in list_types)
+            {
+                _formater["data_type"] = p.Key;
+                _formater["reader_item"] = "_Read(listReader, ref item);";
+                if (p.Value)
+                    _formater["reader_item"] = "_ReadTuple(listReader.BeginTuple(), ref item);";
+
+                sw.WriteLineExt(_formater, @"
+        private static void _ReadList(ITableRowReader rowReader, ref {data_type}[]v)
+        {
+            var listReader = rowReader.BeginList();
+            int count = listReader != null ? listReader.GetCount() : 0;
+            if (count == 0)
+                v = Array.Empty<{data_type}>();
+            else
+            {
+                v = new {data_type}[count];
+                for (int i = 0; i < count; i++)
+                {
+                    {data_type} item = default;
+                    {reader_item}                    
+                    v[i] = item;
+                }
+            }
+        }");                
+            }
+            sw.WriteLine("\t\t#endregion");
         }
 
         public void _ExportLoaderFunc(FilterTable table, StreamWriter sw)
         {
-            List<TableHeaderItem> header = table.Header;
+            List<TableHeaderItem> header_list = table.Header;
             string multi_name = "";
             if (!table.MultiLang)
                 multi_name = "lang = null;";
             _formater["sheet_name_lang"] = multi_name;
-            _formater["col_count"] = header.Count.ToString();
+            _formater["col_count"] = header_list.Count.ToString();
             _formater["sheet_name"] = table.SheetName;
             _formater["class_name"] = _formater["class_prefix"] + table.SheetName + _formater["class_suffix"];
 
-            sw.WriteLine("");
             sw.WriteLineExt(_formater, @"
         private Table _Load{sheet_name}(string lang)
         {
@@ -161,9 +286,9 @@ namespace ExportExcel
             ");
 
 
-            for (int i = 0; i < header.Count; i++)
+            for (int i = 0; i < header_list.Count; i++)
             {
-                sw.WriteLine("\t\t\thead_rst &= ((header[{0}] == \"{1}\") && (header[{0}+{2}] == \"{3}\"));", i, header[i].Name, header.Count, header[i].DataType.ToCsvStr());
+                sw.WriteLine("\t\t\thead_rst &= ((header[{0}] == \"{1}\") && (header[{0}+{2}] == \"{3}\"));", i, header_list[i].Name, header_list.Count, header_list[i].DataType.ToCsvStr());
             }
 
             sw.WriteLineExt(_formater,
@@ -182,9 +307,22 @@ namespace ExportExcel
                     break;                
                 var row = new {class_name}();");
 
-            for (int i = 0; i < header.Count; i++)
+            for (int i = 0; i < header_list.Count; i++)
             {
-                sw.WriteLine($"\t\t\t\trowReader.ExRead(ref row.{header[i].Name});");
+                var header = header_list[i];
+                var data_type = header.DataType;
+                if (data_type.IsList)
+                {
+                    sw.WriteLine($"\t\t\t\t_ReadList(rowReader, ref row.{header.Name});");
+                }
+                else if (data_type.IsTuple)
+                {
+                    sw.WriteLine($"\t\t\t\t_ReadTuple(rowReader.BeginTuple(), ref row.{header.Name});");
+                }
+                else
+                {
+                    sw.WriteLine($"\t\t\t\t_Read(rowReader, ref row.{header.Name});");
+                }
             }
 
             sw.WriteLineExt(_formater,

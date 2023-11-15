@@ -45,7 +45,6 @@ namespace Test{
 			LoaderDict.Add(typeof(TLoc),new TableInfo(_LoadLoc,true));
 		}
 
-
         private Table _LoadItemData(string lang)
         {
             string sheet_name = "ItemData";
@@ -86,14 +85,14 @@ namespace Test{
                 if (!reader.NextRow(out var rowReader))
                     break;                
                 var row = new TItemData();
-				rowReader.ExRead(ref row.Id);
-				rowReader.ExRead(ref row.Name);
-				rowReader.ExRead(ref row.Type);
-				rowReader.ExRead(ref row.SubType);
-				rowReader.ExRead(ref row.Quality);
-				rowReader.ExRead(ref row.PairField);
-				rowReader.ExRead(ref row.PairFieldList);
-				rowReader.ExRead(ref row.ListField);
+				_Read(rowReader, ref row.Id);
+				_Read(rowReader, ref row.Name);
+				_Read(rowReader, ref row.Type);
+				_Read(rowReader, ref row.SubType);
+				_Read(rowReader, ref row.Quality);
+				_ReadTuple(rowReader.BeginTuple(), ref row.PairField);
+				_ReadList(rowReader, ref row.PairFieldList);
+				_ReadList(rowReader, ref row.ListField);
 
                 _temp.Add(row);
             }
@@ -119,7 +118,6 @@ namespace Test{
             return Table.Create(list,dict);
                 
 		}
-
 
         private Table _LoadTestComposeKey(string lang)
         {
@@ -157,10 +155,10 @@ namespace Test{
                 if (!reader.NextRow(out var rowReader))
                     break;                
                 var row = new TTestComposeKey();
-				rowReader.ExRead(ref row.Id);
-				rowReader.ExRead(ref row.Level);
-				rowReader.ExRead(ref row.Name);
-				rowReader.ExRead(ref row.Pos);
+				_Read(rowReader, ref row.Id);
+				_Read(rowReader, ref row.Level);
+				_Read(rowReader, ref row.Name);
+				_ReadTuple(rowReader.BeginTuple(), ref row.Pos);
 
                 _temp.Add(row);
             }
@@ -187,7 +185,6 @@ namespace Test{
             return Table.Create(list,dict);
                 
 		}
-
 
         private Table _LoadLoc(string lang)
         {
@@ -223,8 +220,8 @@ namespace Test{
                 if (!reader.NextRow(out var rowReader))
                     break;                
                 var row = new TLoc();
-				rowReader.ExRead(ref row.Id);
-				rowReader.ExRead(ref row.Val);
+				_Read(rowReader, ref row.Id);
+				_Read(rowReader, ref row.Val);
 
                 _temp.Add(row);
             }
@@ -250,5 +247,125 @@ namespace Test{
             return Table.Create(list,dict);
                 
 		}
-}
+
+        #region Base Reader
+        private static void _Read(ITableDataReader reader, ref bool v)
+        {
+            v = reader.ReadBool();
+        }
+        private static void _Read(ITableDataReader reader, ref int v)
+        {
+            v = reader.ReadInt32();
+        }
+        private static void _Read(ITableDataReader reader, ref uint v)
+        {
+            v = reader.ReadUInt32();
+        }
+        private static void _Read(ITableDataReader reader, ref long v)
+        {
+            v = reader.ReadInt64();
+        }
+        private static void _Read(ITableDataReader reader, ref ulong v)
+        {
+            v = reader.ReadUInt64();
+        }
+        private static void _Read(ITableDataReader reader, ref float v)
+        {
+            v = reader.ReadF32();
+        }
+        private static void _Read(ITableDataReader reader, ref double v)
+        {
+            v = reader.ReadF64();
+        }
+        private static void _Read(ITableDataReader reader, ref string v)
+        {
+            v = reader.ReadString();
+        }
+        private static void _Read(ITableDataReader reader, ref LocStr v)
+        {
+            string s = reader.ReadString();
+            v = s;
+        }
+        private static void _Read(ITableDataReader reader, ref LocId v)
+        {
+            v = reader.ReadInt32();
+        }
+        private static void _Read<T>(ITableDataReader reader, ref T v) where T : Enum
+        {
+            if (!EnumConverterMgr.Convert(reader.ReadInt32(), ref v))
+            {
+                Log.E("没有找到类型 {0} 的转换", typeof(T));
+            }
+        }
+        #endregion
+		#region Tuple Reader
+
+        private static void _ReadTuple(ITableTupleReader tupleReader, ref (int,bool)v)
+        {
+            if(tupleReader==null)
+                return;
+
+			_Read(tupleReader,ref v.Item1);
+			_Read(tupleReader,ref v.Item2);
+		}
+
+        private static void _ReadTuple(ITableTupleReader tupleReader, ref (int,long)v)
+        {
+            if(tupleReader==null)
+                return;
+
+			_Read(tupleReader,ref v.Item1);
+			_Read(tupleReader,ref v.Item2);
+		}
+
+        private static void _ReadTuple(ITableTupleReader tupleReader, ref (float,float,float)v)
+        {
+            if(tupleReader==null)
+                return;
+
+			_Read(tupleReader,ref v.Item1);
+			_Read(tupleReader,ref v.Item2);
+			_Read(tupleReader,ref v.Item3);
+		}
+		#endregion
+
+		#region List Reader
+
+        private static void _ReadList(ITableRowReader rowReader, ref (int,long)[]v)
+        {
+            var listReader = rowReader.BeginList();
+            int count = listReader != null ? listReader.GetCount() : 0;
+            if (count == 0)
+                v = Array.Empty<(int,long)>();
+            else
+            {
+                v = new (int,long)[count];
+                for (int i = 0; i < count; i++)
+                {
+                    (int,long) item = default;
+                    _ReadTuple(listReader.BeginTuple(), ref item);                    
+                    v[i] = item;
+                }
+            }
+        }
+
+        private static void _ReadList(ITableRowReader rowReader, ref int[]v)
+        {
+            var listReader = rowReader.BeginList();
+            int count = listReader != null ? listReader.GetCount() : 0;
+            if (count == 0)
+                v = Array.Empty<int>();
+            else
+            {
+                v = new int[count];
+                for (int i = 0; i < count; i++)
+                {
+                    int item = default;
+                    _Read(listReader, ref item);                    
+                    v[i] = item;
+                }
+            }
+        }
+		#endregion
+	}
 }
