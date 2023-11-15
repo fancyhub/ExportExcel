@@ -95,6 +95,7 @@ list 用 分号 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就�
  |LookUp[TarSheetName.ColName]|查找约束<br>支持 int,uint,list_int,list_uint,int64,uint64, list_int64,string,list_string 不支持枚举<br>注意: TarSheetName.ColName 必须为 BlankForbid / Unique /PK 约束<br>自己字段可以为空<br>中间是点连接符|
  |FilePath[LookUpDir ,Suffix ]|文件路径检查<br>只是支持 string类型, 不支持 list_string<br>比如  FilePath[Assets/Res/Hero,prefab]  该字段的内容填写 file_name<br>工具会检查 Assets/Res/Hero/file_name.prefab 是否存在,同时检查大小写|
  |Range[min,max]|范围检查<br>支持 int32,uint32,int64,uint64, floag,double 以及对应的list 类型|
+ |TupleAlias[AliasName]|给Tuple类型增加别名, 目前只有CSharp的导出支持, 对应的别名需要实现对应的 静态方法 CreateInst|  
 
  # 引用表
  表名 @RefTable, 或者 @RefTable_xxx , 可以分表
@@ -145,39 +146,35 @@ list 用 分号 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就�
 
 ```json
 {
-    "excelPaths": [
-        "../0_no_loc/data",
+    "excelPaths": [        
         "data"
     ],
-    "validation": { 
+    "validation": {
         "searchFileRoot": "../../Client/Resources",
         "sheetNameReg": "^[A-Z][a-zA-Z0-9]*$",
         "colNameReg": "^[A-Z][a-zA-Z0-9_]*$",
         "enumNameReg": "^E[A-Z][A-Za-z0-9_]*$",
         "enumFieldNameReg": "[A-Z][a-zA-Z0-9_]*$",
     },
-    "localization": { //多语言配置
-        "mode": "normal", //模式: none, normal,auto_gen_key
-        "useHashId": true,  //使用 hashId作为Key
-
-        "modeNormal": {
-            "sheetName": "Loc",   //多语言表的名字
-            "defaultLang": "zh-Hans", //默认语言, 生成代码注释用的, 不能为空
-            "des": "LocStr字段 定义的是 Key, 需要一个多语言表, sheetName 对应的表名是多语言表"
-        },
-
-        "modeAutoGenKey": {
-            "sheetName": "Loc",
-            "defaultLang": "zh-Hans",
-            "transSheetName": "LocTrans",
-            "exportTrans": true,
-            "exportTransDir": "Output",
-            "desc": "LocStr 字段定义的是 一个默认语言对应的文本, sheetName 对应的表名是多语言表,里面是空的, 用来描述几种语言, 需要一个额外的翻译表"
-        },
+    "localization": {
+		"enable":false,
+		"sheetName": "Loc",
+		"defaultLang": "zh-Hans",
+		"autoGenKey":true,
+		"useHashId": true, 
     },
+	"exportRule":{
+		"enable": true,
+		"dir": "Output/Rule",
+	},
+	"exportLocTrans":{
+		"enable": true,
+		"dir": "Output",
+	},
     "exportClient": {
         "csv": {
             "enable": true,
+			"utf8bom":true,
             "dir": "Output/Client/Data",
         },
         "bin": {
@@ -188,20 +185,34 @@ list 用 分号 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就�
             "enable": true,
             "namespaceName": "Test",
             "classPrefix": "T",
-            "dir": "Output/Client/CS",
-            "locIdPrefix": "TC_", //多语言的Key 前缀相同,就会导出代码
+			"classSuffix": "",			
+            "dir": "Output/Client/CS",					
             "header": "using System;",
-        },
+			
+			"loader":{
+				"enable":true,
+			},
+			"getter":{
+				"enable":true,
+				"className":"TableMgr",
+				"useStatic":false,
+			},
+			"locId":{
+				"enable":true,
+				"locIdStartWith":"",
+			}
+        },		 
         "lua": {
             "enable": true,
             "classPrefix": "T",
-            "locIdPrefix": "TC_",
+			"locIdPrefix": "TC_",
             "dir": "Output/Client/Lua"
         },
     },
     "exportServer": {
         "csv": {
             "enable": true,
+			"utf8bom":true,
             "dir": "Output/Server/Data",
         },
         "bin": {
@@ -212,14 +223,27 @@ list 用 分号 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就�
             "enable": true,
             "namespaceName": "Test",
             "classPrefix": "T",
+			"classSuffix": "",			
             "dir": "Output/Server/CS",
-            "locIdPrefix": "TC_", 
             "header": "using System;",
+			
+			"loader":{
+				"enable":true,
+			},
+			"getter":{
+				"enable":true,
+				"className":"TableMgr",
+				"useStatic":false,
+			},
+			"locId":{
+				"enable":true,
+				"locIdStartWith":"",
+			}
         },
         "lua": {
             "enable": true,
             "classPrefix": "T",
-            "locIdPrefix": "TC_",
+			"locIdPrefix": "TC_",
             "dir": "Output/Server/Lua"
         },
         "go": {
@@ -230,6 +254,7 @@ list 用 分号 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就�
         }
     }
 }
+
 ```
 
 |字段名|格式要求|描述|
