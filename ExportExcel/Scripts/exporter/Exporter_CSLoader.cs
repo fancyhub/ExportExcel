@@ -117,20 +117,18 @@ namespace ExportExcel
                 sw.WriteLine($"\t\t\tLoaderDict.Add(typeof({class_name}),new TableInfo(_Load{table.SheetName},{table.MultiLang.ToString().ToLower()}));");
             }
 
-
-
             sw.WriteLine("\t\t}");
 
             foreach (var p in tables)
             {
                 _ExportLoaderFunc(p, sw);
             }
-            _ExportReadListFunc(tables, sw);
+            _ExportReadFunc(tables, sw);
 
             sw.WriteLine("\t}");
         }
 
-        public void _ExportReadListFunc(List<FilterTable> table_list, StreamWriter sw)
+        public void _ExportReadFunc(List<FilterTable> table_list, StreamWriter sw)
         {
             sw.Write(@"
         #region Base Reader
@@ -185,9 +183,8 @@ namespace ExportExcel
         #endregion
 ");
 
-
-            Dictionary<string, bool> list_types = new Dictionary<string, bool>();
-            Dictionary<string, DataType> tuple_types = new Dictionary<string, DataType>();
+            Dictionary<(string aliasName, string name), bool> list_types = new Dictionary<(string, string), bool>();
+            Dictionary<(string aliasName, string name), DataType> tuple_types = new Dictionary<(string, string), DataType>();
             foreach (var table in table_list)
             {
                 List<TableHeaderItem> header_list = table.Header;
@@ -197,42 +194,77 @@ namespace ExportExcel
                     if (data_type.IsList)
                     {
                         data_type.IsList = false;
-                        list_types[data_type.ToCSharpStr()] = data_type.IsTuple;
+                        if (header.AttrTupleAlias != null)
+                            list_types[(header.AttrTupleAlias.AliasName, data_type.ToCSharpStr())] = data_type.IsTuple;
+                        else
+                            list_types[(string.Empty, data_type.ToCSharpStr())] = data_type.IsTuple;
                     }
 
-                    if(data_type.IsTuple)
+                    if (data_type.IsTuple)
                     {
-                        tuple_types[data_type.ToCSharpStr()] = data_type;
+                        if (header.AttrTupleAlias != null)
+                            tuple_types[(header.AttrTupleAlias.AliasName, data_type.ToCSharpStr())] = data_type;
+                        else
+                            tuple_types[(string.Empty, data_type.ToCSharpStr())] = data_type;
                     }
                 }
             }
+
+
             sw.WriteLine("\t\t#region Tuple Reader");
             foreach (var p in tuple_types)
             {
-                _formater["data_type"] = p.Key;
-
-                sw.WriteLineExt(_formater, @"
-        private static void _ReadTuple(ITableTupleReader tupleReader, ref {data_type}v)
+                _formater["data_type"] = p.Key.name;
+                _formater["alias_name"] = p.Key.aliasName;
+                if (string.IsNullOrEmpty(p.Key.aliasName))
+                {
+                    sw.WriteLineExt(_formater, @"
+        private static void _ReadTuple(ITableTupleReader tupleReader, ref {data_type} v)
         {
             if(tupleReader==null)
                 return;
 ");
-                for(int i = 0; i < p.Value.Count; i++)
-                {
-                    sw.WriteLine($"\t\t\t_Read(tupleReader,ref v.Item{i+1});");
+                    for (int i = 0; i < p.Value.Count; i++)
+                    {
+                        sw.WriteLine($"\t\t\t_Read(tupleReader,ref v.Item{i + 1});");
+                    }
+                    sw.WriteLine("\t\t}");
                 }
-                sw.WriteLine("\t\t}");
+                else
+                {
+                    sw.WriteLineExt(_formater, @"
+        private static void _ReadTuple(ITableTupleReader tupleReader, ref {alias_name} v, out {data_type} v2)
+        {
+            v2=default;
+            if(tupleReader==null)
+            {
+                v= {alias_name}.CreateInst(false,v2);
+                return;
+            }");
+                    for (int i = 0; i < p.Value.Count; i++)
+                    {
+                        sw.WriteLine($"\t\t\t_Read(tupleReader,ref v2.Item{i + 1});");
+                    }
+
+                    sw.WriteLineExt(_formater,@"
+             v = {alias_name}.CreateInst(true,v2);
+        }");
+                }
             }
             sw.WriteLine("\t\t#endregion\n");
             sw.WriteLine("\t\t#region List Reader");
             foreach (var p in list_types)
             {
-                _formater["data_type"] = p.Key;
-                _formater["reader_item"] = "_Read(listReader, ref item);";
-                if (p.Value)
-                    _formater["reader_item"] = "_ReadTuple(listReader.BeginTuple(), ref item);";
+                _formater["data_type"] = p.Key.name;
+                _formater["alias_name"] = p.Key.aliasName;
 
-                sw.WriteLineExt(_formater, @"
+                if (string.IsNullOrEmpty(p.Key.aliasName))
+                {
+                    _formater["reader_item"] = "_Read(listReader, ref item);";
+                    if (p.Value)
+                        _formater["reader_item"] = "_ReadTuple(listReader.BeginTuple(), ref item);";
+
+                    sw.WriteLineExt(_formater, @"
         private static void _ReadList(ITableRowReader rowReader, ref {data_type}[]v)
         {
             var listReader = rowReader.BeginList();
@@ -249,7 +281,31 @@ namespace ExportExcel
                     v[i] = item;
                 }
             }
-        }");                
+        }");
+                }
+                else
+                {   
+                    sw.WriteLineExt(_formater, @"
+        private static void _ReadList(ITableRowReader rowReader, ref {alias_name}[] v, out {data_type} v2)
+        {
+            v2=default;
+            var listReader = rowReader.BeginList();
+            int count = listReader != null ? listReader.GetCount() : 0;
+            if (count == 0)
+                v = Array.Empty<{alias_name}>();
+            else
+            {
+                v = new {alias_name}[count];
+                for (int i = 0; i < count; i++)
+                {
+                    {alias_name} item = default;
+                    _ReadTuple(listReader.BeginTuple(), ref item, out v2);
+                    v[i] = item;
+                }
+            }
+        }");
+                }
+
             }
             sw.WriteLine("\t\t#endregion");
         }
@@ -313,11 +369,18 @@ namespace ExportExcel
                 var data_type = header.DataType;
                 if (data_type.IsList)
                 {
-                    sw.WriteLine($"\t\t\t\t_ReadList(rowReader, ref row.{header.Name});");
+                    data_type.IsList = false;
+                    if (header.AttrTupleAlias != null)
+                        sw.WriteLine($"\t\t\t\t_ReadList(rowReader, ref row.{header.Name},out {data_type.ToCSharpStr()} __{header.Name});");
+                    else
+                        sw.WriteLine($"\t\t\t\t_ReadList(rowReader, ref row.{header.Name});");
                 }
                 else if (data_type.IsTuple)
                 {
-                    sw.WriteLine($"\t\t\t\t_ReadTuple(rowReader.BeginTuple(), ref row.{header.Name});");
+                    if (header.AttrTupleAlias != null)
+                        sw.WriteLine($"\t\t\t\t_ReadTuple(rowReader.BeginTuple(), ref row.{header.Name}, out {data_type.ToCSharpStr()} __{header.Name});");
+                    else
+                        sw.WriteLine($"\t\t\t\t_ReadTuple(rowReader.BeginTuple(), ref row.{header.Name});");
                 }
                 else
                 {

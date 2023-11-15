@@ -15,7 +15,8 @@ namespace ExportExcel
                 new ConParserRange(),
                 new ConParserFilePath(),
                 new ConParserLookUp(),
-                new ConParserExportFlag()
+                new ConParserExportFlag(),
+                new ConParserTupleAlias(),
             };
 
         public string GetName()
@@ -448,6 +449,47 @@ namespace ExportExcel
                         _min = tt[0].Trim(),
                         _max = tt[1].Trim()
                     };
+                }
+                return null;
+            }
+        }
+
+        public class ConParserTupleAlias : ConstraintParser
+        {
+            public override void Process(TableCol db_col, DataBase db)
+            {
+                var col = db_col.Col;
+                col.AttrTupleAlias = ParseTupleAlias(col);
+                if (col.AttrTupleAlias == null)
+                    return;
+
+                if (!_is_data_type_valid(col.DataType))
+                    ErrSet.E(db_col, $"TupleAlias[],只能支持 tuple");
+            }
+
+            public static bool _is_data_type_valid(DataType data_type)
+            {
+                if (data_type.enum_type != null)
+                    return false;
+
+                return data_type.IsTuple;
+            }
+
+            // 格式: TupleAlias[name]
+            public static ConAttrTupleAlias ParseTupleAlias(TableHeaderItem col)
+            {
+                foreach (var p in col.StrConstraints)
+                {
+                    var temp = p.Trim();
+                    if (!temp.ToLower().StartsWith("tuplealias["))
+                        continue;
+
+                    int start_index = "tuplealias[".Length;
+                    int end_index = temp.Length - 1;
+                    var ret = temp.Substring(start_index, end_index - start_index).Trim();
+                    if (string.IsNullOrEmpty(ret))
+                        return null;
+                    return new ConAttrTupleAlias(ret);
                 }
                 return null;
             }

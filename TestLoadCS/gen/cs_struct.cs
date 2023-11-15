@@ -84,9 +84,21 @@ namespace Test{
 		/// </summary>
 		public (int,bool) PairField;
 		/// <summary>
+		/// 测试Pair
+		/// </summary>
+		public PairItemIntBool PairField2;
+		/// <summary>
+		/// 测试Pair
+		/// </summary>
+		public PairItemIntBool PairField3;
+		/// <summary>
 		/// 测试PairList
 		/// </summary>
 		public (int,long)[] PairFieldList;
+		/// <summary>
+		/// 测试PairList
+		/// </summary>
+		public PairItemIntInt64[] PairFieldList2;
 		/// <summary>
 		/// 测试List
 		/// </summary>

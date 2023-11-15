@@ -93,7 +93,7 @@ namespace ExportExcel
                         sw.WriteLine("\t\t/// " + col.AttrPK.ToString());
                     sw.WriteLine("\t\t/// " + col.Desc.Replace("\n", "\n\t\t/// "));
                     sw.WriteLine("\t\t/// </summary>");
-                    sw.WriteLine("\t\tpublic " + col.DataType.ToCSharpStr() + " " + col.Name + ";");
+                    sw.WriteLine("\t\tpublic " + col.ToCSharpStr() + " " + col.Name + ";");
                 }
                 sw.WriteLine(@"
     }");

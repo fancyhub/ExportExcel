@@ -35,6 +35,7 @@ namespace ExportExcel
         public ConAttrLookup AttrLookUp; //
         public ConAttrFilePath AttrFilePath; //路径检查
         public ConAttrRange AttrRange; //范围检查
+        public ConAttrTupleAlias AttrTupleAlias;
 
         public TableHeaderItem Clone()
         {

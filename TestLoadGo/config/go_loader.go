@@ -108,6 +108,18 @@ func parseInt32Bool(v string) TupleInt32Bool {
 	}
 	return ret
 }
+func parseInt32Int32(v string) TupleInt32Int32 {
+	temp:= strings.Split(v, "|")
+	len:= len(temp)
+	ret:= TupleInt32Int32{ }
+	if len > 0 {
+		ret.Item0 = parseInt32(temp[0])
+	}
+	if len > 1 {
+		ret.Item1 = parseInt32(temp[1])
+	}
+	return ret
+}
 func parseInt32Int64(v string) TupleInt32Int64 {
 	temp:= strings.Split(v, "|")
 	len:= len(temp)
@@ -174,7 +186,7 @@ func (cd *CsvDataMgr) loadItemData() error {
     //3. check ids and types
     row_ids:= all_rows[0]
     row_types:= all_rows[1]
-    if len(row_ids) != len(row_types) || len(row_ids) != 7 {
+    if len(row_ids) != len(row_types) || len(row_ids) != 10 {
 		cd.logger.Error("csv data col count error" + file_name)
         return err
     }
@@ -210,14 +222,32 @@ func (cd *CsvDataMgr) loadItemData() error {
         return err
     }
 
-    if row_ids[5] != "PairFieldList" || row_types[5] != "list_int32_int64" {
+    if row_ids[5] != "PairField2" || row_types[5] != "int32_bool" {
         err:= errors.New("Col fomrat error 5 in " + file_name)
         cd.logger.Error(err.Error())
         return err
     }
 
-    if row_ids[6] != "ListField" || row_types[6] != "list_int32" {
+    if row_ids[6] != "PairField3" || row_types[6] != "int32_int32" {
         err:= errors.New("Col fomrat error 6 in " + file_name)
+        cd.logger.Error(err.Error())
+        return err
+    }
+
+    if row_ids[7] != "PairFieldList" || row_types[7] != "list_int32_int64" {
+        err:= errors.New("Col fomrat error 7 in " + file_name)
+        cd.logger.Error(err.Error())
+        return err
+    }
+
+    if row_ids[8] != "PairFieldList2" || row_types[8] != "list_int32_int64" {
+        err:= errors.New("Col fomrat error 8 in " + file_name)
+        cd.logger.Error(err.Error())
+        return err
+    }
+
+    if row_ids[9] != "ListField" || row_types[9] != "list_int32" {
+        err:= errors.New("Col fomrat error 9 in " + file_name)
         cd.logger.Error(err.Error())
         return err
     }
@@ -227,7 +257,7 @@ func (cd *CsvDataMgr) loadItemData() error {
 	list_data := make([]TItemData, row_count-2)
 	for i := 0; i < row_count-2; i++ {
 		row_data := all_rows[i+2]
-		if len(row_data) != 7 {
+		if len(row_data) != 10 {
 			err := errors.New("CSV  error " + fmt.Sprint(i) + " in " + file_name)
             cd.logger.Error(err.Error())
             return err
@@ -239,8 +269,11 @@ func (cd *CsvDataMgr) loadItemData() error {
 		row_struct.SubType= EItemSubType(parseInt32(row_data[2]))
 		row_struct.Quality= EItemQuality(parseInt32(row_data[3]))
 		row_struct.PairField= parseInt32Bool(row_data[4])
-		row_struct.PairFieldList= parseArrayInt32Int64(row_data[5])
-		row_struct.ListField= parseArrayInt32(row_data[6])
+		row_struct.PairField2= parseInt32Bool(row_data[5])
+		row_struct.PairField3= parseInt32Int32(row_data[6])
+		row_struct.PairFieldList= parseArrayInt32Int64(row_data[7])
+		row_struct.PairFieldList2= parseArrayInt32Int64(row_data[8])
+		row_struct.ListField= parseArrayInt32(row_data[9])
 
         list_data[i] = row_struct
     }

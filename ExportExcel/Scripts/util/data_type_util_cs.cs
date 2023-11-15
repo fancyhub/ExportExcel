@@ -28,6 +28,17 @@ namespace ExportExcel
         };
 
         private static StringBuilder _sb = new StringBuilder();
+
+        public static string ToCSharpStr(this TableHeaderItem item)
+        {
+            if (item.AttrTupleAlias == null)
+                return item.DataType.ToCSharpStr();
+
+            if (item.DataType.IsList)
+                return item.AttrTupleAlias.AliasName + "[]";
+            return item.AttrTupleAlias.AliasName;
+        }
+
         public static string ToCSharpStr(this DataType type)
         {
             _sb.Clear();

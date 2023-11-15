@@ -42,6 +42,10 @@ type TupleInt32Bool struct{
 	Item0 int32
 	Item1 bool
 }
+type TupleInt32Int32 struct{
+	Item0 int32
+	Item1 int32
+}
 type TupleInt32Int64 struct{
 	Item0 int32
 	Item1 int64
@@ -68,8 +72,17 @@ type TItemData struct {
 	// 测试Pair
 	PairField TupleInt32Bool
 
+	// 测试Pair
+	PairField2 TupleInt32Bool
+
+	// 测试Pair
+	PairField3 TupleInt32Int32
+
 	// 测试PairList
 	PairFieldList []TupleInt32Int64
+
+	// 测试PairList
+	PairFieldList2 []TupleInt32Int64
 
 	// 测试List
 	ListField []int32

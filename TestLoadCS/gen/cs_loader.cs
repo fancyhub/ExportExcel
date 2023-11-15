@@ -49,7 +49,7 @@ namespace Test{
         {
             string sheet_name = "ItemData";
             lang = null;
-            int col_count = 8;
+            int col_count = 11;
 
             if(!CreateTableReader(sheet_name,lang,out var reader))
                 return null;
@@ -63,14 +63,17 @@ namespace Test{
             }
             bool head_rst = true;
             
-			head_rst &= ((header[0] == "Id") && (header[0+8] == "int32"));
-			head_rst &= ((header[1] == "Name") && (header[1+8] == "locid"));
-			head_rst &= ((header[2] == "Type") && (header[2+8] == "int32"));
-			head_rst &= ((header[3] == "SubType") && (header[3+8] == "int32"));
-			head_rst &= ((header[4] == "Quality") && (header[4+8] == "int32"));
-			head_rst &= ((header[5] == "PairField") && (header[5+8] == "int32_bool"));
-			head_rst &= ((header[6] == "PairFieldList") && (header[6+8] == "list_int32_int64"));
-			head_rst &= ((header[7] == "ListField") && (header[7+8] == "list_int32"));
+			head_rst &= ((header[0] == "Id") && (header[0+11] == "int32"));
+			head_rst &= ((header[1] == "Name") && (header[1+11] == "locid"));
+			head_rst &= ((header[2] == "Type") && (header[2+11] == "int32"));
+			head_rst &= ((header[3] == "SubType") && (header[3+11] == "int32"));
+			head_rst &= ((header[4] == "Quality") && (header[4+11] == "int32"));
+			head_rst &= ((header[5] == "PairField") && (header[5+11] == "int32_bool"));
+			head_rst &= ((header[6] == "PairField2") && (header[6+11] == "int32_bool"));
+			head_rst &= ((header[7] == "PairField3") && (header[7+11] == "int32_int32"));
+			head_rst &= ((header[8] == "PairFieldList") && (header[8+11] == "list_int32_int64"));
+			head_rst &= ((header[9] == "PairFieldList2") && (header[9+11] == "list_int32_int64"));
+			head_rst &= ((header[10] == "ListField") && (header[10+11] == "list_int32"));
 
             if (!head_rst)
             {
@@ -91,7 +94,10 @@ namespace Test{
 				_Read(rowReader, ref row.SubType);
 				_Read(rowReader, ref row.Quality);
 				_ReadTuple(rowReader.BeginTuple(), ref row.PairField);
+				_ReadTuple(rowReader.BeginTuple(), ref row.PairField2, out (int,bool) __PairField2);
+				_ReadTuple(rowReader.BeginTuple(), ref row.PairField3, out (int,int) __PairField3);
 				_ReadList(rowReader, ref row.PairFieldList);
+				_ReadList(rowReader, ref row.PairFieldList2,out (int,long) __PairFieldList2);
 				_ReadList(rowReader, ref row.ListField);
 
                 _temp.Add(row);
@@ -300,7 +306,7 @@ namespace Test{
         #endregion
 		#region Tuple Reader
 
-        private static void _ReadTuple(ITableTupleReader tupleReader, ref (int,bool)v)
+        private static void _ReadTuple(ITableTupleReader tupleReader, ref (int,bool) v)
         {
             if(tupleReader==null)
                 return;
@@ -309,7 +315,35 @@ namespace Test{
 			_Read(tupleReader,ref v.Item2);
 		}
 
-        private static void _ReadTuple(ITableTupleReader tupleReader, ref (int,long)v)
+        private static void _ReadTuple(ITableTupleReader tupleReader, ref PairItemIntBool v, out (int,bool) v2)
+        {
+            v2=default;
+            if(tupleReader==null)
+            {
+                v= PairItemIntBool.CreateInst(false,v2);
+                return;
+            }
+			_Read(tupleReader,ref v2.Item1);
+			_Read(tupleReader,ref v2.Item2);
+
+             v = PairItemIntBool.CreateInst(true,v2);
+        }
+
+        private static void _ReadTuple(ITableTupleReader tupleReader, ref PairItemIntBool v, out (int,int) v2)
+        {
+            v2=default;
+            if(tupleReader==null)
+            {
+                v= PairItemIntBool.CreateInst(false,v2);
+                return;
+            }
+			_Read(tupleReader,ref v2.Item1);
+			_Read(tupleReader,ref v2.Item2);
+
+             v = PairItemIntBool.CreateInst(true,v2);
+        }
+
+        private static void _ReadTuple(ITableTupleReader tupleReader, ref (int,long) v)
         {
             if(tupleReader==null)
                 return;
@@ -318,7 +352,21 @@ namespace Test{
 			_Read(tupleReader,ref v.Item2);
 		}
 
-        private static void _ReadTuple(ITableTupleReader tupleReader, ref (float,float,float)v)
+        private static void _ReadTuple(ITableTupleReader tupleReader, ref PairItemIntInt64 v, out (int,long) v2)
+        {
+            v2=default;
+            if(tupleReader==null)
+            {
+                v= PairItemIntInt64.CreateInst(false,v2);
+                return;
+            }
+			_Read(tupleReader,ref v2.Item1);
+			_Read(tupleReader,ref v2.Item2);
+
+             v = PairItemIntInt64.CreateInst(true,v2);
+        }
+
+        private static void _ReadTuple(ITableTupleReader tupleReader, ref (float,float,float) v)
         {
             if(tupleReader==null)
                 return;
@@ -344,6 +392,25 @@ namespace Test{
                 {
                     (int,long) item = default;
                     _ReadTuple(listReader.BeginTuple(), ref item);                    
+                    v[i] = item;
+                }
+            }
+        }
+
+        private static void _ReadList(ITableRowReader rowReader, ref PairItemIntInt64[] v, out (int,long) v2)
+        {
+            v2=default;
+            var listReader = rowReader.BeginList();
+            int count = listReader != null ? listReader.GetCount() : 0;
+            if (count == 0)
+                v = Array.Empty<PairItemIntInt64>();
+            else
+            {
+                v = new PairItemIntInt64[count];
+                for (int i = 0; i < count; i++)
+                {
+                    PairItemIntInt64 item = default;
+                    _ReadTuple(listReader.BeginTuple(), ref item, out v2);
                     v[i] = item;
                 }
             }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace ExportExcel
@@ -53,4 +53,13 @@ namespace ExportExcel
         }
     }
 
+    public class ConAttrTupleAlias : ConstraintAttr
+    {
+        public string AliasName;
+
+        public ConAttrTupleAlias(string name)
+        {
+            AliasName = name;
+        }
+    }
 }
