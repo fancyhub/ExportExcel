@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace ExportExcel
 {
@@ -18,13 +19,6 @@ namespace ExportExcel
     /// </summary>
     public class ExeConfig
     {
-        public const string C_FILE_NAME = "config.json";
-        public static string GetFilePath()
-        {
-            string dir = Environment.CurrentDirectory;
-            return Path.Combine(dir, C_FILE_NAME);
-        }
-
         public List<string> excelPaths = new List<string>();
         public ValidationConfig validation = new ValidationConfig();
         public LocalizationConfig localization = new LocalizationConfig();
@@ -34,9 +28,8 @@ namespace ExportExcel
         public ExportConfig exportServer = new ExportConfig();
 
 
-        public static ExeConfig Load()
+        public static ExeConfig Load(string file_path)
         {
-            string file_path = GetFilePath();
             if (!File.Exists(file_path))
             {
                 ErrSet.E("配置文件不存在 " + file_path);
@@ -58,10 +51,17 @@ namespace ExportExcel
             }
         }
 
-        public void Save()
+        public void Save(string file_path)
         {
-            string file_path = GetFilePath();
-            File.WriteAllText(file_path, JsonConvert.SerializeObject(this, Formatting.Indented));
+            try
+            {
+                File.WriteAllText(file_path, JsonConvert.SerializeObject(this, Formatting.Indented));
+                Console.WriteLine("创建配置成功 " + file_path);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("创建文件失败 " + file_path + " " + ex.Message);
+            }
         }
 
         public enum ELocalizationMode
@@ -183,7 +183,7 @@ namespace ExportExcel
 
             public CSharpLoaderConfig loader = new CSharpLoaderConfig();
             public CSharpGetterConfig getter = new CSharpGetterConfig();
-            public CSharpLocIdConfig locId = new CSharpLocIdConfig();            
+            public CSharpLocIdConfig locId = new CSharpLocIdConfig();
 
             public string GetClassName(string sheet_name)
             {
