@@ -58,7 +58,7 @@
         "lua": {
             "enable": true,
             "classPrefix": "T",
-			"locIdPrefix": "TC_",
+			"locIdStartWith": "TC_",
             "dir": "Output/Client/Lua"
         },
     },
@@ -96,7 +96,7 @@
         "lua": {
             "enable": true,
             "classPrefix": "T",
-			"locIdPrefix": "TC_",
+			"locIdStartWith": "TC_",
             "dir": "Output/Server/Lua"
         },
         "go": {

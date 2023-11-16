@@ -40,6 +40,7 @@ namespace ExportExcel
             StreamWriter sw = new StreamWriter(dest_file_path);
             sw.WriteLine(@"
 -- 此文件由工具自动生成，请勿手动修改
+local Log = Log
 local this = LuaTableMgr
 this._name_2_list = {}
 this._name_2_map = {}
@@ -98,12 +99,12 @@ local function _Load{sheet_name}()
 
     local first_line = csv_line_reader()
     if first_line == nil or #first_line ~= {col_count} then
-        log(""加载 表格失败, 格式不对 "" .. sheet_name)
+        Log.E(""加载 表格失败, 格式不对 "" .. sheet_name)
         return
     end
     local sec_line = csv_line_reader()
     if sec_line == nil or #sec_line ~= {col_count} then
-        log(""加载 表格失败, 格式不对 "" .. sheet_name)
+        Log.E(""加载 表格失败, 格式不对 "" .. sheet_name)
         return
     end
 

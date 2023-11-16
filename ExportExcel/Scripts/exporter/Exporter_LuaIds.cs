@@ -27,7 +27,7 @@ namespace ExportExcel
         }
         public void Process(DataBase data)
         {
-            if (_config == null || !_config.enable || string.IsNullOrEmpty(_config.locIdPrefix))
+            if (_config == null || !_config.enable || string.IsNullOrEmpty(_config.locIdStartWith))
                 return;
             if (data.Config.localization.Mode == ExeConfig.ELocalizationMode.None)
                 return;
@@ -48,7 +48,7 @@ namespace ExportExcel
             sw.WriteLine("LocDef = {");
             foreach (var p in dict)
             {
-                if (!p.Key.StartsWith(_config.locIdPrefix))
+                if (!p.Key.StartsWith(_config.locIdStartWith))
                     continue;
 
                 //写注释

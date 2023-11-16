@@ -73,6 +73,7 @@ namespace ExportExcel
 
         public class LocalizationConfig
         {
+            [JsonIgnore]
             public ELocalizationMode Mode;
 
             public bool enable = false;
@@ -135,14 +136,13 @@ namespace ExportExcel
             }
         }
 
-
         public class ValidationConfig
         {
-            public string sheetNameReg;
-            public string colNameReg;
-            public string enumNameReg;
-            public string enumFieldNameReg;
             public string searchFileRoot = "./";
+            public string sheetNameReg = "^[A-Z][a-zA-Z0-9]*$";
+            public string colNameReg = "^[A-Z][a-zA-Z0-9_]*$";
+            public string enumNameReg = "^E[A-Z][a-zA-Z0-9_]*$";
+            public string enumFieldNameReg = "^[A-Z][a-zA-Z0-9_]*$";
         }
 
         public class ExportConfig
@@ -157,7 +157,7 @@ namespace ExportExcel
         public class CSharpGetterConfig
         {
             public bool enable;
-            public string className = "";
+            public string className = "TableMgr";
             public bool useStatic = false;
         }
 
@@ -175,11 +175,11 @@ namespace ExportExcel
         public class CSharpConfig
         {
             public bool enable;
-            public string namespaceName;
+            public string namespaceName = "";
             public string classPrefix = "";
             public string classSuffix = "";
-            public string dir;
-            public string header;
+            public string dir = "Output";
+            public string header = @"using System;\nusing System.Collections;\nusing System.Collections.Generic;";
 
             public CSharpLoaderConfig loader = new CSharpLoaderConfig();
             public CSharpGetterConfig getter = new CSharpGetterConfig();
@@ -197,42 +197,42 @@ namespace ExportExcel
         public class LocTransConfig
         {
             public bool enable;
-            public string dir;
+            public string dir = "Output";
         }
 
         public class RuleConfig
         {
             public bool enable;
-            public string dir;
+            public string dir = "Output";
         }
 
         public class BinConfig
         {
             public bool enable;
-            public string dir;
+            public string dir = "Output";
         }
 
         public class CsvConfig
         {
             public bool enable;
-            public bool utf8bom;
-            public string dir;
+            public bool utf8bom = true;
+            public string dir = "";
         }
 
         public class LuaConfig
         {
             public bool enable;
-            public string classPrefix;
-            public string dir;
-            public string locIdPrefix;
+            public string classPrefix = "";
+            public string dir = "Output";
+            public string locIdStartWith="~";
         }
 
         public class GoConfig
         {
             public bool enable;
-            public string packageName;
-            public string classPrefix;
-            public string dir;
+            public string packageName = "config";
+            public string classPrefix = "";
+            public string dir = "Output";
         }
     }
 }
