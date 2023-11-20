@@ -33,7 +33,6 @@ namespace ExportExcel
             if (_config == null || !_config.enable)
                 return;
 
-            _formater["class_prefix"] = _config.classPrefix;
 
             List<FilterTable> tables = FilterTable.Filter(data, _flag);
             string dest_file_path = System.IO.Path.Combine(_config.dir, C_FILE_NAME);
@@ -60,7 +59,7 @@ this._name_2_loader = name_2_loader");
 
             foreach (var p in tables)
             {
-                string class_name = _formater["class_prefix"] + p.SheetName;
+                string class_name = _config.GetClassName(p.SheetName);
                 sw.WriteLine("name_2_loader[\"{0}\"]= _Load{1}", class_name, p.SheetName);
             }
             sw.Close();
@@ -75,7 +74,7 @@ this._name_2_loader = name_2_loader");
             _formater["sheet_name_lang"] = multi_name;
             _formater["col_count"] = header.Count.ToString();
             _formater["sheet_name"] = table.SheetName;
-            _formater["class_name"] = _formater["class_prefix"]+ table.SheetName;
+            _formater["class_name"] = _config.GetClassName(table.SheetName);
             var pk = table.PK;
 
             if (pk != null)

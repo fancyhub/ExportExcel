@@ -200,8 +200,6 @@ namespace ExportExcel
 
             public string GetClassName(string sheet_name)
             {
-                if (string.IsNullOrEmpty(classPrefix))
-                    return sheet_name;
                 return classPrefix + sheet_name + classSuffix;
             }
         }
@@ -219,9 +217,7 @@ namespace ExportExcel
             public CppGetterConfig getter = new CppGetterConfig();
 
             public string GetClassName(string sheet_name)
-            {
-                if (string.IsNullOrEmpty(classPrefix))
-                    return sheet_name;
+            {                
                 return classPrefix + sheet_name + classSuffix;
             }
         }
@@ -258,6 +254,11 @@ namespace ExportExcel
             public string classPrefix = "";
             public string dir = "Output";
             public string locIdStartWith="~";
+
+            public string GetClassName(string sheet_name)
+            {
+                return classPrefix + sheet_name;
+            }
         }
 
         public class GoConfig
@@ -266,6 +267,11 @@ namespace ExportExcel
             public string packageName = "config";
             public string classPrefix = "";
             public string dir = "Output";
+
+            public string GetClassName(string sheet_name)
+            {                
+                return classPrefix + sheet_name ;
+            }
         }
     }
 }

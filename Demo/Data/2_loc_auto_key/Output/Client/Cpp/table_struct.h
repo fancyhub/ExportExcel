@@ -140,7 +140,7 @@ class Table
 		TItem* Get(TKey key)
 		{
 			auto it = Dict.find(key);
-			return it != Dict.end() ? it->second.get() : nullptr;
+			return it != Dict.end() ? it->second : nullptr;
 		}
 	};
 

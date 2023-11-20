@@ -33,7 +33,6 @@ namespace ExportExcel
             if (_config == null || !_config.enable)
                 return;
 
-            _formater["class_prefix"] = _config.classPrefix;
             List<FilterTable> tables = FilterTable.Filter(data, _flag);
             string dest_file_path = System.IO.Path.Combine(_config.dir, C_FILE_NAME);
             FileUtil.CreateFileDir(dest_file_path);
@@ -67,7 +66,7 @@ namespace ExportExcel
                     continue;
 
                 var pk = table.PK;
-                _formater["class_name"] = _formater["class_prefix"] + table.SheetName;
+                _formater["class_name"] = _config.GetClassName(table.SheetName);
                 _formater["sheet_name"] = table.SheetName;
                 sw.WriteLineExt(_formater,
                     @"

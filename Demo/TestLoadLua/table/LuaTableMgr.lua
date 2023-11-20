@@ -3,8 +3,8 @@ _G.LuaTableMgr = LuaTableMgr
 
 csv = require "table.util.csv"
 require "table.util.TableUtil"
-require "table.gen.Lua_Struct"
-require "table.gen.Lua_Loader"
+require "table.gen.table_getter"
+require "table.gen.table_loader"
 require "table.gen.LocDef"
 require "table.util.string_ext"
 

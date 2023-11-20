@@ -35,9 +35,7 @@ namespace ExportExcel
         {
             if (_config == null || !_config.enable || !_config.loader.enable)
                 return;
-
-            _formater["class_prefix"] = _config.classPrefix;
-            _formater["class_suffix"] = _config.classSuffix;
+            
             List<FilterTable> tables = FilterTable.Filter(data, _flag);
 
             string name_space = _config.namespaceName;
@@ -112,7 +110,7 @@ namespace ExportExcel
 
             foreach (var table in tables)
             {
-                var class_name = _formater["class_prefix"] + table.SheetName + _formater["class_suffix"];
+                var class_name = _config.GetClassName(table.SheetName);
                 var sheet_name = table.SheetName;
                 sw.WriteLine($"\t\t\tLoaderDict.Add(typeof({class_name}),new TableInfo(_Load{table.SheetName},{table.MultiLang.ToString().ToLower()}));");
             }
@@ -319,7 +317,7 @@ namespace ExportExcel
             _formater["sheet_name_lang"] = multi_name;
             _formater["col_count"] = header_list.Count.ToString();
             _formater["sheet_name"] = table.SheetName;
-            _formater["class_name"] = _formater["class_prefix"] + table.SheetName + _formater["class_suffix"];
+            _formater["class_name"] = _config.GetClassName(table.SheetName);
 
             sw.WriteLineExt(_formater, @"
         private Table _Load{sheet_name}(string lang)

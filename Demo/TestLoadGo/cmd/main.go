@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	csvDirPath0 = "../../TestData/0_no_loc/Output/Server/Data"
-	csvDirPath1 = "../../TestData/1_loc/Output/Server/Data"
-	csvDirPath2 = "../../TestData/2_loc_auto_key/Output/Server/Data"
+	csvDirPath0 = "../../Data/0_no_loc/Output/Server/Data"
+	csvDirPath1 = "../../Data/1_loc/Output/Server/Data"
+	csvDirPath2 = "../../Data/2_loc_auto_key/Output/Server/Data"
 )
 
 type ExampleLogger struct {

@@ -9,9 +9,9 @@ _G.Log = {
 }
 require "table.LuaTableMgr"
 
-LuaTableMgr.BaseDir = "../TestData/0_no_loc/Output/Client/Data";
-LuaTableMgr.BaseDir = "../TestData/1_loc/Output/Client/Data";
-LuaTableMgr.BaseDir = "../TestData/2_loc_auto_key/Output/Client/Data";
+LuaTableMgr.BaseDir = "../Data/0_no_loc/Output/Client/Data";
+LuaTableMgr.BaseDir = "../Data/1_loc/Output/Client/Data";
+LuaTableMgr.BaseDir = "../Data/2_loc_auto_key/Output/Client/Data";
 
 local itemDataList= LuaTableMgr.GetTItemDataList()
 local item = LuaTableMgr.GetTItemData(1)

@@ -32,8 +32,6 @@ namespace ExportExcel
             if (_config == null || !_config.enable)
                 return;
 
-
-            _formater["class_prefix"] = _config.classPrefix;
             string package_name = _config.packageName;
             string dest_file_path = System.IO.Path.Combine(_config.dir, C_FILE_NAME);
             FileUtil.CreateFileDir(dest_file_path);
@@ -52,7 +50,7 @@ const (
 );
             foreach (FilterTable t in tables)
             {
-                _formater["class_name"] = _formater["class_prefix"] + t.SheetName;
+                _formater["class_name"] = _config.GetClassName(t.SheetName);;
                 _formater["sheet_name"] = t.SheetName;
 
                 sw.WriteLineExt(_formater, "\t{class_name}FileName = \"{sheet_name}.csv\"");
@@ -81,7 +79,7 @@ func CreateCsvDataMgr(logger ILogger,reader IDataReader) (*CsvDataMgr, error) {
 
             foreach (var t in tables)
             {
-                _formater["class_name"] = _formater["class_prefix"] + t.SheetName;
+                _formater["class_name"] = _config.GetClassName(t.SheetName);
                 sw.WriteLineExt(_formater, "\t\t{class_name}List: make([]{class_name}, 0),");
                 var pk = t.PK;
                 if (t.PK != null)
@@ -105,7 +103,7 @@ func CreateCsvDataMgr(logger ILogger,reader IDataReader) (*CsvDataMgr, error) {
 
             foreach (var t in tables)
             {
-                _formater["class_name"] = _formater["class_prefix"] + t.SheetName;
+                _formater["class_name"] = _config.GetClassName(t.SheetName);
                 _formater["sheet_name"] = t.SheetName;
                 sw.WriteLineExt(_formater, "\tcd.FileName2Func[{class_name}FileName] = cd.load{sheet_name}");
             }
@@ -232,7 +230,7 @@ func parseString(v string) string {
         public void _export_load_func(FilterTable table, StreamWriter sw)
         {
             _formater["sheet_name"] = table.SheetName;
-            _formater["class_name"] = _formater["class_prefix"] + table.SheetName;
+            _formater["class_name"] = _config.GetClassName(table.SheetName);
 
             _formater["col_count"] = table.ColCount.ToString();
             sw.WriteLineExt(_formater,

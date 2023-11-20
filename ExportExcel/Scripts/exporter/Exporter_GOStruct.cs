@@ -35,7 +35,6 @@ namespace ExportExcel
                 return;
 
 
-            _formater["class_prefix"] = _config.classPrefix;
             string package_name = _config.packageName;
             string dest_file_path = System.IO.Path.Combine(_config.dir, C_FILE_NAME);
             FileUtil.CreateFileDir(dest_file_path);
@@ -76,7 +75,7 @@ import (
 
             foreach (FilterTable t in tables)
             {
-                _formater["class_name"] = _formater["class_prefix"] + t.SheetName;
+                _formater["class_name"] = _config.GetClassName(t.SheetName);
                 sw.WriteLineExt(_formater, "type {class_name} struct {");
 
                 foreach (TableHeaderItem c in t.Header)
@@ -116,7 +115,7 @@ type CsvDataMgr struct {
 );
             foreach (var t in tables)
             {
-                _formater["class_name"] = _formater["class_prefix"] + t.SheetName;
+                _formater["class_name"] = _config.GetClassName(t.SheetName);
                 _formater["sheet_name"] = t.SheetName;
                 sw.WriteLineExt(_formater, "\t{class_name}Mux  sync.RWMutex");
                 sw.WriteLineExt(_formater, "\t{class_name}List []{class_name}");

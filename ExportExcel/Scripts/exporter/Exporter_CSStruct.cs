@@ -33,10 +33,7 @@ namespace ExportExcel
         public void Process(DataBase data)
         {
             if (_config == null || !_config.enable)
-                return;
-
-            _formater["class_prefix"] = _config.classPrefix;
-            _formater["class_suffix"] = _config.classSuffix;
+                return;            
 
             string name_space = _config.namespaceName;
             List<FilterTable> tables = FilterTable.Filter(data, _flag);
@@ -76,7 +73,7 @@ namespace ExportExcel
             foreach (FilterTable table in tables)
             {
                 _formater["sheet_name"] = table.SheetName;
-                _formater["class_name"] = _formater["class_prefix"] + table.SheetName + _formater["class_suffix"];
+                _formater["class_name"] = _config.GetClassName(table.SheetName);;
 
                 List<TableHeaderItem> header = table.Header;
 

@@ -35,9 +35,7 @@ namespace ExportExcel
         {
             if (_config == null || !_config.enable || !_config.getter.enable)
                 return;
-
-            _formater["class_prefix"] = _config.classPrefix;
-            _formater["class_suffix"] = _config.classSuffix;
+            
             List<FilterTable> tables = FilterTable.Filter(data, _flag);
 
             string name_space = _config.namespaceName;
@@ -86,7 +84,7 @@ namespace ExportExcel
             _formater["sheet_name_lang"] = multi_name;
             _formater["col_count"] = header.Count.ToString();
             _formater["sheet_name"] = table.SheetName;
-            _formater["class_name"] = _formater["class_prefix"] + table.SheetName + _formater["class_suffix"];
+            _formater["class_name"] = _config.GetClassName(table.SheetName);
 
             TableHeaderItem pk = table.PK;
 
