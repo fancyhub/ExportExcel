@@ -55,7 +55,22 @@
 				"enable":true,
 				"locIdStartWith":"",
 			}
-        },		 
+        },	
+		"cpp": {
+            "enable": true,
+            "namespaceName": "Test",
+            "classPrefix": "T",
+			"classSuffix": "",			
+            "dir": "Output/Client/Cpp",					
+            "header": "#include \"loc_str.h\"",
+			
+			"loader":{
+				"enable":true,
+			},
+			"getter":{
+				"enable":true,				
+			},			 
+        },			
         "lua": {
             "enable": true,
             "classPrefix": "T",

@@ -11,14 +11,14 @@ using System.Linq;
 *************************************************************************************/
 namespace ExportExcel
 {
-    public class Exporter_LuaStruct : IProcessNode
+    public class Exporter_LuaGetter : IProcessNode
     {
-        public const string C_FILE_NAME = "Lua_Struct.lua";
+        public const string C_FILE_NAME = "table_getter.lua";
         public StringFormater _formater = new StringFormater();
         public ExeConfig.LuaConfig _config;
         public EExportFlag _flag;
 
-        public Exporter_LuaStruct(EExportFlag flag, ExeConfig.LuaConfig config)
+        public Exporter_LuaGetter(EExportFlag flag, ExeConfig.LuaConfig config)
         {
             _flag = flag;
             _config = config;

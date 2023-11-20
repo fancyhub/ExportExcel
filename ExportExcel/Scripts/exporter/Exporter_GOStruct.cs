@@ -14,7 +14,7 @@ namespace ExportExcel
 {
     public class ExporterGOStruct : IProcessNode
     {
-        public const string C_FILE_NAME = "go_struct.go";
+        public const string C_FILE_NAME = "table_struct.go";
         public StringFormater _formater = new StringFormater();
         public EExportFlag _flag;
         public ExeConfig.GoConfig _config;

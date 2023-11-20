@@ -12,6 +12,8 @@ namespace ExportExcel
 {
     public class Exporter_LuaLoader : IProcessNode
     {
+        public const string C_FILE_NAME = "table_loader.lua";
+        public StringFormater _formater = new StringFormater();
         public ExeConfig.LuaConfig _config;
         public EExportFlag _flag;
 
@@ -25,8 +27,7 @@ namespace ExportExcel
         {
             return "Export";
         }
-        public const string C_FILE_NAME = "Lua_Loader.lua";
-        public StringFormater _formater = new StringFormater();
+        
         public void Process(DataBase data)
         {
             if (_config == null || !_config.enable)

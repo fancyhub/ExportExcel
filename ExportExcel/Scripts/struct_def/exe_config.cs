@@ -28,6 +28,7 @@ namespace ExportExcel
         public ExportConfig exportServer = new ExportConfig();
 
 
+
         public static ExeConfig Load(string file_path)
         {
             if (!File.Exists(file_path))
@@ -152,6 +153,18 @@ namespace ExportExcel
             public CSharpConfig csharp = new CSharpConfig();
             public LuaConfig lua = new LuaConfig();
             public GoConfig go = new GoConfig();
+            public CppConfig cpp = new CppConfig();
+        }
+
+
+        public class CppGetterConfig
+        {
+            public bool enable;            
+        }
+
+        public class CppLoaderConfig
+        {
+            public bool enable;
         }
 
         public class CSharpGetterConfig
@@ -184,6 +197,26 @@ namespace ExportExcel
             public CSharpLoaderConfig loader = new CSharpLoaderConfig();
             public CSharpGetterConfig getter = new CSharpGetterConfig();
             public CSharpLocIdConfig locId = new CSharpLocIdConfig();
+
+            public string GetClassName(string sheet_name)
+            {
+                if (string.IsNullOrEmpty(classPrefix))
+                    return sheet_name;
+                return classPrefix + sheet_name + classSuffix;
+            }
+        }
+
+        public class CppConfig
+        {
+            public bool enable;
+            public string namespaceName = "";
+            public string classPrefix = "";
+            public string classSuffix = "";
+            public string dir = "Output";
+            public string header = "";
+
+            public CppLoaderConfig loader = new CppLoaderConfig();
+            public CppGetterConfig getter = new CppGetterConfig();
 
             public string GetClassName(string sheet_name)
             {

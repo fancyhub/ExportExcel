@@ -70,8 +70,12 @@ namespace ExportExcel
             node_list.Add(new Exporter_CSGetter(flag, config.csharp));
             node_list.Add(new Exporter_CSIds(flag, config.csharp));
 
+            node_list.Add(new Exporter_CppStruct(flag, config.cpp));
+            node_list.Add(new Exporter_CppLoader(flag, config.cpp));
+            node_list.Add(new Exporter_CppGetter(flag, config.cpp));
+
             node_list.Add(new Exporter_LuaIds(flag, config.lua));
-            node_list.Add(new Exporter_LuaStruct(flag, config.lua));
+            node_list.Add(new Exporter_LuaGetter(flag, config.lua));
             node_list.Add(new Exporter_LuaLoader(flag, config.lua));
             node_list.Add(new Exporter_LuaStructDef(flag, config.lua));
 

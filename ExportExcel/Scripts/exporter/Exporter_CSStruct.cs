@@ -14,7 +14,7 @@ namespace ExportExcel
     //导出 csharp的数据结构
     public class Exporter_CSStruct : IProcessNode
     {
-        public const string C_FILE_NAME = "cs_struct.cs";
+        public const string C_FILE_NAME = "table_struct.cs";
         public StringFormater _formater = new StringFormater();
         public ExeConfig.CSharpConfig _config;
         public EExportFlag _flag;

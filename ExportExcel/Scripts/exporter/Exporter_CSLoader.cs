@@ -13,7 +13,7 @@ namespace ExportExcel
     //导出 csharp的 加载
     public class Exporter_CSLoader : IProcessNode
     {
-        public const string C_FILE_NAME = "cs_loader.cs";
+        public const string C_FILE_NAME = "table_loader.cs";
 
         public StringFormater _formater = new StringFormater();
 

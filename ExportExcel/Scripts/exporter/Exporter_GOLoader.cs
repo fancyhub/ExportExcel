@@ -13,7 +13,7 @@ namespace ExportExcel
 {
     public class ExporterGOLoader : IProcessNode
     {
-        public const string C_FILE_NAME = "go_loader.go";
+        public const string C_FILE_NAME = "table_loader.go";
         public StringFormater _formater = new StringFormater();
         public EExportFlag _flag;
         public ExeConfig.GoConfig _config;
