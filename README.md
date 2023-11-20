@@ -1,4 +1,7 @@
 # ExportExcel
+support C#, Go, Cpp, Lua  
+Support Csv, Bin
+
 # 数据表   
 ## 概述
 如果数据表要分表, 以第一个读取的表格为主, 后面的表格只能 少列, 移动列, 不能少列,否则会报错  
@@ -150,7 +153,8 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
 
 ```json
 {
-    "excelPaths": [        
+    "excelPaths": [
+        "../0_no_loc/data",
         "data"
     ],
     "validation": {
@@ -161,11 +165,11 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
         "enumFieldNameReg": "[A-Z][a-zA-Z0-9_]*$",
     },
     "localization": {
-		"enable":false,
+		"enable":true,
 		"sheetName": "Loc",
 		"defaultLang": "zh-Hans",
 		"autoGenKey":true,
-		"useHashId": true, 
+		"useHashId": true,
     },
 	"exportRule":{
 		"enable": true,
@@ -191,7 +195,7 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
             "classPrefix": "T",
 			"classSuffix": "",			
             "dir": "Output/Client/CS",					
-            "header": "using System;",
+            "header": "using System;\n",
 			
 			"loader":{
 				"enable":true,
@@ -205,11 +209,26 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
 				"enable":true,
 				"locIdStartWith":"",
 			}
-        },		 
+        },	
+		"cpp": {
+            "enable": true,
+            "namespaceName": "Test",
+            "classPrefix": "T",
+			"classSuffix": "",			
+            "dir": "Output/Client/Cpp",					
+            "header": "#include \"loc_str.h\"",
+			
+			"loader":{
+				"enable":true,
+			},
+			"getter":{
+				"enable":true,				
+			},			 
+        },			
         "lua": {
             "enable": true,
             "classPrefix": "T",
-			"locIdPrefix": "TC_",
+			"locIdStartWith": "TC_",
             "dir": "Output/Client/Lua"
         },
     },
@@ -224,12 +243,12 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
             "dir": "Output/Server/Data",
         },
         "csharp": {
-            "enable": true,
+           "enable": true,
             "namespaceName": "Test",
             "classPrefix": "T",
 			"classSuffix": "",			
-            "dir": "Output/Server/CS",
-            "header": "using System;",
+            "dir": "Output/Server/CS",					
+            "header": "using System;\n",
 			
 			"loader":{
 				"enable":true,
@@ -247,7 +266,7 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
         "lua": {
             "enable": true,
             "classPrefix": "T",
-			"locIdPrefix": "TC_",
+			"locIdStartWith": "TC_",
             "dir": "Output/Server/Lua"
         },
         "go": {
@@ -258,6 +277,7 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
         }
     }
 }
+
 
 ```
 
