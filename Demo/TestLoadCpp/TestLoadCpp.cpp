@@ -1,0 +1,66 @@
+// TestLoadCpp.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
+//
+
+#include <iostream>
+#include <filesystem>
+
+
+#include "gen/table_struct.h"
+#include "gen/table_getter.h"
+#include "gen/table_loader.h"
+#include "reader/csv_reader.h"
+using namespace Test;
+
+
+std::filesystem::path dir0("../Data/0_no_loc/Output/Client/Data");
+std::filesystem::path dir1("../Data/1_loc/Output/Client/Data");
+std::filesystem::path dir2("../Data/2_loc_auto_key/Output/Client/Data");
+
+
+class TableReaderCreator : public ITableReaderCreator
+{
+private:
+	TableReaderCsv _reader;
+	std::filesystem::path _base_dir;
+
+public:
+	TableReaderCreator(const std::filesystem::path& base_dir)
+	{
+		_base_dir = base_dir;
+	}
+public:
+	ITableReader* ReadTable(const std::string& sheet_name, const std::string& lang_name)
+	{
+		auto file_path = _base_dir;				
+		if (lang_name.empty())
+			file_path /= sheet_name + ".csv";
+		else
+			file_path /= sheet_name +"_"+ lang_name + ".csv";
+		_reader.LoadCsvFile(file_path.string());
+		return &_reader;
+	}
+};
+int main()
+{
+	TableMgr mgr;
+	TableLoaderMgr loaderMgr;
+	std::string lang_name = TableLoaderMgr::LangList[0];
+	
+	auto dir = std::filesystem::absolute(dir2);
+	TableReaderCreator readerCreator(dir);
+
+	TableLoader loader;
+	for (auto it = mgr.AllTableDict.begin(); it != mgr.AllTableDict.end(); it++)
+	{
+		const std::string& name = it->first;
+		if (!loaderMgr.FindLoader(name, loader))
+			continue;
+
+		loader(it->second, lang_name, readerCreator);
+	}
+
+
+	auto item = mgr.TableTTestComposeKey.Get(std::tuple<unsigned int, int>(1, 1));
+
+	std::cout << "Hello World!\n";
+}

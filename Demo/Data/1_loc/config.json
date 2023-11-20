@@ -1,0 +1,110 @@
+{
+    "excelPaths": [
+        "../0_no_loc/data",
+        "data"
+    ],     
+    "validation": {
+        "searchFileRoot": "../../Client/Resources",
+        "sheetNameReg": "^[A-Z][a-zA-Z0-9]*$",
+        "colNameReg": "^[A-Z][a-zA-Z0-9_]*$",
+        "enumNameReg": "^E[A-Z][A-Za-z0-9_]*$",
+        "enumFieldNameReg": "[A-Z][a-zA-Z0-9_]*$",
+    },
+    "localization": {
+		"enable":true,
+		"sheetName": "Loc",
+		"defaultLang": "zh-Hans",
+		"autoGenKey":false,
+		"useHashId": true, 
+    },
+	"exportRule":{
+		"enable": true,
+		"dir": "Output/Rule",
+	},
+	"exportLocTrans":{
+		"enable": true,
+		"dir": "Output",
+	},
+    "exportClient": {
+        "csv": {
+            "enable": true,
+			"utf8bom":true,
+            "dir": "Output/Client/Data",
+        },
+        "bin": {
+            "enable": true,
+            "dir": "Output/Client/Data",
+        },
+        "csharp": {
+            "enable": true,
+            "namespaceName": "Test",
+            "classPrefix": "T",
+			"classSuffix": "",			
+            "dir": "Output/Client/CS",					
+            "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
+			
+			"loader":{
+				"enable":true,
+			},
+			"getter":{
+				"enable":true,
+				"className":"TableMgr",
+				"useStatic":false,
+			},
+			"locId":{
+				"enable":true,
+				"locIdStartWith":"",
+			}
+        },		 
+        "lua": {
+            "enable": true,
+            "classPrefix": "T",
+			"locIdStartWith": "TC_",
+            "dir": "Output/Client/Lua"
+        },
+    },
+    "exportServer": {
+        "csv": {
+            "enable": true,
+			"utf8bom":true,
+            "dir": "Output/Server/Data",
+        },
+        "bin": {
+            "enable": true,
+            "dir": "Output/Server/Data",
+        },
+        "csharp": {
+            "enable": true,
+            "namespaceName": "Test",
+            "classPrefix": "T",
+			"classSuffix": "",			
+            "dir": "Output/Server/CS",					
+            "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
+			
+			"loader":{
+				"enable":true,
+			},
+			"getter":{
+				"enable":true,
+				"className":"TableMgr",
+				"useStatic":false,
+			},
+			"locId":{
+				"enable":true,
+				"locIdStartWith":"",
+			}
+        },
+        "lua": {
+            "enable": true,
+            "classPrefix": "T",
+			"locIdStartWith": "TC_",
+            "dir": "Output/Server/Lua"
+        },
+        "go": {
+            "enable": true,
+            "packageName": "config",
+            "classPrefix": "T",
+            "dir": "Output/Server/Go",
+        }
+    }
+}
