@@ -13,6 +13,7 @@ echo.
 
 echo ========== copy client Cpp files ===================
 xcopy /S /Y Output\Client\Cpp\*.cpp ..\..\TestLoadCpp\gen\
+xcopy /S /Y Output\Client\Cpp\*.h ..\..\TestLoadCpp\gen\
 echo.
 
 echo ========== copy sever Go files ===================

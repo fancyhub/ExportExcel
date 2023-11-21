@@ -5,8 +5,9 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <typeinfo>
 
-#include "loc_str.h"
+#include "../dep/loc_str.h"
 
 namespace Test {
 class Table
@@ -19,14 +20,14 @@ class Table
 	public:
 		Table() :_MulitLang(false)
 		{
-			_TableName = ";
-			_LangName = ";
+			_TableName = "";
+			_LangName = "";
 		}
 
 		Table(const std::string& tableName, bool multiLang) :_MulitLang(multiLang)
 		{
 			_TableName = tableName;
-			_LangName = ";
+			_LangName = "";
 		}
 
 		void SetLang(const std::string& langName)
@@ -137,13 +138,28 @@ class Table
 		TableDict(const std::string& tableName, bool multiLang) :TableList<TItem>(tableName, multiLang) {}
 		virtual ~TableDict() { Dict.clear(); }
 
-		TItem* Get(TKey key)
+		const TItem* Get(TKey key)const
 		{
 			auto it = Dict.find(key);
 			return it != Dict.end() ? it->second : nullptr;
 		}
 	};
 
+	struct TableTypeInfo
+	{
+	private:
+		std::size_t _hash_code;
+		const char* _name;
+
+	public:
+		TableTypeInfo() :_name(nullptr), _hash_code(0) {}
+		TableTypeInfo(const TableTypeInfo& other) :_name(other._name), _hash_code(other._hash_code) {}
+		TableTypeInfo(const std::type_info& info) { _hash_code = info.hash_code(); _name = info.name(); }
+		const char* name()const { return _name; }
+		template<class T>static TableTypeInfo Create() { return typeid(T); }
+		std::size_t operator()(const TableTypeInfo& p)const { return p._hash_code; }
+		bool operator()(const TableTypeInfo& _Left, const TableTypeInfo& _Right) const { return _Left._hash_code == _Right._hash_code && _Left._name == _Right._name; }
+	};
 }
 
 namespace Test {
@@ -153,131 +169,123 @@ enum class EItemType
 {
 	//  无
 	None = 0,
+
 	//  武器
 	Weapon = 1,
+
 	//  消耗品
 	Cosume = 2,
+
 };
 
 enum class EItemSubType
 {
 	//  无
 	None = 0,
+
 	//  手枪
 	ShotGun = 1,
+
 	//  加农炮
 	Cannon = 2,
+
 };
 
 enum class EItemQuality
 {
 	//  普通
 	None = 0,
+
 	//  灰色
 	Gray = 2,
+
 	//  绿色
 	Green = 3,
+
 	//  紫色
 	Purple = 4,
+
 };
 
 enum class EItemFlag
 {
 	//  无
 	None = 0,
+
 	//  可堆叠
 	Stack = 1,
+
 	//  可删除
 	CanDelete = 2,
+
 };
 
-struct TItemData
-    {
-	/// <summary>
-	/// PK
-	/// 物品ID
-	/// </summary>
-	 int Id;
-	/// <summary>
-	/// 名称
-	/// </summary>
-	 LocId Name;
-	/// <summary>
-	/// 类型
-	/// </summary>
-	 EItemType Type;
-	/// <summary>
-	/// 子类
-	/// </summary>
-	 EItemSubType SubType;
-	/// <summary>
-	/// 品质
-	/// </summary>
-	 EItemQuality Quality;
-	/// <summary>
-	/// 测试Pair
-	/// </summary>
-	 std::tuple<int,bool> PairField;
-	/// <summary>
-	/// 测试Pair
-	/// </summary>
-	 std::tuple<int,bool> PairField2;
-	/// <summary>
-	/// 测试Pair
-	/// </summary>
-	 std::tuple<int,int> PairField3;
-	/// <summary>
-	/// 测试PairList
-	/// </summary>
-	 std::vector<std::tuple<int,long long>> PairFieldList;
-	/// <summary>
-	/// 测试PairList
-	/// </summary>
-	 std::vector<std::tuple<int,long long>> PairFieldList2;
-	/// <summary>
-	/// 测试List
-	/// </summary>
-	 std::vector<int> ListField;
+struct TItemData 
+{
+	// PK
+	// 物品ID
+	int Id;
 
-    };
+	// 名称
+	LocId Name;
 
-struct TTestComposeKey
-    {
-	/// <summary>
-	/// PK[Level]
-	/// 角色Id
-	/// </summary>
-	 unsigned int Id;
-	/// <summary>
-	/// 等级
-	/// </summary>
-	 int Level;
-	/// <summary>
-	/// 名字
-	/// </summary>
-	 LocId Name;
-	/// <summary>
-	/// 位置
-	/// </summary>
-	 std::tuple<float,float,float> Pos;
-	/// <summary>
-	/// 标记位
-	/// </summary>
-	 EItemFlag Flags;
+	// 类型
+	EItemType Type;
 
-    };
+	// 子类
+	EItemSubType SubType;
 
-struct TLoc
-    {
-	/// <summary>
-	/// PK
-	/// id
-	/// </summary>
-	 int Id;
-	/// <summary>
-	/// 
-	/// </summary>
-	 std::string Val;
+	// 品质
+	EItemQuality Quality;
 
-    };
+	// 测试Pair
+	std::tuple<int,bool> PairField;
+
+	// 测试Pair
+	std::tuple<int,bool> PairField2;
+
+	// 测试Pair
+	std::tuple<int,int> PairField3;
+
+	// 测试PairList
+	std::vector<std::tuple<int,long long>> PairFieldList;
+
+	// 测试PairList
+	std::vector<std::tuple<int,long long>> PairFieldList2;
+
+	// 测试List
+	std::vector<int> ListField;
+
+};
+
+struct TTestComposeKey 
+{
+	// PK[Level]
+	// 角色Id
+	unsigned int Id;
+
+	// 等级
+	int Level;
+
+	// 名字
+	LocId Name;
+
+	// 位置
+	std::tuple<float,float,float> Pos;
+
+	// 标记位
+	EItemFlag Flags;
+
+};
+
+struct TLoc 
+{
+	// PK
+	// id
+	int Id;
+
+	// 
+	std::string Val;
+
+};
 }

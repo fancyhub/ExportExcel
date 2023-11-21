@@ -59,12 +59,12 @@ namespace Test {
 	};
 	using TableLoader = std::function <bool(Table* table, std::string lang_name, ITableReaderCreator& tableReaderCreator)>;
 
-	struct TableInfo
+	struct TableLoaderInfo
 	{
 		TableLoader Loader;
 		bool MultiLang;
-		TableInfo() { Loader = nullptr; MultiLang = false; }
-		TableInfo(TableLoader loader, bool multiLang){Loader = loader;MultiLang = multiLang;}
+		TableLoaderInfo() { Loader = nullptr; MultiLang = false; }
+		TableLoaderInfo(TableLoader loader, bool multiLang){Loader = loader;MultiLang = multiLang;}
 	};
 
 	class TableLoaderMgr
@@ -72,14 +72,19 @@ namespace Test {
 	public:
 		const static int LangCount = 2;
 		const static std::string LangList[LangCount];
-		std::unordered_map < std::string, TableInfo> LoaderDict;
+		std::unordered_map <TableTypeInfo, TableLoaderInfo, TableTypeInfo, TableTypeInfo> LoaderDict;
 
 	public:
 		TableLoaderMgr();	
 
-		bool FindLoader(const std::string& table_name, TableLoader& loader)
+		template<class TItem> bool FindLoader(TableLoader& loader)
 		{
-			auto it = LoaderDict.find(table_name);
+			return FindLoader(typeid(TItem), loader);
+		}
+
+		bool FindLoader(const TableTypeInfo& info, TableLoader& loader)
+		{
+			auto it = LoaderDict.find(info);
 			if (it == LoaderDict.end())
 				return false;
 

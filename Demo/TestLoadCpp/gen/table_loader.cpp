@@ -370,8 +370,8 @@ static Table* _LoadLoc(Table* table, std::string lang, ITableReaderCreator& tabl
 
 TableLoaderMgr::TableLoaderMgr()
 {
-	LoaderDict["TItemData"] = TableInfo(_LoadItemData, false);
-	LoaderDict["TTestComposeKey"] = TableInfo(_LoadTestComposeKey, false);
-	LoaderDict["TLoc"] = TableInfo(_LoadLoc, true);
+	LoaderDict[typeid(TItemData)] = TableLoaderInfo(_LoadItemData, false);
+	LoaderDict[typeid(TTestComposeKey)] = TableLoaderInfo(_LoadTestComposeKey, false);
+	LoaderDict[typeid(TLoc)] = TableLoaderInfo(_LoadLoc, true);
 }
 }

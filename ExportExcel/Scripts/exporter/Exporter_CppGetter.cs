@@ -65,7 +65,7 @@ namespace ExportExcel
 {namespace_start}
 struct TableMgr
 {
-	std::unordered_map<std::string, Table*> AllTableDict;
+	std::unordered_map<TableTypeInfo, Table*, TableTypeInfo, TableTypeInfo> AllTableDict;
 
 ");
 
@@ -104,9 +104,49 @@ struct TableMgr
             {
                 _formater["class_name"] = _config.GetClassName(table.SheetName);
                 _formater["multi_lang"] = table.MultiLang.ToString().ToLower();
-                sw.WriteLineExt(_formater, @"       AllTableDict[""{class_name}""] = &Table{class_name};");
+                sw.WriteLineExt(_formater, @"       AllTableDict[typeid({class_name})] = &Table{class_name};");
             }
-            sw.WriteLineExt(_formater, "\t}\n}; \n{namespace_end}");
+            sw.WriteLine("\t}");
+
+
+
+            foreach (var table in tables)
+            {
+                _formater["class_name"] = _config.GetClassName(table.SheetName);
+                var pk = table.PK;
+                if (pk == null)
+                    continue;
+
+                _formater["pk_name"] = pk.Name;
+                _formater["pk_type"] = pk.DataType.ToCppStr();
+
+                if (!pk.AttrPK.IsCompose())
+                {   
+                    sw.WriteLineExt(_formater, @"
+    const {class_name}* Get{class_name}({pk_type} {pk_name})const
+    {
+        return Table{class_name}.Get({pk_name});
+    }
+");
+                }
+                else
+                {
+                    _formater["pk_sec_name"] = pk.AttrPK._sec_key.Name;
+                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.DataType.ToCppStr();
+
+                    sw.WriteLineExt(_formater, @"
+    const {class_name}* Get{class_name}({pk_type} {pk_name},{pk_sec_type} {pk_sec_name})const
+    {
+        return Table{class_name}.Get(std::tuple<{pk_type},{pk_sec_type}>({pk_name},{pk_sec_name}));
+    }
+");
+                }
+            }
+
+
+            sw.WriteLine("};");
+
+            sw.WriteLine(_formater["namespace_end"]);
             sw.Close();
         }         
     }

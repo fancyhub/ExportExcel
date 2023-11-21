@@ -7,23 +7,41 @@
 #include "table_struct.h"
 
 namespace Test {
-	struct TableMgr
+struct TableMgr
+{
+	std::unordered_map<TableTypeInfo, Table*, TableTypeInfo, TableTypeInfo> AllTableDict;
+
+
+	TableDict<int,TItemData> TableTItemData;
+	TableDict<std::tuple<unsigned int,int>,TTestComposeKey> TableTTestComposeKey;
+	TableDict<int,TLoc> TableTLoc;
+
+	TableMgr():AllTableDict()
+       ,TableTItemData("TItemData",false)
+       ,TableTTestComposeKey("TTestComposeKey",false)
+       ,TableTLoc("TLoc",true)
 	{
-		std::unordered_map<std::string, Table*> AllTableDict;
+       AllTableDict[typeid(TItemData)] = &TableTItemData;
+       AllTableDict[typeid(TTestComposeKey)] = &TableTTestComposeKey;
+       AllTableDict[typeid(TLoc)] = &TableTLoc;
+	}
+
+    const TItemData* GetTItemData(int Id)const
+    {
+        return TableTItemData.Get(Id);
+    }
 
 
-		TableDict<int, TItemData> TableTItemData;
-		TableDict<std::tuple<unsigned int, int>, TTestComposeKey> TableTTestComposeKey;
-		TableDict<int, TLoc> TableTLoc;
+    const TTestComposeKey* GetTTestComposeKey(unsigned int Id,int Level)const
+    {
+        return TableTTestComposeKey.Get(std::tuple<unsigned int,int>(Id,Level));
+    }
 
-		TableMgr() :AllTableDict()
-			, TableTItemData("TItemData", false)
-			, TableTTestComposeKey("TTestComposeKey", false)
-			, TableTLoc("TLoc", true)
-		{
-			AllTableDict["TItemData"] = &TableTItemData;
-			AllTableDict["TTestComposeKey"] = &TableTTestComposeKey;
-			AllTableDict["TLoc"] = &TableTLoc;
-		}
-	};
+
+    const TLoc* GetTLoc(int Id)const
+    {
+        return TableTLoc.Get(Id);
+    }
+
+};
 }

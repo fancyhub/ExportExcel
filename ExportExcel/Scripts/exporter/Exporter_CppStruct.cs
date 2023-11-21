@@ -45,6 +45,11 @@ namespace ExportExcel
             }
 
 			_formater["user_header"] = _config.header;
+			_formater["parent_class"] = "";
+			if(!string.IsNullOrEmpty(_config.parentClass))
+			{
+                _formater["parent_class"] = " : public "+ _config.parentClass;
+            }
 
             string name_space = _config.namespaceName;
             List<FilterTable> tables = FilterTable.Filter(data, _flag);
@@ -59,6 +64,7 @@ namespace ExportExcel
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <typeinfo>
 
 {user_header}
 
@@ -73,14 +79,14 @@ class Table
 	public:
 		Table() :_MulitLang(false)
 		{
-			_TableName = "";
-			_LangName = "";
+			_TableName = """";
+			_LangName = """";
 		}
 
 		Table(const std::string& tableName, bool multiLang) :_MulitLang(multiLang)
 		{
 			_TableName = tableName;
-			_LangName = "";
+			_LangName = """";
 		}
 
 		void SetLang(const std::string& langName)
@@ -191,13 +197,28 @@ class Table
 		TableDict(const std::string& tableName, bool multiLang) :TableList<TItem>(tableName, multiLang) {}
 		virtual ~TableDict() { Dict.clear(); }
 
-		TItem* Get(TKey key)
+		const TItem* Get(TKey key)const
 		{
 			auto it = Dict.find(key);
 			return it != Dict.end() ? it->second : nullptr;
 		}
 	};
 
+	struct TableTypeInfo
+	{
+	private:
+		std::size_t _hash_code;
+		const char* _name;
+
+	public:
+		TableTypeInfo() :_name(nullptr), _hash_code(0) {}
+		TableTypeInfo(const TableTypeInfo& other) :_name(other._name), _hash_code(other._hash_code) {}
+		TableTypeInfo(const std::type_info& info) { _hash_code = info.hash_code(); _name = info.name(); }
+		const char* name()const { return _name; }
+		template<class T>static TableTypeInfo Create() { return typeid(T); }
+		std::size_t operator()(const TableTypeInfo& p)const { return p._hash_code; }
+		bool operator()(const TableTypeInfo& _Left, const TableTypeInfo& _Right) const { return _Left._hash_code == _Right._hash_code && _Left._name == _Right._name; }
+	};
 {namespace_end}
 
 {namespace_start}
@@ -220,6 +241,7 @@ enum class {enum_name}
                 {
                     sw.WriteLine("\t//  " + p2.ExcelVal.Replace("\n", "\n\t\t/// "));
                     sw.WriteLine("\t{0} = {1},", p2.Name, p2.Val);
+					sw.WriteLine();
                 }
                 sw.WriteLine("};");
             }
@@ -234,21 +256,18 @@ enum class {enum_name}
 
                 sw.WriteLineExt(_formater,
                     @"
-struct {class_name}
-    {");
+struct {class_name} {parent_class}
+{");
 
                 foreach (TableHeaderItem col in header)
                 {
                     //写注释
-                    sw.WriteLine("\t/// <summary>");
                     if (col.AttrPK != null)
-                        sw.WriteLine("\t/// " + col.AttrPK.ToString());
-                    sw.WriteLine("\t/// " + col.Desc.Replace("\n", "\n\t\t/// "));
-                    sw.WriteLine("\t/// </summary>");
-                    sw.WriteLine("\t " + col.DataType.ToCppStr() + " " + col.Name + ";");
+                        sw.WriteLine("\t// " + col.AttrPK.ToString());
+                    sw.WriteLine("\t// " + col.Desc.Replace("\n", "\n\t\t/// "));
+                    sw.WriteLine("\t" + col.DataType.ToCppStr() + " " + col.Name + ";\n");
                 }
-                sw.WriteLine(@"
-    };");
+                sw.WriteLine("};");
             }
             if (!string.IsNullOrEmpty(name_space))
                 sw.WriteLine("}");

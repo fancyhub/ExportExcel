@@ -189,6 +189,7 @@ namespace ExportExcel
         {
             public bool enable;
             public string namespaceName = "";
+            public string parentClass = "";
             public string classPrefix = "";
             public string classSuffix = "";
             public string dir = "Output";
@@ -208,6 +209,7 @@ namespace ExportExcel
         {
             public bool enable;
             public string namespaceName = "";
+            public string parentClass = "";
             public string classPrefix = "";
             public string classSuffix = "";
             public string dir = "Output";

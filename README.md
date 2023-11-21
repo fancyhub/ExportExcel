@@ -153,131 +153,99 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
 
 ```json
 {
-    "excelPaths": [
-        "../0_no_loc/data",
-        "data"
-    ],
-    "validation": {
-        "searchFileRoot": "../../Client/Resources",
-        "sheetNameReg": "^[A-Z][a-zA-Z0-9]*$",
-        "colNameReg": "^[A-Z][a-zA-Z0-9_]*$",
-        "enumNameReg": "^E[A-Z][A-Za-z0-9_]*$",
-        "enumFieldNameReg": "[A-Z][a-zA-Z0-9_]*$",
+  "excelPaths": [
+    "../0_no_loc/data",
+    "data"
+  ],
+  "validation": {
+    "searchFileRoot": "../../Client/Resources",
+    "sheetNameReg": "^[A-Z][a-zA-Z0-9]*$",
+    "colNameReg": "^[A-Z][a-zA-Z0-9_]*$",
+    "enumNameReg": "^E[A-Z][A-Za-z0-9_]*$",
+    "enumFieldNameReg": "[A-Z][a-zA-Z0-9_]*$"
+  },
+  "localization": {
+    "enable": true,
+    "sheetName": "Loc",
+    "defaultLang": "zh-Hans",
+    "useHashId": true,
+    "autoGenKey": true
+  },
+  "exportLocTrans": {
+    "enable": true,
+    "dir": "Output"
+  },
+  "exportRule": {
+    "enable": true,
+    "dir": "Output/Rule"
+  },
+  "exportClient": {
+    "csv": {
+      "enable": true,
+      "utf8bom": true,
+      "dir": "Output/Client/Data"
     },
-    "localization": {
-		"enable":true,
-		"sheetName": "Loc",
-		"defaultLang": "zh-Hans",
-		"autoGenKey":true,
-		"useHashId": true,
+    "bin": {
+      "enable": true,
+      "dir": "Output/Client/Data"
     },
-	"exportRule":{
-		"enable": true,
-		"dir": "Output/Rule",
-	},
-	"exportLocTrans":{
-		"enable": true,
-		"dir": "Output",
-	},
-    "exportClient": {
-        "csv": {
-            "enable": true,
-			"utf8bom":true,
-            "dir": "Output/Client/Data",
-        },
-        "bin": {
-            "enable": true,
-            "dir": "Output/Client/Data",
-        },
-        "csharp": {
-            "enable": true,
-            "namespaceName": "Test",
-            "classPrefix": "T",
-			"classSuffix": "",			
-            "dir": "Output/Client/CS",					
-            "header": "using System;\n",
-			
-			"loader":{
-				"enable":true,
-			},
-			"getter":{
-				"enable":true,
-				"className":"TableMgr",
-				"useStatic":false,
-			},
-			"locId":{
-				"enable":true,
-				"locIdStartWith":"",
-			}
-        },	
-		"cpp": {
-            "enable": true,
-            "namespaceName": "Test",
-            "classPrefix": "T",
-			"classSuffix": "",			
-            "dir": "Output/Client/Cpp",					
-            "header": "#include \"loc_str.h\"",
-			
-			"loader":{
-				"enable":true,
-			},
-			"getter":{
-				"enable":true,				
-			},			 
-        },			
-        "lua": {
-            "enable": true,
-            "classPrefix": "T",
-			"locIdStartWith": "TC_",
-            "dir": "Output/Client/Lua"
-        },
+    "csharp": {
+      "enable": true,
+      "namespaceName": "Test",
+      "parentClass": "",
+      "classPrefix": "T",
+      "classSuffix": "",
+      "dir": "Output/Client/CS",
+      "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
+      "loader": {
+        "enable": true
+      },
+      "getter": {
+        "enable": true,
+        "className": "TableMgr",
+        "useStatic": false
+      },
+      "locId": {
+        "enable": true,
+        "locIdStartWith": ""
+      }
     },
-    "exportServer": {
-        "csv": {
-            "enable": true,
-			"utf8bom":true,
-            "dir": "Output/Server/Data",
-        },
-        "bin": {
-            "enable": true,
-            "dir": "Output/Server/Data",
-        },
-        "csharp": {
-           "enable": true,
-            "namespaceName": "Test",
-            "classPrefix": "T",
-			"classSuffix": "",			
-            "dir": "Output/Server/CS",					
-            "header": "using System;\n",
-			
-			"loader":{
-				"enable":true,
-			},
-			"getter":{
-				"enable":true,
-				"className":"TableMgr",
-				"useStatic":false,
-			},
-			"locId":{
-				"enable":true,
-				"locIdStartWith":"",
-			}
-        },
-        "lua": {
-            "enable": true,
-            "classPrefix": "T",
-			"locIdStartWith": "TC_",
-            "dir": "Output/Server/Lua"
-        },
-        "go": {
-            "enable": true,
-            "packageName": "config",
-            "classPrefix": "T",
-            "dir": "Output/Server/Go",
-        }
+    "lua": {
+      "enable": true,
+      "classPrefix": "T",
+      "dir": "Output/Client/Lua",
+      "locIdStartWith": "TC_"
+    },  
+    "cpp": {
+      "enable": true,
+      "namespaceName": "Test",
+      "parentClass": "",
+      "classPrefix": "T",
+      "classSuffix": "",
+      "dir": "Output/Client/Cpp",
+      "header": "#include \"loc_str.h\"",
+      "loader": {
+        "enable": true
+      },
+      "getter": {
+        "enable": true
+      }
     }
+  },
+  "exportServer": {
+    "csv": {
+      "enable": true,
+      "utf8bom": true,
+      "dir": "Output/Server/Data"
+    },
+    "go": {
+      "enable": true,
+      "packageName": "config",
+      "classPrefix": "T",
+      "dir": "Output/Server/Go"
+    },     
+  }
 }
-
 
 ```
 

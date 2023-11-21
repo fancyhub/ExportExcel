@@ -69,6 +69,11 @@ namespace ExportExcel
                 sw.WriteLine("\t}");
             }
 
+            _formater["parent_class"] = "";
+            if (!string.IsNullOrEmpty(_config.parentClass))
+            {
+                _formater["parent_class"] = " : " + _config.parentClass;
+            }
             //生成类结构
             foreach (FilterTable table in tables)
             {
@@ -79,7 +84,7 @@ namespace ExportExcel
 
                 sw.WriteLineExt(_formater,
                     @"
-    public sealed partial class {class_name}
+    public sealed partial class {class_name} {parent_class}
     {");
 
                 foreach (TableHeaderItem col in header)

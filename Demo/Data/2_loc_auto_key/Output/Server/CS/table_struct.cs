@@ -72,7 +72,7 @@ namespace Test{
 		CanDelete = 2,
 	}
 
-    public sealed partial class TItemData
+    public sealed partial class TItemData 
     {
 		/// <summary>
 		/// PK
@@ -118,7 +118,7 @@ namespace Test{
 
     }
 
-    public sealed partial class TTestComposeKey
+    public sealed partial class TTestComposeKey 
     {
 		/// <summary>
 		/// PK[Level]

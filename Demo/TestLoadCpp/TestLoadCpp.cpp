@@ -43,24 +43,20 @@ public:
 int main()
 {
 	TableMgr mgr;
-	TableLoaderMgr loaderMgr;
+	TableLoaderMgr loaderMgr;	
+	TableReaderCreator readerCreator(std::filesystem::absolute(dir2));
+
 	std::string lang_name = TableLoaderMgr::LangList[0];
-	
-	auto dir = std::filesystem::absolute(dir2);
-	TableReaderCreator readerCreator(dir);
 
 	TableLoader loader;
 	for (auto it = mgr.AllTableDict.begin(); it != mgr.AllTableDict.end(); it++)
 	{
-		const std::string& name = it->first;
-		if (!loaderMgr.FindLoader(name, loader))
+		if (!loaderMgr.FindLoader(it->first, loader))
 			continue;
-
 		loader(it->second, lang_name, readerCreator);
 	}
-
-
-	auto item = mgr.TableTTestComposeKey.Get(std::tuple<unsigned int, int>(1, 1));
+	
+	auto item = mgr.GetTTestComposeKey(1, 1);
 
 	std::cout << "Hello World!\n";
 }

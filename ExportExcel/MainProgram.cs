@@ -40,6 +40,7 @@ namespace ExportExcel
                         DisplayUsage();
                         return -2;
                     }
+
                     PipeLine pipeline = PipelineBuilder.CreatePipeLine(config);
 
                     if (arg != ECmdArg.WatchMode)
