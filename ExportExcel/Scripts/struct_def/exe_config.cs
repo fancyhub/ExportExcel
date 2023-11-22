@@ -22,8 +22,7 @@ namespace ExportExcel
         public List<string> excelPaths = new List<string>();
         public ValidationConfig validation = new ValidationConfig();
         public LocalizationConfig localization = new LocalizationConfig();
-        public LocTransConfig exportLocTrans = new LocTransConfig();
-        public RuleConfig exportRule = new RuleConfig();
+        public ExportCommonConfig exportCommon= new ExportCommonConfig();        
         public ExportConfig exportClient = new ExportConfig();
         public ExportConfig exportServer = new ExportConfig();
 
@@ -146,6 +145,13 @@ namespace ExportExcel
             public string enumFieldNameReg = "^[A-Z][a-zA-Z0-9_]*$";
         }
 
+        public class ExportCommonConfig
+        {
+            public LocTransConfig localizationTranslate = new LocTransConfig();
+            public RuleConfig ruleExcel = new RuleConfig();
+            public SchemaConfig schema = new SchemaConfig();
+        }
+
         public class ExportConfig
         {
             public CsvConfig csv = new CsvConfig();
@@ -236,6 +242,13 @@ namespace ExportExcel
             public bool enable;
             public string dir = "Output";
         }
+
+        public class SchemaConfig
+        {
+            public bool enable;
+            public string dir = "Output";
+        }
+
 
         public class BinConfig
         {

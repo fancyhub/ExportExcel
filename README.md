@@ -201,10 +201,12 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
     "useHashId":false,  // 多语言的Key 是否需要变成 int, 如果是true的时候, 会多生成一张 loc_key.csv 的表格
     "autoGenKey":true, //必须是true
   },
-  "exportLocTrans": {
-    "enable": true, //是否重新导出翻译表, 项目需要翻译的时候, 可以导出,并翻译, 初期可以关闭
-    "dir": "Output"
-  },
+  "exportCommon":{
+    "localizationTranslate": {
+      "enable": true, //是否重新导出翻译表, 项目需要翻译的时候, 可以导出,并翻译, 初期可以关闭
+      "dir": "Output"
+    }
+  }
 }    
 ```
 
@@ -248,98 +250,104 @@ key 的生成规则 是 {sheet_name}\_{col_name}\_{pk_val}
 
 ```json
 {
-  "excelPaths": [
-    "../0_no_loc/data",
-    "data"
-  ],
-  "validation": {
-    "searchFileRoot": "../../Client/Resources",
-    "sheetNameReg": "^[A-Z][a-zA-Z0-9]*$",
-    "colNameReg": "^[A-Z][a-zA-Z0-9_]*$",
-    "enumNameReg": "^E[A-Z][A-Za-z0-9_]*$",
-    "enumFieldNameReg": "[A-Z][a-zA-Z0-9_]*$"
-  },
-  "localization": {
-    "enable": true,
-    "sheetName": "Loc",
-    "defaultLang": "zh-Hans",
-    "useHashId": true,
-    "autoGenKey": true
-  },
-  "exportLocTrans": {
-    "enable": true,
-    "dir": "Output"
-  },
-  "exportRule": {
-    "enable": true,
-    "dir": "Output/Rule"
-  },
-  "exportClient": {
-    "csv": {
-      "enable": true,
-      "utf8bom": true,
-      "dir": "Output/Client/Data"
+    "excelPaths": [
+        "../0_no_loc/data",
+        "data"
+    ],
+    "validation": {
+        "searchFileRoot": "../../Client/Resources",
+        "sheetNameReg": "^[A-Z][a-zA-Z0-9]*$",
+        "colNameReg": "^[A-Z][a-zA-Z0-9_]*$",
+        "enumNameReg": "^E[A-Z][A-Za-z0-9_]*$",
+        "enumFieldNameReg": "[A-Z][a-zA-Z0-9_]*$"
     },
-    "bin": {
-      "enable": true,
-      "dir": "Output/Client/Data"
-    },
-    "csharp": {
-      "enable": true,
-      "namespaceName": "Test",
-      "parentClass": "",
-      "classPrefix": "T",
-      "classSuffix": "",
-      "dir": "Output/Client/CS",
-      "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
-      "loader": {
-        "enable": true
-      },
-      "getter": {
+    "localization": {
         "enable": true,
-        "className": "TableMgr",
-        "useStatic": false
-      },
-      "locId": {
-        "enable": true,
-        "locIdStartWith": ""
-      }
+        "sheetName": "Loc",
+        "defaultLang": "zh-Hans",
+        "useHashId": true,
+        "autoGenKey": true
     },
-    "lua": {
-      "enable": true,
-      "classPrefix": "T",
-      "dir": "Output/Client/Lua",
-      "locIdStartWith": "TC_"
-    },  
-    "cpp": {
-      "enable": true,
-      "namespaceName": "Test",
-      "parentClass": "",
-      "classPrefix": "T",
-      "classSuffix": "",
-      "dir": "Output/Client/Cpp",
-      "header": "#include \"loc_str.h\"",
-      "loader": {
-        "enable": true
-      },
-      "getter": {
-        "enable": true
-      }
+    "exportCommon": {
+        "localizationTranslate": {
+            "enable": true,
+            "dir": "Output"
+        },
+        "ruleExcel": {
+            "enable": true,
+            "dir": "Output/Rule"
+        },
+        "schema": {
+            "enable": true,
+            "dir": "Output/Rule"
+        },
+    },
+    "exportClient": {
+        "csv": {
+            "enable": true,
+            "utf8bom": true,
+            "dir": "Output/Client/Data"
+        },
+        "bin": {
+            "enable": true,
+            "dir": "Output/Client/Data"
+        },
+        "csharp": {
+            "enable": true,
+            "namespaceName": "Test",
+            "parentClass": "",
+            "classPrefix": "T",
+            "classSuffix": "",
+            "dir": "Output/Client/CS",
+            "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
+            "loader": {
+                "enable": true
+            },
+            "getter": {
+                "enable": true,
+                "className": "TableMgr",
+                "useStatic": false
+            },
+            "locId": {
+                "enable": true,
+                "locIdStartWith": ""
+            }
+        },
+        "lua": {
+            "enable": true,
+            "classPrefix": "T",
+            "dir": "Output/Client/Lua",
+            "locIdStartWith": "TC_"
+        },
+        "cpp": {
+            "enable": true,
+            "namespaceName": "Test",
+            "parentClass": "",
+            "classPrefix": "T",
+            "classSuffix": "",
+            "dir": "Output/Client/Cpp",
+            "header": "#include \"loc_str.h\"",
+            "loader": {
+                "enable": true
+            },
+            "getter": {
+                "enable": true
+            }
+        }
+    },
+    "exportServer": {
+        "csv": {
+            "enable": true,
+            "utf8bom": true,
+            "dir": "Output/Server/Data"
+        },
+        "go": {
+            "enable": true,
+            "packageName": "config",
+            "classPrefix": "T",
+            "dir": "Output/Server/Go"
+        },
     }
-  },
-  "exportServer": {
-    "csv": {
-      "enable": true,
-      "utf8bom": true,
-      "dir": "Output/Server/Data"
-    },
-    "go": {
-      "enable": true,
-      "packageName": "config",
-      "classPrefix": "T",
-      "dir": "Output/Server/Go"
-    },     
-  }
 }
 
 ```

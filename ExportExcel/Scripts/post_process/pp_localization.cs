@@ -136,7 +136,7 @@ namespace ExportExcel
                         
 
                         //3.3  创建新的翻译表, 用来后续的导出, 方便翻译, 有新旧的比较
-                        if (data_base.Config.exportLocTrans != null && data_base.Config.exportLocTrans.enable) //需要导出 翻译表
+                        if (data_base.Config.exportCommon.localizationTranslate.enable) //需要导出 翻译表
                         {
                             data_base.TableLocTrans = _CreateNewTableTrans(table_loc, default_lang_name, default_lang_dict, loc_trans_dict);
                         }
