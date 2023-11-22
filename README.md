@@ -149,7 +149,102 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
 |10003|消耗品|
 |10004|2|
 
-# 配置文件 config.json
+# 多语言
+支持三种模式  
+## 模式0: Disable
+    localization.enable = false
+
+## 模式1: Normal
+```json
+{
+  "localization":{
+    "enable":true,  //必须是true
+    "defaultLang": "zh-Hans", //默认语言, 生成LocId代码的时候, 对应的语言会变成注释
+    "sheetName": "Loc",  //多语言的表格名
+    "useHashId":false,  // 多语言的Key 是否需要变成 int, 如果是true的时候, 会多生成一张 loc_key.csv 的表格
+    "autoGenKey":false, //必须是false
+  }
+}    
+```
+
+
+
+### Loc 表格
+导出的csv 会变成多份, Loc_English.csv, Loc_zh-Hans.csv,  如果使用HashId, 会多生成 Loc_Key.csv 
+
+|Id|English|zh-Hans|其他语言名|
+|----|----|----|----|
+|string \| pk | string|string|string|
+|多语言key|English |中文|其他语言|
+|TC_A|Test A|测试 A|xxx|
+|TC_B|Test B|测试 B|xxx|
+|TXT_OK|OK|确认|xxx|
+|#TXT_XX 不读取该行|XX|xx|xxx|
+
+
+
+### 其他表格
+|Id|Name|
+|----|----|
+|int \| pk | locstr|
+|Id|Name|
+|1001|TC_A|
+|1002|TC_B|
+
+## 模式2: AutoGenKey (自动生成Key)
+```json
+{
+  "localization":{
+    "enable":true,  //必须是true
+    "defaultLang": "zh-Hans", //默认语言
+    "sheetName": "Loc",  //多语言的表格名, 这个表格的内容是 为了确定有多少种语言, 以及翻译使用
+    "useHashId":false,  // 多语言的Key 是否需要变成 int, 如果是true的时候, 会多生成一张 loc_key.csv 的表格
+    "autoGenKey":true, //必须是true
+  },
+  "exportLocTrans": {
+    "enable": true, //是否重新导出翻译表, 项目需要翻译的时候, 可以导出,并翻译, 初期可以关闭
+    "dir": "Output"
+  },
+}    
+```
+
+key 的生成规则 是 {sheet_name}_{col_name}_{pk_val}   
+如果是两个PK  {sheet_name}_{col_name}_{pk_val}_{pk_sec_val}
+
+
+### 其他表格 Item
+|Id|Name|#comment|
+|----|----|----|
+|int \| pk | locstr||
+|Id|Name||
+|1001|盾牌|生成的多语言key = ITEM_NAME_10001|
+|1002|剑|生成的多语言key = ITEM_NAME_10002|
+
+### Loc 表格 
+翻译表, 初期的数据内容可以为空,等到需要翻译的时候, 才添加内容  
+下面的表格, 导出的csv 会变成多份, Loc_English.csv, Loc_zh-Hans.csv,  如果使用HashId, 会多生成 Loc_Key.csv 
+
+|Id|English|zh-Hans|其他语言名|
+|----|----|----|----|
+|string \| pk | string|string|string|
+|多语言key|English |中文|其他语言|
+|ITEM_NAME_10001|shield|大盾|xxx|
+|#ITEM_NAME_10002 (可以没有)|xx|xx|xxx|
+
+
+
+### 生成的新翻译表 Loc (文件名Loc_New.xlsx)
+
+|Id|#Old_zh-Hans|English|zh-Hans|其他语言名|
+|----|----|----|----|----|
+|string \| pk |string| string|string|string|
+|多语言key|#Old_zh-Hans|English |中文|其他语言|
+|ITEM_NAME_10001|大盾|shield|盾牌|xxx|
+|ITEM_NAME_10002| | |剑||
+
+翻译的时候, 可以通过比较 Old_zh-Hans 和 zh-Hans 来判断是否发生了变化, 来决定是否要重新翻译其他语言
+
+# 配置文件 
 
 ```json
 {
