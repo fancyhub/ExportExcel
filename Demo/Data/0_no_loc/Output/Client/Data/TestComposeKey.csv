@@ -1,5 +1,0 @@
-﻿Id,Level,Name,Pos,Flags
-uint32,int32,locstr,float32_float32_float32,int32
-1,1,测试,1|2|3,3
-1,2,你好,7|8|9,3
-2,1,我好,4|5|6,0
