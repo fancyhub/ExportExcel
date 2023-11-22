@@ -142,7 +142,7 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
 物品表
 |Id|ItemType|
 |----|----|
-|int\|pk| int \| Enum[EItemType]|
+|int<br/>pk| int <br/> Enum[EItemType]|
 |物品Id|物品类型|
 |10001|武器|
 |10002|1|
@@ -174,7 +174,7 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
 
 |Id|English|zh-Hans|其他语言名|
 |----|----|----|----|
-|string \| pk | string|string|string|
+|string <br/> pk | string|string|string|
 |多语言key|English |中文|其他语言|
 |TC_A|Test A|测试 A|xxx|
 |TC_B|Test B|测试 B|xxx|
@@ -186,7 +186,7 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
 ### 其他表格
 |Id|Name|
 |----|----|
-|int \| pk | locstr|
+|int <br/> pk | locstr|
 |Id|Name|
 |1001|TC_A|
 |1002|TC_B|
@@ -215,7 +215,7 @@ key 的生成规则 是 {sheet_name}_{col_name}_{pk_val}
 ### 其他表格 Item
 |Id|Name|#comment|
 |----|----|----|
-|int \| pk | locstr||
+|int <br/> pk | locstr||
 |Id|Name||
 |1001|盾牌|生成的多语言key = ITEM_NAME_10001|
 |1002|剑|生成的多语言key = ITEM_NAME_10002|
@@ -226,7 +226,7 @@ key 的生成规则 是 {sheet_name}_{col_name}_{pk_val}
 
 |Id|English|zh-Hans|其他语言名|
 |----|----|----|----|
-|string \| pk | string|string|string|
+|string <br/>pk | string|string|string|
 |多语言key|English |中文|其他语言|
 |ITEM_NAME_10001|shield|大盾|xxx|
 |#ITEM_NAME_10002 (可以没有)|xx|xx|xxx|
@@ -237,7 +237,7 @@ key 的生成规则 是 {sheet_name}_{col_name}_{pk_val}
 
 |Id|#Old_zh-Hans|English|zh-Hans|其他语言名|
 |----|----|----|----|----|
-|string \| pk |string| string|string|string|
+|string <br/> pk |string| string|string|string|
 |多语言key|#Old_zh-Hans|English |中文|其他语言|
 |ITEM_NAME_10001|大盾|shield|盾牌|xxx|
 |ITEM_NAME_10002| | |剑||
