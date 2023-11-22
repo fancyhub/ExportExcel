@@ -208,8 +208,8 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
 }    
 ```
 
-key 的生成规则 是 {sheet_name}_{col_name}_{pk_val}   
-如果是两个PK  {sheet_name}_{col_name}_{pk_val}_{pk_sec_val}
+key 的生成规则 是 {sheet_name}\_{col_name}\_{pk_val}   
+如果是两个PK  {sheet_name}\_{col_name}\_{pk_val}\_{pk_sec_val}
 
 
 ### 其他表格 Item
