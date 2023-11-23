@@ -260,6 +260,7 @@ namespace ExportExcel
         public class JsonConfig
         {
             public bool enable;
+            public bool header = false;
             public string dir = "";
         }
 

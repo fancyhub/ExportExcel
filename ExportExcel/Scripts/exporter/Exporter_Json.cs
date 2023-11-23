@@ -40,10 +40,14 @@ namespace ExportExcel
                     string out_file_path = Path.Combine(_config.dir, table.SheetName + ".json");
                     FileUtil.CreateFileDir(out_file_path);
 
-                    JsonObject root = new JsonObject();
-                    root["Header"] = _CreateTableHeader(table.Header);
-                    root["Data"] = _CreateTableData(table);
-
+                    JsonNode root = _CreateTableData(table);
+                    if(_config.header)
+                    {
+                        var temp= new JsonObject();
+                        temp["Header"] = _CreateTableHeader(table.Header);
+                        temp["Data"] = root;
+                        root = temp;
+                    }
 
                     using (Stream sw = new FileStream(out_file_path, FileMode.Create, FileAccess.Write))
                     {
