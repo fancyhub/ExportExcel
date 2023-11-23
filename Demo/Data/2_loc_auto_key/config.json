@@ -41,6 +41,10 @@
             "enable": true,
             "dir": "Output/Client/Data"
         },
+		"json": {
+            "enable": true,
+            "dir": "Output/Client/Data"
+        },
         "csharp": {
             "enable": true,
             "namespaceName": "Test",

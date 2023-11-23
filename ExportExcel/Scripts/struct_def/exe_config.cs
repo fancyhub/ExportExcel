@@ -22,7 +22,7 @@ namespace ExportExcel
         public List<string> excelPaths = new List<string>();
         public ValidationConfig validation = new ValidationConfig();
         public LocalizationConfig localization = new LocalizationConfig();
-        public ExportCommonConfig exportCommon= new ExportCommonConfig();        
+        public ExportCommonConfig exportCommon = new ExportCommonConfig();
         public ExportConfig exportClient = new ExportConfig();
         public ExportConfig exportServer = new ExportConfig();
 
@@ -156,6 +156,7 @@ namespace ExportExcel
         {
             public CsvConfig csv = new CsvConfig();
             public BinConfig bin = new BinConfig();
+            public JsonConfig json = new JsonConfig();
             public CSharpConfig csharp = new CSharpConfig();
             public LuaConfig lua = new LuaConfig();
             public GoConfig go = new GoConfig();
@@ -165,7 +166,7 @@ namespace ExportExcel
 
         public class CppGetterConfig
         {
-            public bool enable;            
+            public bool enable;
         }
 
         public class CppLoaderConfig
@@ -225,7 +226,7 @@ namespace ExportExcel
             public CppGetterConfig getter = new CppGetterConfig();
 
             public string GetClassName(string sheet_name)
-            {                
+            {
                 return classPrefix + sheet_name + classSuffix;
             }
         }
@@ -249,11 +250,17 @@ namespace ExportExcel
             public string dir = "Output";
         }
 
-
         public class BinConfig
         {
             public bool enable;
             public string dir = "Output";
+        }
+
+
+        public class JsonConfig
+        {
+            public bool enable;
+            public string dir = "";
         }
 
         public class CsvConfig
@@ -268,7 +275,7 @@ namespace ExportExcel
             public bool enable;
             public string classPrefix = "";
             public string dir = "Output";
-            public string locIdStartWith="~";
+            public string locIdStartWith = "~";
 
             public string GetClassName(string sheet_name)
             {
@@ -284,8 +291,8 @@ namespace ExportExcel
             public string dir = "Output";
 
             public string GetClassName(string sheet_name)
-            {                
-                return classPrefix + sheet_name ;
+            {
+                return classPrefix + sheet_name;
             }
         }
     }

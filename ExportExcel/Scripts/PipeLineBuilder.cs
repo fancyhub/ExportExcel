@@ -82,6 +82,7 @@ namespace ExportExcel
 
             node_list.Add(new ExporterCSV(flag, config.csv));
             node_list.Add(new Exporter_BinData(flag, config.bin));
+            node_list.Add(new Exporter_Json(flag, config.json));
 
             node_list.Add(new ExporterGOStruct(flag, config.go));
             node_list.Add(new ExporterGOLoader(flag, config.go));

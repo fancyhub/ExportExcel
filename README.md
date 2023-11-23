@@ -1,6 +1,6 @@
 # ExportExcel
 support C#, Go, Cpp, Lua  
-Support Csv, Bin
+Support Csv, Bin, Json
 
 # 数据表   
 ## 概述
@@ -289,6 +289,10 @@ key 的生成规则 是 {sheet_name}\_{col_name}\_{pk_val}
             "dir": "Output/Client/Data"
         },
         "bin": {
+            "enable": true,
+            "dir": "Output/Client/Data"
+        },
+        "json": {
             "enable": true,
             "dir": "Output/Client/Data"
         },
