@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Collections.Generic;
 
@@ -24,41 +24,43 @@ namespace ExportExcel
         public static List<string> CollectExcelFiles(List<string> path_list)
         {
             List<string> ret = new List<string>(200);
-            foreach (var path in path_list)
+            foreach (var path in path_list) //按照文件的添加顺序
             {
-                _CollectExcelFiles(path, ret);
+                var temp = _CollectExcelFiles(path);
+                foreach (var p in temp)
+                {
+                    if (!ret.Contains(p))
+                        ret.Add(p);
+                }
             }
             return ret;
         }
 
-        public static List<string> CollectExcelFiles(string path)
+        private static List<string> _CollectExcelFiles(string path)
         {
-            List<string> ret = new List<string>(200);
-            _CollectExcelFiles(path, ret);
-            return ret;
-        }
-
-        private static void _CollectExcelFiles(string path, List<string> inout_list)
-        {
+            List<string> ret = new List<string>();
             string full_path = System.IO.Path.GetFullPath(path);
             if (System.IO.File.Exists(full_path))
             {
-                if (_IsSupport(full_path) && !inout_list.Contains(full_path))
-                    inout_list.Add(full_path);
+                if (_IsSupport(full_path))
+                    ret.Add(full_path);
             }
             else if (System.IO.Directory.Exists(full_path))
             {
                 string[] sub_files = System.IO.Directory.GetFiles(full_path, "*.*", System.IO.SearchOption.AllDirectories);
                 foreach (var p in sub_files)
                 {
-                    if (_IsSupport(p) && !inout_list.Contains(full_path))
-                        inout_list.Add(p);
+                    if (_IsSupport(p))
+                        ret.Add(p);
                 }
+                //按照路径从小到大,排序
+                ret.Sort();
             }
             else
             {
                 Logger.Print("路径不存在 {0}", path);
             }
+            return ret;
         }
 
         private static bool _IsSupport(string file_path)
@@ -73,7 +75,7 @@ namespace ExportExcel
                 if (file_path.EndsWith(p, true, null))
                     return true;
             }
-            
+
             return false;
         }
     }
