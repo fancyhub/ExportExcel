@@ -28,7 +28,9 @@ namespace ExportExcel
         {
             foreach (var p in _constratint_parser_list)
             {
+
                 data_base.ForeachCol(p.Process, data_base);
+
             }
         }
 
@@ -350,7 +352,14 @@ namespace ExportExcel
             public override void Process(TableCol db_col, DataBase db)
             {
                 var col = db_col.Col;
-                col.AttrLookUp = ParseLookUp(col);
+                try
+                {
+                    col.AttrLookUp = ParseLookUp(col);
+                }
+                catch (Exception e)
+                {
+                    ErrSet.E(db_col, e.Message + " " + db_col.Table.FilePath);
+                }
 
                 if (col.AttrLookUp == null)
                     return;
@@ -388,6 +397,10 @@ namespace ExportExcel
                     var ret = temp.Substring(start_index, end_index - start_index);
 
                     var tt = ret.Split('.', StringSplitOptions.RemoveEmptyEntries);
+                    if (tt.Length != 2)
+                    {
+                        throw new Exception($"约束 {p} 不符合规则");
+                    }
                     return new ConAttrLookup()
                     {
                         _sheet_name = tt[0].Trim(),

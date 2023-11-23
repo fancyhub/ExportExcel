@@ -313,7 +313,7 @@ namespace ExportExcel
                 if (pk_idx >= 0)
                     return true;
 
-                ErrSet.E(col, "LocStr 字段,该表格必须要有主key");
+                ErrSet.E(col, "LocStr 字段,该表格必须要有主key "+ col.Table.FilePath);
                 return false;
             });
 

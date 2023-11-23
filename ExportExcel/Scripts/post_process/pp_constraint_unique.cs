@@ -120,14 +120,14 @@ namespace ExportExcel
             //3. 找到目标列
             if (!db.FindCol(attr, out TableCol tar_col))
             {
-                ErrSet.E(col, $"对应的约束，{attr}, 找不到对应目标列");
+                ErrSet.E(col, $"对应的约束，{attr}, 找不到对应目标列, " + col.Table.FilePath);
                 return;
             }
 
             //4. 检查目标列的属性,是否 包含BlankForbid
             if (!tar_col.Col.AttrBlankForbid)
             {
-                ErrSet.E(col, $"对应的约束，{attr}, 目标列 必须标记为 PK 或 Unique 或 BlankForbid");
+                ErrSet.E(col, $"对应的约束，{attr}, 目标列 必须标记为 PK 或 Unique 或 BlankForbid, " + tar_col.Table.FilePath);
                 return;
             }
             dict[tar_col.SheetColName] = tar_col;

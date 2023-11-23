@@ -107,14 +107,14 @@ namespace ExportExcel
                 //5.2 检查名字是否合法, 多语言表的字段名不检查
                 if (!_config.localization.IsLocalizationSheet(sheet_name)  && !S_COL_NAME_REGEX.IsMatch(field_name))
                 {
-                    ErrSet.E($"{rule_table.SheetName}.{field_name} 规则表该字段不符合命名规范");
+                    ErrSet.E($"{rule_table.SheetName}.{field_name} 该字段不符合命名规范", sheet.Workbook.FilePath);
                     continue;
                 }
 
                 //5.3 检查该列的名字是否重复了
                 if (rule_table.Header[field_name] != null)
                 {
-                    ErrSet.E($"{rule_table.SheetName}.{field_name} 规则表该字段重复出现");
+                    ErrSet.E($"{rule_table.SheetName}.{field_name} 该字段重复出现", sheet.Workbook.FilePath);
                     continue;
                 }
 
@@ -127,13 +127,13 @@ namespace ExportExcel
                     field_type = DataTypeUtilCsv.ParseDataType(cell_val_type, out StrConstraints);
                     if (!field_type.Valid())
                     {
-                        ErrSet.E($"{rule_table.SheetName}.{field_name} {cell_val_type} 规则表里面的数据类型未知");
+                        ErrSet.E($"{rule_table.SheetName}.{field_name} {cell_val_type} 数据类型未知", sheet.Workbook.FilePath);
                         continue;
                     }
                 }
                 catch (Exception e)
                 {
-                    ErrSet.E($"{rule_table.SheetName}.{field_name} 规则表解析类型出错 " + e.Message);
+                    ErrSet.E($"{rule_table.SheetName}.{field_name} 解析类型出错 " + e.Message,sheet.Workbook.FilePath);
                     continue;
                 }
 
