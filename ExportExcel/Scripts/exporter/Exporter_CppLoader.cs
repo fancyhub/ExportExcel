@@ -371,7 +371,7 @@ TableLoaderMgr::TableLoaderMgr()
          
         public void _ExportLoaderFunc(FilterTable table, StreamWriter sw)
         {
-            List<TableHeaderItem> header_list = table.Header;
+            List<TableField> header_list = table.GetHeader();
             string multi_name = "";
             if (!table.MultiLang)
                 multi_name = "lang = \"\";";
@@ -443,7 +443,7 @@ static Table* _Load{sheet_name}(Table* table, std::string lang, ITableReaderCrea
                 }
                 else
                 {
-                    if(data_type.enum_type!=null)
+                    if(header.AttrEnum!=null)
                         sw.WriteLine($"\t\t_ReadEnum(rowReader,item.{header.Name});");
                     else
                         sw.WriteLine($"\t\trowReader->Read(item.{header.Name});");
@@ -456,11 +456,11 @@ static Table* _Load{sheet_name}(Table* table, std::string lang, ITableReaderCrea
     tableList->SetListData(array, rowCount);  
 ");
 
-            TableHeaderItem pk = table.PK;
+            TableField pk = table.PK;
 			if (pk != null)
 			{
 				_formater["pk_name"] = pk.Name;
-				_formater["pk_type"] = pk.DataType.ToCppStr();
+				_formater["pk_type"] = pk.ToCppStr();
 				if (!pk.AttrPK.IsCompose())
 				{
 					sw.WriteLineExt(_formater, @"
@@ -477,7 +477,7 @@ static Table* _Load{sheet_name}(Table* table, std::string lang, ITableReaderCrea
 				else
 				{
                     _formater["pk_sec_name"] = pk.AttrPK._sec_key.Name;
-                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.DataType.ToCppStr();
+                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToCppStr();
                     sw.WriteLineExt(_formater, @"
 		auto tableDict= dynamic_cast<TableDict<std::tuple<{pk_type},{pk_sec_type}>,{class_name}>*>(table);
 		tableDict->Dict.clear();

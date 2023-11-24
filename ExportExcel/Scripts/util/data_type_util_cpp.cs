@@ -29,9 +29,11 @@ namespace ExportExcel
 
         private static StringBuilder _sb = new StringBuilder();    
 
-        public static string ToCppStr(this DataType type)
+        public static string ToCppStr(this TableField field)
         {
             _sb.Clear();
+            var type = field.DataType;
+
             if(type.IsList)
             {
                 _sb.Append("std::vector<");
@@ -50,10 +52,10 @@ namespace ExportExcel
             }
             else
             {
-                if (type.enum_type == null)
+                if (field.AttrEnum == null)
                     _sb.Append(_data_type_2_cpp_str[type.type0]);
                 else
-                    _sb.Append(type.enum_type.Name);
+                    _sb.Append(field.AttrEnum.Name);
             }
 
             if (type.IsList)

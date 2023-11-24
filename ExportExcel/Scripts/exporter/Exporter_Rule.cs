@@ -49,7 +49,7 @@ namespace ExportExcel
 
                 //3. 每一列单独处理
                 int col_index = 0;
-                foreach (TableHeaderItem col in table.Header.List)
+                foreach (TableField col in table.Header.List)
                 {
                     //3.1 写名字
                     _set_value(work_sheet, 0, col_index, col.Name);
@@ -92,7 +92,7 @@ namespace ExportExcel
             return ret;
         }
 
-        public List<string> _build_constraint(TableHeaderItem col)
+        public List<string> _build_constraint(TableField col)
         {
             List<string> ret = new List<string>();
             if (col.AttrPK != null)
@@ -107,9 +107,9 @@ namespace ExportExcel
             {
                 ret.Add("Export[Svr]");
             }
-            if (col.DataType.enum_type != null)
+            if (col.AttrEnum != null)
             {
-                ret.Add(string.Format("Enum[{0}]", col.DataType.enum_type.Name));
+                ret.Add(string.Format("Enum[{0}]", col.AttrEnum.Name));
             }
             return ret;
         }

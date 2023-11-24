@@ -44,7 +44,7 @@ namespace ExportExcel
             public override void Process(TableCol db_col, DataBase db)
             {
                 //1. 解析 PK
-                TableHeaderItem col = db_col.Col;
+                TableField col = db_col.Col;
                 ConAttrPK attr_pk = _parse_pk(col);
                 if (attr_pk == null)
                     return;
@@ -76,7 +76,7 @@ namespace ExportExcel
                     ErrSet.E(db_col, $"{attr_pk} 第二个key 不能是自己");
                     return;
                 }
-                TableHeaderItem sec_col = db_col.Table.Header[sec_key_name];
+                TableField sec_col = db_col.Table.Header[sec_key_name];
                 if (sec_col == null)
                 {
                     ErrSet.E(db_col, $"{attr_pk} 第二个key 找不到");
@@ -86,23 +86,23 @@ namespace ExportExcel
                 attr_pk._sec_key_idx = db_col.Table.Header.IndexOfCol(sec_key_name);
                 sec_col.AttrBlankForbid = true; //不允许为空
 
-                if (!_is_data_type_combine(col.DataType) || !_is_data_type_combine(sec_col.DataType))
+                if (!_is_data_type_combine(col) || !_is_data_type_combine(sec_col))
                     ErrSet.E(db_col, $"组合PK, 只能支持 int/uint");
             }
 
-            public static bool _is_data_type_combine(DataType data_type)
+            public static bool _is_data_type_combine(TableField header_item)
             {
-                if (data_type.IsTuple || data_type.IsList)
+                if (header_item.DataType.IsTuple || header_item.DataType.IsList)
                     return false;
-                if (data_type.enum_type != null)
+                if (header_item.AttrEnum != null)
                     return false;
 
-                if (data_type.type0 == EDataType.Int32 || data_type.type0 == EDataType.UInt32)
+                if (header_item.DataType.type0 == EDataType.Int32 || header_item.DataType.type0 == EDataType.UInt32)
                     return true;
                 return false;
             }
 
-            public static ConAttrPK _parse_pk(TableHeaderItem col)
+            public static ConAttrPK _parse_pk(TableField col)
             {
                 foreach (var p in col.StrConstraints)
                 {
@@ -128,19 +128,19 @@ namespace ExportExcel
         {
             public override void Process(TableCol db_col, DataBase db)
             {
-                TableHeaderItem col = db_col.Col;
+                TableField col = db_col.Col;
                 string ref_enum_name = _parse_enum(col);
                 if (string.IsNullOrEmpty(ref_enum_name))
                     return;
 
-                col.DataType.enum_type = db.EnumDB.Find(ref_enum_name);
-                if (col.DataType.enum_type == null)
+                col.AttrEnum = db.EnumDB.Find(ref_enum_name);
+                if (col.AttrEnum == null)
                 {
                     ErrSet.E(db_col, $"找不到对应的枚举类型 {ref_enum_name}");
                     return;
                 }
 
-                if (col.DataType.enum_type != null && !_is_support_enum(col.DataType))
+                if (col.AttrEnum != null && !_is_support_enum(col.DataType))
                 {
                     ErrSet.E(db_col, $"只有 int,list_int 支持枚举类型 {ref_enum_name}");
                     return;
@@ -148,7 +148,7 @@ namespace ExportExcel
             }
 
             // 格式 : Enum[E_Enum_Name] 
-            public static string _parse_enum(TableHeaderItem col)
+            public static string _parse_enum(TableField col)
             {
                 foreach (var str in col.StrConstraints)
                 {
@@ -219,7 +219,7 @@ namespace ExportExcel
             }
 
             // 格式: Unique
-            public static bool ParseUnique(TableHeaderItem col)
+            public static bool ParseUnique(TableField col)
             {
                 foreach (var p in col.StrConstraints)
                 {
@@ -243,7 +243,7 @@ namespace ExportExcel
             }
 
             // 格式 : BlankForbid
-            public static bool ParseBlankForbid(TableHeaderItem col)
+            public static bool ParseBlankForbid(TableField col)
             {
                 foreach (var p in col.StrConstraints)
                 {
@@ -265,7 +265,7 @@ namespace ExportExcel
 
             // 格式: Export[Client], Export[Svr], Export[None]
             // 不填写 默认all
-            public static EExportFlag ParseExport(TableHeaderItem col)
+            public static EExportFlag ParseExport(TableField col)
             {
                 foreach (var str in col.StrConstraints)
                 {
@@ -314,7 +314,7 @@ namespace ExportExcel
             }
 
             // 格式: FilePath[Dir,prefab]
-            public static ConAttrFilePath ParseFilePath(TableHeaderItem col)
+            public static ConAttrFilePath ParseFilePath(TableField col)
             {
                 foreach (var p in col.StrConstraints)
                 {
@@ -364,27 +364,27 @@ namespace ExportExcel
                 if (col.AttrLookUp == null)
                     return;
 
-                if (!_is_data_type_valid(col.DataType))
+                if (!_is_data_type_valid(col))
                     ErrSet.E(db_col, $"LookUp 约束, 只能支持 int,int64,string 以及对应的list类型, 不支持枚举");
             }
 
-            public bool _is_data_type_valid(DataType data_type)
+            public bool _is_data_type_valid(TableField field)
             {
-                if (data_type.enum_type != null)
+                if (field.AttrEnum != null)
                     return false;
 
-                if (data_type.IsTuple)
+                if (field.DataType.IsTuple)
                     return false;
 
-                if (data_type.type0 != EDataType.Int32
-                    && data_type.type0 != EDataType.Int64
-                    && data_type.type0 != EDataType.String)
+                if (field.DataType.type0 != EDataType.Int32
+                    && field.DataType.type0 != EDataType.Int64
+                    && field.DataType.type0 != EDataType.String)
                     return false;
                 return true;
             }
 
             // 格式: LookUp[SheetName.ColName]
-            public static ConAttrLookup ParseLookUp(TableHeaderItem col)
+            public static ConAttrLookup ParseLookUp(TableField col)
             {
                 foreach (var p in col.StrConstraints)
                 {
@@ -420,28 +420,28 @@ namespace ExportExcel
                 if (col.AttrRange == null)
                     return;
 
-                if (!_is_data_type_valid(col.DataType))
+                if (!_is_data_type_valid(col))
                     ErrSet.E(db_col, $"Range[],只能支持 int,int64,float,double 以及对应的list类型, 不支持枚举");
             }
 
-            public static bool _is_data_type_valid(DataType data_type)
+            public static bool _is_data_type_valid(TableField field)
             {
-                if (data_type.enum_type != null)
+                if (field.AttrEnum != null)
                     return false;
 
-                if (data_type.IsTuple)
+                if (field.DataType.IsTuple)
                     return false;
 
-                if (data_type.type0 != EDataType.Int32
-                    && data_type.type0 != EDataType.Int64
-                    && data_type.type0 != EDataType.Float32
-                    && data_type.type0 != EDataType.Float64)
+                if (field.DataType.type0 != EDataType.Int32
+                    && field.DataType.type0 != EDataType.Int64
+                    && field.DataType.type0 != EDataType.Float32
+                    && field.DataType.type0 != EDataType.Float64)
                     return false;
                 return true;
             }
 
             // 格式: Range[min,max]
-            public static ConAttrRange ParseRange(TableHeaderItem col)
+            public static ConAttrRange ParseRange(TableField col)
             {
                 foreach (var p in col.StrConstraints)
                 {
@@ -469,24 +469,24 @@ namespace ExportExcel
             public override void Process(TableCol db_col, DataBase db)
             {
                 var col = db_col.Col;
-                col.AttrTupleAlias = ParseTupleAlias(col);
+                col.AttrTupleAlias = _ParseTupleAlias(col);
                 if (col.AttrTupleAlias == null)
                     return;
 
-                if (!_is_data_type_valid(col.DataType))
+                if (!_IsDataTypeValid(col))
                     ErrSet.E(db_col, $"TupleAlias[],只能支持 tuple");
             }
 
-            public static bool _is_data_type_valid(DataType data_type)
+            private static bool _IsDataTypeValid(TableField field)
             {
-                if (data_type.enum_type != null)
+                if (field.AttrEnum != null)
                     return false;
 
-                return data_type.IsTuple;
+                return field.DataType.IsTuple;
             }
 
             // 格式: TupleAlias[name]
-            public static ConAttrTupleAlias ParseTupleAlias(TableHeaderItem col)
+            private static ConAttrTupleAlias _ParseTupleAlias(TableField col)
             {
                 foreach (var p in col.StrConstraints)
                 {

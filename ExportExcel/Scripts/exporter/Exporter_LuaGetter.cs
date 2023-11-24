@@ -78,7 +78,7 @@ end");
 
                 if (pk != null)
                 {
-                    _formater["pk_type"] = pk.DataType.ToLuaStr();
+                    _formater["pk_type"] = pk.ToLuaStr();
                     _formater["pk_name"] = pk.Name;
                     if (!pk.AttrPK.IsCompose())
                     {

@@ -34,7 +34,7 @@ namespace ExportExcel
     public class ConAttrPK : ConstraintAttr
     {
         public string _sec_key_col_name;
-        public TableHeaderItem _sec_key;
+        public TableField _sec_key;
         public int _sec_key_idx;
         /// <summary>
         /// 是否为组合key

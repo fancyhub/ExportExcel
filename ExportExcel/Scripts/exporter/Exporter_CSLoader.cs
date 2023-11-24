@@ -35,7 +35,7 @@ namespace ExportExcel
         {
             if (_config == null || !_config.enable || !_config.loader.enable)
                 return;
-            
+
             List<FilterTable> tables = FilterTable.Filter(data, _flag);
 
             string name_space = _config.namespaceName;
@@ -185,23 +185,23 @@ namespace ExportExcel
             Dictionary<(string aliasName, string name), DataType> tuple_types = new Dictionary<(string, string), DataType>();
             foreach (var table in table_list)
             {
-                List<TableHeaderItem> header_list = table.Header;
-                foreach (var header in header_list)
+                List<TableField> header_list = table.GetHeader();
+                foreach (var field in header_list)
                 {
-                    DataType data_type = header.DataType;
+                    DataType data_type = field.DataType;
                     if (data_type.IsList)
                     {
                         data_type.IsList = false;
-                        if (header.AttrTupleAlias != null)
-                            list_types[(header.AttrTupleAlias.AliasName, data_type.ToCSharpStr())] = data_type.IsTuple;
+                        if (field.AttrTupleAlias != null)
+                            list_types[(field.AttrTupleAlias.AliasName, data_type.ToCSharpStr())] = data_type.IsTuple;
                         else
                             list_types[(string.Empty, data_type.ToCSharpStr())] = data_type.IsTuple;
                     }
 
                     if (data_type.IsTuple)
                     {
-                        if (header.AttrTupleAlias != null)
-                            tuple_types[(header.AttrTupleAlias.AliasName, data_type.ToCSharpStr())] = data_type;
+                        if (field.AttrTupleAlias != null)
+                            tuple_types[(field.AttrTupleAlias.AliasName, data_type.ToCSharpStr())] = data_type;
                         else
                             tuple_types[(string.Empty, data_type.ToCSharpStr())] = data_type;
                     }
@@ -244,7 +244,7 @@ namespace ExportExcel
                         sw.WriteLine($"\t\t\t_Read(tupleReader,ref v2.Item{i + 1});");
                     }
 
-                    sw.WriteLineExt(_formater,@"
+                    sw.WriteLineExt(_formater, @"
              v = {alias_name}.CreateInst(true,v2);
         }");
                 }
@@ -282,7 +282,7 @@ namespace ExportExcel
         }");
                 }
                 else
-                {   
+                {
                     sw.WriteLineExt(_formater, @"
         private static void _ReadList(ITableRowReader rowReader, ref {alias_name}[] v, out {data_type} v2)
         {
@@ -310,7 +310,7 @@ namespace ExportExcel
 
         public void _ExportLoaderFunc(FilterTable table, StreamWriter sw)
         {
-            List<TableHeaderItem> header_list = table.Header;
+            List<TableField> header_list = table.GetHeader();
             string multi_name = "";
             if (!table.MultiLang)
                 multi_name = "lang = null;";
@@ -363,26 +363,26 @@ namespace ExportExcel
 
             for (int i = 0; i < header_list.Count; i++)
             {
-                var header = header_list[i];
-                var data_type = header.DataType;
+                TableField field = header_list[i];
+                DataType data_type = field.DataType;
                 if (data_type.IsList)
                 {
                     data_type.IsList = false;
-                    if (header.AttrTupleAlias != null)
-                        sw.WriteLine($"\t\t\t\t_ReadList(rowReader, ref row.{header.Name},out {data_type.ToCSharpStr()} __{header.Name});");
+                    if (field.AttrTupleAlias != null)
+                        sw.WriteLine($"\t\t\t\t_ReadList(rowReader, ref row.{field.Name},out {data_type.ToCSharpStr()} __{field.Name});");
                     else
-                        sw.WriteLine($"\t\t\t\t_ReadList(rowReader, ref row.{header.Name});");
+                        sw.WriteLine($"\t\t\t\t_ReadList(rowReader, ref row.{field.Name});");
                 }
                 else if (data_type.IsTuple)
                 {
-                    if (header.AttrTupleAlias != null)
-                        sw.WriteLine($"\t\t\t\t_ReadTuple(rowReader.BeginTuple(), ref row.{header.Name}, out {data_type.ToCSharpStr()} __{header.Name});");
+                    if (field.AttrTupleAlias != null)
+                        sw.WriteLine($"\t\t\t\t_ReadTuple(rowReader.BeginTuple(), ref row.{field.Name}, out {data_type.ToCSharpStr()} __{field.Name});");
                     else
-                        sw.WriteLine($"\t\t\t\t_ReadTuple(rowReader.BeginTuple(), ref row.{header.Name});");
+                        sw.WriteLine($"\t\t\t\t_ReadTuple(rowReader.BeginTuple(), ref row.{field.Name});");
                 }
                 else
                 {
-                    sw.WriteLine($"\t\t\t\t_Read(rowReader, ref row.{header.Name});");
+                    sw.WriteLine($"\t\t\t\t_Read(rowReader, ref row.{field.Name});");
                 }
             }
 
@@ -399,12 +399,12 @@ namespace ExportExcel
             }            
             ");
 
-            TableHeaderItem pk = table.PK;
+            TableField pk = table.PK;
             _formater["pk_name"] = "";
             if (pk != null)
             {
                 _formater["pk_name"] = pk.Name;
-                _formater["pk_type"] = pk.DataType.ToCSharpStr();
+                _formater["pk_type"] = pk.ToCSharpStr();
 
                 if (!pk.AttrPK.IsCompose())
                 {
@@ -426,7 +426,7 @@ namespace ExportExcel
                 else
                 {
                     _formater["pk_sec_name"] = pk.AttrPK._sec_key.Name;
-                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.DataType.ToCSharpStr();
+                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToCSharpStr();
                     sw.WriteLineExt(_formater,
                        @"
             var dict = new Dictionary<({pk_type},{pk_sec_type}), {class_name}>(list.Count);

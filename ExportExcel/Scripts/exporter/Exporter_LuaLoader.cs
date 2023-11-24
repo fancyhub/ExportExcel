@@ -67,7 +67,7 @@ this._name_2_loader = name_2_loader");
 
         public void _export_load_func(FilterTable table, StreamWriter sw)
         {
-            List<TableHeaderItem> header = table.Header;
+            List<TableField> header = table.GetHeader();
             string multi_name = "";
             if (table.MultiLang)
                 multi_name = "sheet_name = sheet_name ..\"_\".. lang;";
@@ -116,7 +116,7 @@ local function _Load{sheet_name}()
 
             for (int i = 0; i < header.Count; i++)
             {
-                TableHeaderItem c = header[i];
+                TableField c = header[i];
                 sw.WriteLine("\t\tdata.{0}= {2}(line[{1}])", c.Name, i + 1, c.DataType.ToLuaParseStr());
             }
 

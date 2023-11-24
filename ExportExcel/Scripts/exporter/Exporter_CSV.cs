@@ -43,7 +43,7 @@ namespace ExportExcel
 
                 foreach (var table in multi_lang_tables)
                 {
-                    List<TableHeaderItem> header = table.Header;
+                    List<TableField> header = table.GetHeader();
                     string out_file_path = Path.Combine(_config.dir, table.SheetName + ".csv");
                     FileUtil.CreateFileDir(out_file_path);
                     using (StreamWriter sw = new StreamWriter(out_file_path, false, encoding))
@@ -51,7 +51,7 @@ namespace ExportExcel
                         //写文件头
                         int count = header.Count;
                         int index = 0;
-                        foreach (TableHeaderItem head_col in header)
+                        foreach (TableField head_col in header)
                         {
                             if (index > 0)
                                 sw.Write(',');
@@ -61,7 +61,7 @@ namespace ExportExcel
                         sw.Write("\n");
 
                         index = 0;
-                        foreach (TableHeaderItem head_col in header)
+                        foreach (TableField head_col in header)
                         {
                             if (index > 0)
                                 sw.Write(',');

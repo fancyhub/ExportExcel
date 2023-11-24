@@ -21,14 +21,12 @@ namespace ExportExcel
             List<int> temp = new List<int>();
             data_base.ForeachCol((col) =>
             {
-                DataType data_type = col.Col.DataType;
-                EnumType enum_ref = data_type.enum_type;
-                if (enum_ref == null)
+                if (col.Col.AttrEnum == null)
                     return;
 
                 col.ForeachCell((cell) =>
                 {
-                    string new_v = _Convert(cell.Value, data_type, temp);
+                    string new_v = _Convert(cell.Value, col.Col, temp);
                     if (!string.IsNullOrEmpty(new_v))
                     {
                         cell.Value = new_v;
@@ -40,12 +38,12 @@ namespace ExportExcel
             });
         }
 
-        public static string _Convert(string v, DataType data_type, List<int> temp_list)
+        public static string _Convert(string v, TableField header_item, List<int> temp_list)
         {
             //1. 先把string 转换成list int
             temp_list.Clear();
             var temp = v.Split(ConstDef.C_LIST_SPLIT);
-            EnumType enum_table = data_type.enum_type;
+            EnumType enum_table = header_item.AttrEnum;
             foreach (var p in temp)
             {
                 bool ok = enum_table.Convert(p, out int result);
@@ -55,7 +53,7 @@ namespace ExportExcel
             }
 
             //2.如果是list 类型, 直接join
-            if (data_type.IsList)
+            if (header_item.DataType.IsList)
                 return string.Join(ConstDef.C_LIST_SPLIT, temp_list);
 
             //3. 按位合并

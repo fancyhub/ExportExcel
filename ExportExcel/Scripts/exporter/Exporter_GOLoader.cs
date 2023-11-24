@@ -50,7 +50,7 @@ const (
 );
             foreach (FilterTable t in tables)
             {
-                _formater["class_name"] = _config.GetClassName(t.SheetName);;
+                _formater["class_name"] = _config.GetClassName(t.SheetName); ;
                 _formater["sheet_name"] = t.SheetName;
 
                 sw.WriteLineExt(_formater, "\t{class_name}FileName = \"{sheet_name}.csv\"");
@@ -84,10 +84,10 @@ func CreateCsvDataMgr(logger ILogger,reader IDataReader) (*CsvDataMgr, error) {
                 var pk = t.PK;
                 if (t.PK != null)
                 {
-                    _formater["pk_type"] = pk.DataType.ToGoStr();
+                    _formater["pk_type"] = pk.ToGoStr();
                     if (t.PK.AttrPK.IsCompose())
                     {
-                        _formater["pk_sec_type"] = pk.AttrPK._sec_key.DataType.ToGoStr();
+                        _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToGoStr();
                         sw.WriteLineExt(_formater, "\t\t{class_name}Map:  make(map[{pk_type}]map[{pk_sec_type}]*{class_name}, 0),");
                     }
                     else
@@ -113,46 +113,69 @@ func CreateCsvDataMgr(logger ILogger,reader IDataReader) (*CsvDataMgr, error) {
 }
 ");
 
-            _export_base_parse(sw);
-            _export_parse(sw, GetAllDateTypes(tables));
-
+            _ExportBaseParser(sw);
+            _ExportTupleParaser(sw, tables);
+            _ExportListParaser(sw, tables);
             foreach (FilterTable t in tables)
             {
-                _export_load_func(t, sw);
+                _ExportLoadFunc(t, sw);
             }
             sw.Close();
         }
 
-        public void _export_parse(StreamWriter sw, List<DataType> type_list)
-        {
-            //导出Tuple
-            foreach (var p in type_list)
-            {
-                DataType t = p;
-                if (!t.IsTuple)
-                    continue;
-                if (t.IsList)
-                    continue;
 
+        private void _ExportTupleParaser(StreamWriter sw, List<FilterTable> table_list)
+        {
+            List<DataType> all_types = new List<DataType>();
+            foreach (var p in table_list)
+            {
+                foreach (var p2 in p._header)
+                {
+                    DataType t = p2.Item1.DataType;
+                    if (t.IsTuple)
+                    {
+                        t.IsList = false;
+                        _AddType(all_types, t);
+                    }
+                }
+            }
+
+            //导出Tuple
+            foreach (var p in all_types)
+            {
                 sw.WriteLine($"func {p.ToGoParseStr()}(v string) {p.ToGoStr()} {{");
                 sw.WriteLine($"\ttemp:= strings.Split(v, \"{ConstDef.C_TUPLE_SPLIT}\")");
                 sw.WriteLine("\tlen:= len(temp)");
                 sw.WriteLine($"\tret:= {p.ToGoStr()}{{ }}");
-                for (int i = 0; i < t.Count; i++)
+                for (int i = 0; i < p.Count; i++)
                 {
                     sw.WriteLine($"\tif len > {i} {{");
-                    sw.WriteLine($"\t\tret.Item{i} = {t.Get(i).ToGoParseStr()}(temp[{i}])");
+                    sw.WriteLine($"\t\tret.Item{i} = {p.Get(i).ToGoParseStr()}(temp[{i}])");
                     sw.WriteLine("\t}");
                 }
                 sw.WriteLine("\treturn ret\n}");
             }
+        }
+
+        private void _ExportListParaser(StreamWriter sw, List<FilterTable> table_list)
+        {
+            List<DataType> all_types = new List<DataType>();
+            foreach (var p in table_list)
+            {
+                foreach (var p2 in p._header)
+                {
+                    DataType t = p2.Item1.DataType;
+                    if (t.IsList)
+                    {
+                        _AddType(all_types, t);
+                    }
+                }
+            }
 
             //导出List
-            foreach (var p in type_list)
+            foreach (var p in all_types)
             {
                 DataType t = p;
-                if (!t.IsList)
-                    continue;
                 t.IsList = false;
                 sw.WriteLine($"func {p.ToGoParseStr()} (v string) {p.ToGoStr()}{{");
                 sw.WriteLine($"\ttemp := strings.Split(v, \"{ConstDef.C_LIST_SPLIT}\")");
@@ -165,7 +188,7 @@ func CreateCsvDataMgr(logger ILogger,reader IDataReader) (*CsvDataMgr, error) {
             }
         }
 
-        public void _export_base_parse(StreamWriter sw)
+        private static void _ExportBaseParser(StreamWriter sw)
         {
             string msg = @"                        
             
@@ -227,7 +250,8 @@ func parseString(v string) string {
             sw.WriteLine(msg);
         }
 
-        public void _export_load_func(FilterTable table, StreamWriter sw)
+
+        private void _ExportLoadFunc(FilterTable table, StreamWriter sw)
         {
             _formater["sheet_name"] = table.SheetName;
             _formater["class_name"] = _config.GetClassName(table.SheetName);
@@ -261,11 +285,11 @@ func (cd *CsvDataMgr) load{sheet_name}() error {
     }
 ");
 
-            List<TableHeaderItem> header = table.Header;
+            List<TableField> header = table.GetHeader();
             _formater["col_count"] = header.Count.ToString();
             for (int i = 0; i < header.Count; i++)
             {
-                TableHeaderItem col = header[i];
+                TableField col = header[i];
                 _formater["col_name"] = col.Name;
                 _formater["col_idx"] = i.ToString();
                 _formater["col_type"] = col.DataType.ToCsvStr();
@@ -297,9 +321,10 @@ func (cd *CsvDataMgr) load{sheet_name}() error {
 
             for (int i = 0; i < header.Count; i++)
             {
-                TableHeaderItem c = header[i];
-                if (c.DataType.enum_type != null)
-                    sw.WriteLine("\t\trow_struct.{0}= {3}({2}(row_data[{1}]))", c.Name, i, c.DataType.ToGoParseStr(), c.DataType.enum_type.Name);
+                TableField c = header[i];
+
+                if (c.AttrEnum != null)
+                    sw.WriteLine("\t\trow_struct.{0}= {3}({2}(row_data[{1}]))", c.Name, i, c.DataType.ToGoParseStr(), c.AttrEnum.Name);
                 else
                     sw.WriteLine("\t\trow_struct.{0}= {2}(row_data[{1}])", c.Name, i, c.DataType.ToGoParseStr());
 
@@ -309,10 +334,10 @@ func (cd *CsvDataMgr) load{sheet_name}() error {
         list_data[i] = row_struct
     }");
 
-            TableHeaderItem pk = table.PK;
+            TableField pk = table.PK;
             if (pk != null)
             {
-                _formater["pk_type"] = pk.DataType.ToGoStr();
+                _formater["pk_type"] = pk.ToGoStr();
                 _formater["pk_name"] = pk.Name;
 
                 if (!pk.AttrPK.IsCompose())
@@ -337,7 +362,7 @@ func (cd *CsvDataMgr) load{sheet_name}() error {
 
                 else
                 {
-                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.DataType.ToGoStr();
+                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToGoStr();
                     _formater["pk_sec_name"] = pk.AttrPK._sec_key.Name;
                     sw.WriteLineExt(_formater,
                  @"
@@ -379,29 +404,7 @@ func (cd *CsvDataMgr) load{sheet_name}() error {
         }
 
 
-        public static List<DataType> GetAllDateTypes(List<FilterTable> tables)
-        {
-            List<DataType> ret = new List<DataType>();
-
-            foreach (var p in tables)
-            {
-                foreach (var p2 in p._header)
-                {
-                    DataType t = p2.Item1.DataType;
-                    if (!t.IsTuple && !t.IsList)
-                        continue;
-
-                    t.IsList = false;
-                    _AddType(ret, p2.Item1.DataType);
-                    _AddType(ret, t);
-
-                }
-            }
-            return ret;
-        }
-
-
-        public static void _AddType(List<DataType> list, DataType t)
+        private static void _AddType(List<DataType> list, DataType t)
         {
             bool found = false;
             foreach (var p in list)
@@ -412,7 +415,6 @@ func (cd *CsvDataMgr) load{sheet_name}() error {
                     break;
                 }
             }
-
             if (!found)
                 list.Add(t);
         }

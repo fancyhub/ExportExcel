@@ -80,14 +80,14 @@ namespace ExportExcel
                 _formater["sheet_name"] = table.SheetName;
                 _formater["class_name"] = _config.GetClassName(table.SheetName);;
 
-                List<TableHeaderItem> header = table.Header;
+                List<TableField> header = table.GetHeader();
 
                 sw.WriteLineExt(_formater,
                     @"
     public sealed partial class {class_name} {parent_class}
     {");
 
-                foreach (TableHeaderItem col in header)
+                foreach (TableField col in header)
                 {
                     //写注释
                     sw.WriteLine("\t\t/// <summary>");

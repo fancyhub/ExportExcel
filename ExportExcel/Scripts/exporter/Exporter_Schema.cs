@@ -74,7 +74,7 @@ namespace ExportExcel
             return ret;
         }
 
-        private SchemaColumn _CreateColumn(TableHeaderItem item, string sec_key_name)
+        private SchemaColumn _CreateColumn(TableField item, string sec_key_name)
         {
             SchemaColumn ret = new SchemaColumn();
             ret.Name = item.Name;
@@ -91,7 +91,7 @@ namespace ExportExcel
             return ret;
         }
 
-        private SchemaConstraint _CreateSchemaConstraint(TableHeaderItem item, string sec_key_name)
+        private SchemaConstraint _CreateSchemaConstraint(TableField item, string sec_key_name)
         {
             SchemaConstraint ret = new SchemaConstraint();
             if (item.StrConstraints != null)
@@ -106,9 +106,9 @@ namespace ExportExcel
                 ret.Key = ESchemaKey.SecondKey.ToString();
             }
 
-            if (item.DataType.enum_type != null)
+            if (item.AttrEnum != null)
             {
-                ret.Enum = item.DataType.enum_type.Name;
+                ret.Enum = item.AttrEnum.Name;
             }
 
             if (item.AttrTupleAlias != null)

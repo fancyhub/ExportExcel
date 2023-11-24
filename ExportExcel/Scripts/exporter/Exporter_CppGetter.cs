@@ -79,13 +79,13 @@ struct TableMgr
                 }
                 else if(!pk.AttrPK.IsCompose())
                 {
-                    _formater["pk_type"] = pk.DataType.ToCppStr();
+                    _formater["pk_type"] = pk.ToCppStr();
                     sw.WriteLineExt(_formater, "\tTableDict<{pk_type},{class_name}> Table{class_name};");
                 }
                 else
                 {
-                    _formater["pk_type"] = pk.DataType.ToCppStr();
-                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.DataType.ToCppStr();
+                    _formater["pk_type"] = pk.ToCppStr();
+                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToCppStr();
                     sw.WriteLineExt(_formater, "\tTableDict<std::tuple<{pk_type},{pk_sec_type}>,{class_name}> Table{class_name};");
                 }
             }
@@ -118,7 +118,7 @@ struct TableMgr
                     continue;
 
                 _formater["pk_name"] = pk.Name;
-                _formater["pk_type"] = pk.DataType.ToCppStr();
+                _formater["pk_type"] = pk.ToCppStr();
 
                 if (!pk.AttrPK.IsCompose())
                 {   
@@ -132,7 +132,7 @@ struct TableMgr
                 else
                 {
                     _formater["pk_sec_name"] = pk.AttrPK._sec_key.Name;
-                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.DataType.ToCppStr();
+                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToCppStr();
 
                     sw.WriteLineExt(_formater, @"
     const {class_name}* Get{class_name}({pk_type} {pk_name},{pk_sec_type} {pk_sec_name})const

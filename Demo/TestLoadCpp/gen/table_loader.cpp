@@ -3,7 +3,7 @@
 #include "table_loader.h"
 
 namespace Test {
-	const std::string TableLoaderMgr::LangList[] = {"zh-Hans","EN"};	
+	const std::string TableLoaderMgr::LangList[] = {"EN","zh-Hans"};	
 
 	template <class T1, class T2>
 	static bool _ReadTuple(ITableRowReader* reader, std::tuple<T1, T2>& item)

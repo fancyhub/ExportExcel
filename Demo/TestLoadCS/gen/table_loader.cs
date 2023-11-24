@@ -27,8 +27,8 @@ namespace Test{
         {        
             LangList= new List<string>(2);
 
-			LangList.Add("zh-Hans");
 			LangList.Add("EN");
+			LangList.Add("zh-Hans");
 			EnumConverterMgr.RegFunc((v) => (EItemType)v, (v) => (int)v);
 			EnumConverterMgr.RegFunc((v) => (EItemSubType)v, (v) => (int)v);
 			EnumConverterMgr.RegFunc((v) => (EItemQuality)v, (v) => (int)v);

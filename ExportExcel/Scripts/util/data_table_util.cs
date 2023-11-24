@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace ExportExcel
@@ -48,7 +48,7 @@ namespace ExportExcel
             foreach (var t in self.Tables)
             {
                 Table table = t.Value;
-                List<TableHeaderItem> col_list = table.Header.List;
+                List<TableField> col_list = table.Header.List;
                 for (int i = 0; i < col_list.Count; i++)
                 {
                     TableCol col_data = new TableCol(table, i);
@@ -62,7 +62,7 @@ namespace ExportExcel
             foreach (var t in self.Tables)
             {
                 Table table = t.Value;
-                List<TableHeaderItem> col_list = table.Header.List;
+                List<TableField> col_list = table.Header.List;
                 for (int i = 0; i < col_list.Count; i++)
                 {
                     TableCol col_data = new TableCol(table, i);
@@ -76,7 +76,7 @@ namespace ExportExcel
             foreach (var t in self.Tables)
             {
                 Table table = t.Value;
-                List<TableHeaderItem> col_list = table.Header.List;
+                List<TableField> col_list = table.Header.List;
                 for (int i = 0; i < col_list.Count; i++)
                 {
                     TableCol col_data = new TableCol(table, i);

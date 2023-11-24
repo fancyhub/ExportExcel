@@ -29,14 +29,41 @@ namespace ExportExcel
 
         private static StringBuilder _sb = new StringBuilder();
 
-        public static string ToCSharpStr(this TableHeaderItem item)
+        public static string ToCSharpStr(this TableField item)
         {
-            if (item.AttrTupleAlias == null)
-                return item.DataType.ToCSharpStr();
+            if (item.AttrTupleAlias != null)
+            {
+                if (item.DataType.IsList)
+                    return item.AttrTupleAlias.AliasName + "[]";
+                return item.AttrTupleAlias.AliasName;
+            }
 
-            if (item.DataType.IsList)
-                return item.AttrTupleAlias.AliasName + "[]";
-            return item.AttrTupleAlias.AliasName;
+            var type = item.DataType;
+            _sb.Clear();
+            if (type.IsTuple)
+            {
+                _sb.Append("(");
+                _sb.Append(_data_type_2_csharp_str[type.type0]);
+
+                for (int i = 1; i < type.Count; i++)
+                {
+                    _sb.Append(",");
+                    _sb.Append(_data_type_2_csharp_str[type.Get(i)]);
+                }
+                _sb.Append(")");
+            }
+            else
+            {
+                if (item.AttrEnum == null)
+                    _sb.Append(_data_type_2_csharp_str[type.type0]);
+                else
+                    _sb.Append(item.AttrEnum.Name);
+            }
+
+            if (type.IsList)
+                _sb.Append("[]");
+
+            return _sb.ToString();
         }
 
         public static string ToCSharpStr(this DataType type)
@@ -56,10 +83,7 @@ namespace ExportExcel
             }
             else
             {
-                if (type.enum_type == null)
-                    _sb.Append(_data_type_2_csharp_str[type.type0]);
-                else
-                    _sb.Append(type.enum_type.Name);
+                _sb.Append(_data_type_2_csharp_str[type.type0]);
             }
 
             if (type.IsList)

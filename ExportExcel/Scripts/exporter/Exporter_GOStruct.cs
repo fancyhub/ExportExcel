@@ -31,7 +31,7 @@ namespace ExportExcel
         }
         public void Process(DataBase data)
         {
-            if(_config == null || !_config.enable)            
+            if (_config == null || !_config.enable)
                 return;
 
 
@@ -60,7 +60,7 @@ import (
                 sw.WriteLine();
             }
 
-            var type_list = GetAllDateTypes(tables);
+            var type_list = _GetAllTupleTypes(tables);
             foreach (var p in type_list)
             {
                 string name = p.ToGoStr();
@@ -78,18 +78,18 @@ import (
                 _formater["class_name"] = _config.GetClassName(t.SheetName);
                 sw.WriteLineExt(_formater, "type {class_name} struct {");
 
-                foreach (TableHeaderItem c in t.Header)
+                foreach (TableField c in t.GetHeader())
                 {
                     //写注释                    
                     if (c.AttrPK != null)
                         sw.WriteLine("\t// " + c.AttrPK.ToString());
                     sw.WriteLine("\t// " + c.Desc.Replace("\n", "\n\t// "));
-                    if (c.DataType.enum_type != null)
+                    if (c.AttrEnum != null)
                     {
-                        sw.WriteLine("\t{0} {1}", c.Name, c.DataType.enum_type.Name);
+                        sw.WriteLine("\t{0} {1}", c.Name, c.AttrEnum.Name);
                     }
                     else
-                        sw.WriteLine("\t{0} {1}", c.Name, c.DataType.ToGoStr());
+                        sw.WriteLine("\t{0} {1}", c.Name, c.ToGoStr());
                     sw.WriteLine("");
                 }
                 sw.WriteLine("}");
@@ -122,11 +122,11 @@ type CsvDataMgr struct {
                 var pk = t.PK;
                 if (t.PK != null)
                 {
-                    _formater["pk_type"] = pk.DataType.ToGoStr();
+                    _formater["pk_type"] = pk.ToGoStr();
 
                     if (t.PK.AttrPK.IsCompose())
                     {
-                        _formater["pk_sec_type"] = pk.AttrPK._sec_key.DataType.ToGoStr();
+                        _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToGoStr();
                         sw.WriteLineExt(_formater, "\t{class_name}Map  map[{pk_type}]map[{pk_sec_type}]*{class_name}");
                     }
                     else
@@ -143,7 +143,7 @@ type CsvDataMgr struct {
             sw.Close();
         }
 
-        public static List<DataType> GetAllDateTypes(List<FilterTable> tables)
+        private static List<DataType> _GetAllTupleTypes(List<FilterTable> tables)
         {
             List<DataType> ret = new List<DataType>();
 

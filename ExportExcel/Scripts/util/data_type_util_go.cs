@@ -34,9 +34,10 @@ namespace ExportExcel
             return _data_type_2_go_str[type];
         }
 
-        public static string ToGoStr(this DataType type)
+        public static string ToGoStr(this TableField field)
         {
             _sb.Clear();
+            var type = field.DataType;
             if (type.IsList)
                 _sb.Append("[]");
 
@@ -52,12 +53,34 @@ namespace ExportExcel
             }
             else
             {
-                if (type.enum_type == null)
+                if (field.AttrEnum == null)
                     _sb.Append(_data_type_2_go_str[type.type0]);
                 else
-                    _sb.Append(type.enum_type.Name);
+                    _sb.Append(field.AttrEnum.Name);
             }
 
+            return _sb.ToString();
+        }
+
+        public static string ToGoStr(this DataType data_type)
+        {
+            _sb.Clear();
+
+            if (data_type.IsList)
+                _sb.Append("[]");
+
+            if (data_type.IsTuple)
+            {
+                _sb.Append("Tuple");
+                _sb.Append(_UpFirst(_data_type_2_go_str[data_type.type0]));
+            }
+            else 
+                _sb.Append(_data_type_2_go_str[data_type.type0]);
+
+            for (int i = 1; i < data_type.Count; i++)
+            {
+                _sb.Append(_UpFirst(_data_type_2_go_str[data_type.Get(i)]));
+            }
             return _sb.ToString();
         }
 
@@ -96,7 +119,7 @@ namespace ExportExcel
         {
             if (s == null || s.Length == 0)
                 return s;
-            return s.Substring(0,1).ToUpper() + s.Substring(1);
+            return s.Substring(0, 1).ToUpper() + s.Substring(1);
         }
     }
 }

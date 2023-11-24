@@ -252,20 +252,20 @@ enum class {enum_name}
                 _formater["sheet_name"] = table.SheetName;
 				_formater["class_name"] = _config.GetClassName(table.SheetName);
 
-                List<TableHeaderItem> header = table.Header;
+                List<TableField> header = table.GetHeader();
 
                 sw.WriteLineExt(_formater,
                     @"
 struct {class_name} {parent_class}
 {");
 
-                foreach (TableHeaderItem col in header)
+                foreach (TableField col in header)
                 {
                     //写注释
                     if (col.AttrPK != null)
                         sw.WriteLine("\t// " + col.AttrPK.ToString());
                     sw.WriteLine("\t// " + col.Desc.Replace("\n", "\n\t\t/// "));
-                    sw.WriteLine("\t" + col.DataType.ToCppStr() + " " + col.Name + ";\n");
+                    sw.WriteLine("\t" + col.ToCppStr() + " " + col.Name + ";\n");
                 }
                 sw.WriteLine("};");
             }

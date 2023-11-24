@@ -35,8 +35,7 @@ namespace ExportExcel
         public EDataType type4;
         public int Count;
         public bool IsTuple => Count > 1;
-        public bool IsList;
-        public EnumType enum_type;
+        public bool IsList;        
 
         public void AddType(EDataType type)
         {

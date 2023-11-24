@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
  
 
@@ -7,7 +7,7 @@ namespace ExportExcel
     public struct TableCol
     {
         public Table Table;
-        public TableHeaderItem Col;
+        public TableField Col;
         public int ColIndex;
 
         public TableCol(Table table, int col_index)

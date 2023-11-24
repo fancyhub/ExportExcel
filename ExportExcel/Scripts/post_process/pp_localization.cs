@@ -186,10 +186,10 @@ namespace ExportExcel
             table_trans.Header.Add(table_loc.Header.Pk.Clone());
             table_trans.SheetName = table_loc.SheetName;
 
-            TableHeaderItem header_col = table_loc.Header[default_lang_name];
+            TableField header_col = table_loc.Header[default_lang_name];
             for (int i = 0; i < lang_list.Count; i++)
             {
-                TableHeaderItem t = header_col.Clone();
+                TableField t = header_col.Clone();
                 t.Name = lang_list[i];
                 t.ExcelColIdx = i + 1;
                 t.Desc = t.Name;
@@ -225,7 +225,7 @@ namespace ExportExcel
 
             TableHeader header = newTable.Header;
             header.Add(table_loc.Header.Pk.Clone());
-            TableHeaderItem val_col = new TableHeaderItem();
+            TableField val_col = new TableField();
             val_col.Name = "Val";
             val_col.Desc = "";
             val_col.DataType = new DataType();

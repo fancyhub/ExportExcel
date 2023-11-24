@@ -80,7 +80,7 @@ namespace ExportExcel
             _checker.Add(EDataType.LocStr, new FTC_LocStr());
         }
 
-        public void SetCurCol(TableHeaderItem col)
+        public void SetCurCol(TableField col)
         {
             //1. 计算当前的检查 类型
             _cur_checker = _checker[col.DataType.type0];

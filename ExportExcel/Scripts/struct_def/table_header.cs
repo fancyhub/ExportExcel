@@ -19,7 +19,7 @@ namespace ExportExcel
     }
 
 
-    public class TableHeaderItem
+    public class TableField
     {
         public string Name;
         public string Desc;
@@ -36,10 +36,11 @@ namespace ExportExcel
         public ConAttrFilePath AttrFilePath; //路径检查
         public ConAttrRange AttrRange; //范围检查
         public ConAttrTupleAlias AttrTupleAlias;
+        public EnumType AttrEnum;
 
-        public TableHeaderItem Clone()
+        public TableField Clone()
         {
-            return new TableHeaderItem()
+            return new TableField()
             {
                 Name = Name,
                 Desc = Desc,
@@ -52,20 +53,21 @@ namespace ExportExcel
                 AttrBlankForbid = AttrBlankForbid,
                 AttrLookUp = AttrLookUp,
                 AttrFilePath = AttrFilePath,
-                AttrRange = AttrRange
+                AttrRange = AttrRange,
+                AttrEnum = AttrEnum,
             };
         }
     }
 
     public class TableHeader
     {
-        public Dictionary<string, TableHeaderItem> Dict;
-        public List<TableHeaderItem> List;
+        public Dictionary<string, TableField> Dict;
+        public List<TableField> List;
 
         public TableHeader()
         {
-            Dict = new Dictionary<string, TableHeaderItem>();
-            List = new List<TableHeaderItem>();
+            Dict = new Dictionary<string, TableField>();
+            List = new List<TableField>();
         }
 
         //检查表格, 是否两边的头一致, 返回 缺少的字段
@@ -73,8 +75,8 @@ namespace ExportExcel
         {
             //1. 准备
             out_rslt.Clear();
-            Dictionary<string, TableHeaderItem> dict_rule = Dict;
-            Dictionary<string, TableHeaderItem> dict_data = other_header.Dict;
+            Dictionary<string, TableField> dict_rule = Dict;
+            Dictionary<string, TableField> dict_data = other_header.Dict;
 
             //2. 检查列的缺失
             foreach (var p in dict_rule)
@@ -109,7 +111,7 @@ namespace ExportExcel
             return out_rslt.Count == 0;
         }
 
-        public bool Add(TableHeaderItem col)
+        public bool Add(TableField col)
         {
             //1. 检查            
             if (Dict.ContainsKey(col.Name))
@@ -131,7 +133,7 @@ namespace ExportExcel
             }
         }
 
-        public TableHeaderItem Pk
+        public TableField Pk
         {
             get
             {
@@ -149,7 +151,7 @@ namespace ExportExcel
             return -1;
         }
 
-        public TableHeaderItem this[int index]
+        public TableField this[int index]
         {
             get
             {
@@ -157,7 +159,7 @@ namespace ExportExcel
             }
         }
 
-        public TableHeaderItem this[string name]
+        public TableField this[string name]
         {
             get
             {

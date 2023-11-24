@@ -44,7 +44,7 @@ namespace ExportExcel
                     if(_config.header)
                     {
                         var temp= new JsonObject();
-                        temp["Header"] = _CreateTableHeader(table.Header);
+                        temp["Header"] = _CreateTableHeader(table.GetHeader());
                         temp["Data"] = root;
                         root = temp;
                     }
@@ -66,7 +66,7 @@ namespace ExportExcel
         private static JsonNode _CreateTableData(FilterTable table)
         {
             int row_count = table.RowCount;
-            var header = table.Header;
+            var header = table.GetHeader();
 
             List<JsonNode> array = new List<JsonNode>(row_count);
             for (int i = 0; i < row_count; i++)
@@ -77,7 +77,7 @@ namespace ExportExcel
             return new JsonArray(array.ToArray());
         }
 
-        private static JsonNode _CreateRowData(FilterTable table, List<TableHeaderItem> header, int row)
+        private static JsonNode _CreateRowData(FilterTable table, List<TableField> header, int row)
         {
             JsonObject ret = new JsonObject();
             for (int i = 0; i < header.Count; i++)
@@ -88,7 +88,7 @@ namespace ExportExcel
             return ret;
         }
 
-        private static JsonNode _ParseCellData(string data, TableHeaderItem header_item)
+        private static JsonNode _ParseCellData(string data, TableField header_item)
         {
             if (header_item.DataType.IsList)
             {
@@ -158,7 +158,7 @@ namespace ExportExcel
             }
         }
 
-        private static JsonNode _CreateTableHeader(List<TableHeaderItem> list)
+        private static JsonNode _CreateTableHeader(List<TableField> list)
         {
             JsonArray ret = new JsonArray();
 

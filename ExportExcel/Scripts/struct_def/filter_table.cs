@@ -11,7 +11,7 @@ namespace ExportExcel
 {
     public class FilterTable
     {
-        public List<(TableHeaderItem, int)> _header;
+        public List<(TableField, int)> _header;
         public string[,] _body;
         public int _row_count = 0;
         public int _col_count = 0;
@@ -27,7 +27,7 @@ namespace ExportExcel
 
             var header = _filter_header(table, flag);
             if (header.Count == 0)
-                return;             
+                return;
 
             _header = header;
             _body = table.Body;
@@ -71,7 +71,7 @@ namespace ExportExcel
             }
         }
 
-        public TableHeaderItem PK
+        public TableField PK
         {
             get
             {
@@ -84,22 +84,19 @@ namespace ExportExcel
             }
         }
 
-        public List<TableHeaderItem> Header
+        public List<TableField> GetHeader()
         {
-            get
-            {
-                if (_header == null)
-                    return null;
-                List<TableHeaderItem> ret = new List<TableHeaderItem>(_header.Count);
-                foreach (var p in _header)
-                    ret.Add(p.Item1);
-                return ret;
-            }
+            if (_header == null)
+                return null;
+            List<TableField> ret = new List<TableField>(_header.Count);
+            foreach (var p in _header)
+                ret.Add(p.Item1);
+            return ret;
         }
 
-        public List<ValueTuple<TableHeaderItem, int>> _filter_header(Table table, EExportFlag flag)
+        public List<ValueTuple<TableField, int>> _filter_header(Table table, EExportFlag flag)
         {
-            List<(TableHeaderItem, int)> ret = new List<(TableHeaderItem, int)>();
+            List<(TableField, int)> ret = new List<(TableField, int)>();
 
             var col_list = table.Header.List;
             for (int i = 0; i < col_list.Count; i++)

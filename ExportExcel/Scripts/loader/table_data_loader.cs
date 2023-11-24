@@ -137,7 +137,7 @@ namespace ExportExcel
                     continue;
                 }
 
-                TableHeaderItem col = new TableHeaderItem();
+                TableField col = new TableField();
                 col.Name = field_name;
                 col.DataType = field_type;
                 col.Desc = row_desc.CellStrExt(i);
@@ -168,7 +168,7 @@ namespace ExportExcel
             for (int rule_col_idx = 0; rule_col_idx < tar.Header.Count; rule_col_idx++)
             {
                 //找到对应的数据 index
-                TableHeaderItem rule_col = tar.Header[rule_col_idx];
+                TableField rule_col = tar.Header[rule_col_idx];
                 int data_col_idx = data_header.IndexOfCol(rule_col.Name);
                 //没有找到, 填充空
                 if (data_col_idx < 0)

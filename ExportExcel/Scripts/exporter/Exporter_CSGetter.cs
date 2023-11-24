@@ -77,7 +77,7 @@ namespace ExportExcel
 
         public void _ExportGetterFunc(FilterTable table, StreamWriter sw)
         {
-            List<TableHeaderItem> header = table.Header;
+            List<TableField> header = table.GetHeader();
             string multi_name = "";
             if (!table.MultiLang)
                 multi_name = "lang = null;";
@@ -86,7 +86,7 @@ namespace ExportExcel
             _formater["sheet_name"] = table.SheetName;
             _formater["class_name"] = _config.GetClassName(table.SheetName);
 
-            TableHeaderItem pk = table.PK;
+            TableField pk = table.PK;
 
             sw.WriteLineExt(_formater,
                 @"      
@@ -100,7 +100,7 @@ namespace ExportExcel
             if (pk != null)
             {
                 _formater["pk_name"] = pk.Name;
-                _formater["pk_type"] = pk.DataType.ToCSharpStr();
+                _formater["pk_type"] = pk.ToCSharpStr();
 
                 if (!pk.AttrPK.IsCompose())
                 {
@@ -120,7 +120,7 @@ namespace ExportExcel
                 else
                 {
                     _formater["pk_sec_name"] = pk.AttrPK._sec_key.Name;
-                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.DataType.ToCSharpStr();
+                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToCSharpStr();
                     sw.WriteLineExt(_formater,
                     @"
         public {static_flag} {class_name} Get{class_name}({pk_type} {pk_name},{pk_sec_type} {pk_sec_name})

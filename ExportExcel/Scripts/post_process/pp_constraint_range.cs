@@ -53,7 +53,7 @@ namespace ExportExcel
     {
         public Dictionary<EDataType, I_DataRange> _dict = new Dictionary<EDataType, I_DataRange>();
         public I_DataRange _cur;
-        public TableHeaderItem _col;
+        public TableField _col;
         public DataRange()
         {
             _dict.Add(EDataType.Int32, new DataRangeInt());
@@ -64,7 +64,7 @@ namespace ExportExcel
             _dict.Add(EDataType.Float64, new DataRangeDouble());
         }
 
-        public bool SetCol(TableHeaderItem col)
+        public bool SetCol(TableField col)
         {
             _col = col;
             _cur = null;

@@ -47,10 +47,10 @@ namespace ExportExcel
                 string class_name = _config.classPrefix + table.SheetName;
 
                 sw.WriteLine($"---@class {class_name}");
-                foreach (var c in table.Header)
+                foreach (var c in table.GetHeader())
                 {
                     string field_name = c.Name;
-                    string field_type = c.DataType.ToLuaStr();
+                    string field_type = c.ToLuaStr();
                     sw.WriteLine($"---@field {field_name} {field_type}");
                 }
                 sw.WriteLine($"local {class_name}={{}}");

@@ -40,26 +40,27 @@ namespace ExportExcel
         };
          
 
-        public static string ToLuaStr(this DataType data)
+        public static string ToLuaStr(this TableField field)
         {
+            var data = field.DataType;
             string ret = _data_type_2_lua_str[data.type0];
             if (data.IsList)
             {
                 if (data.IsTuple)
                     return string.Format("table<Tuple_{0}_{1}>", _data_type_2_lua_str[data.type0], _data_type_2_lua_str[data.type1]);
-                else if (data.enum_type == null)
+                else if (field.AttrEnum == null)
                     return string.Format("table<{0}>", ret);
                 else
-                    return string.Format("table<{0}>", data.enum_type.Name);
+                    return string.Format("table<{0}>", field.AttrEnum .Name);
             }
             else
             {
                 if (data.IsTuple)
                     return string.Format("Tuple_{0}_{1}", _data_type_2_lua_str[data.type0], _data_type_2_lua_str[data.type1]);
-                else if (data.enum_type == null)
+                else if (field.AttrEnum == null)
                     return ret;
                 else
-                    return data.enum_type.Name;
+                    return field.AttrEnum.Name;
             }
         }
 
