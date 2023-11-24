@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using MongoDB.Bson;
 using Newtonsoft.Json.Linq;
 
 namespace ExportExcel
@@ -33,7 +32,7 @@ namespace ExportExcel
                 if ((p.Value.TableExportFlag & _flag) == 0)
                     continue;
 
-                List<FilterTable> multi_lang_tables = GetMultiLangTable(p.Value, _flag);
+                List<FilterTable> multi_lang_tables = FilterTable.SplitMultiLangTable(p.Value, _flag);
 
                 foreach (var table in multi_lang_tables)
                 {
@@ -44,30 +43,12 @@ namespace ExportExcel
                     using (StreamWriter sw = new StreamWriter(out_file_path, false, System.Text.Encoding.UTF8))
                     {
                         sw.Write(data.ToString(Newtonsoft.Json.Formatting.Indented));
-                    } 
+                    }
                 }
             }
         }
 
-        public static List<FilterTable> GetMultiLangTable(Table table, EExportFlag flag)
-        {
-            List<FilterTable> ret = new List<FilterTable>();
-            if (table.MultiLangBody == null)
-            {
-                ret.Add(new FilterTable(table, flag));
-                return ret;
-            }
 
-            foreach (var p in table.MultiLangBody)
-            {
-                FilterTable t = new FilterTable(table, flag);
-                t._body = p.Value;
-                t.SheetName = table.SheetName + "_" + p.Key;
-                t._row_count = p.Value.GetLength(0);
-                ret.Add(t);
-            }
-            return ret;
-        }
 
         public static JToken ConvertToJsonObj(FilterTable table, bool with_header)
         {

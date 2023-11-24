@@ -12,21 +12,22 @@ using System.Text;
 namespace ExportExcel
 {
     //导出 CSV 结构
-    public class ExporterCSV : IProcessNode
+    public class Exporter_CSV : IProcessNode
     {
-        
+
         public EExportFlag _flag;
         public Config.CsvConfig _config;
 
-        public ExporterCSV(EExportFlag flag, Config.CsvConfig config)
+        public Exporter_CSV(EExportFlag flag, Config.CsvConfig config)
         {
             _flag = flag;
             _config = config;
         }
         public string GetName()
         {
-            return "Export";
+            return "Export Csv";
         }
+
         public void Process(DataBase data)
         {
             if (_config == null || !_config.enable)
@@ -39,7 +40,7 @@ namespace ExportExcel
                 if ((p.Value.TableExportFlag & _flag) == 0)
                     continue;
 
-                List<FilterTable> multi_lang_tables = _get_multi_lang_table(p.Value);
+                List<FilterTable> multi_lang_tables = FilterTable.SplitMultiLangTable(p.Value, _flag);
 
                 foreach (var table in multi_lang_tables)
                 {
@@ -80,7 +81,7 @@ namespace ExportExcel
                                 if (j > 0)
                                     sw.Write(',');
                                 string s = table[i, j];
-                                sw.Write(_format_csv_str(s));
+                                sw.Write(_FormatCsvStr(s));
                             }
                             sw.Write("\n");
                         }
@@ -89,27 +90,7 @@ namespace ExportExcel
             }
         }
 
-        public List<FilterTable> _get_multi_lang_table(Table table)
-        {
-            List<FilterTable> ret = new List<FilterTable>();
-            if (table.MultiLangBody == null)
-            {
-                ret.Add(new FilterTable(table, _flag));
-                return ret;
-            }
-
-            foreach (var p in table.MultiLangBody)
-            {
-                FilterTable t = new FilterTable(table, _flag);
-                t._body = p.Value;
-                t.SheetName = table.SheetName + "_" + p.Key;
-                t._row_count = p.Value.GetLength(0);
-                ret.Add(t);
-            }
-            return ret;
-        }
-
-        public static string _format_csv_str(string s)
+        public static string _FormatCsvStr(string s)
         {
             bool contain_qutos = s.Contains("\"");
             bool contain_newline = (s.Contains("\n") || s.Contains("\r"));

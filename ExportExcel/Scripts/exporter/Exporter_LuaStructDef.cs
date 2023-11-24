@@ -25,7 +25,7 @@ namespace ExportExcel
 
         public string GetName()
         {
-            return "Export";
+            return "Export Lua Struct Define";
         }
 
         public void Process(DataBase data)

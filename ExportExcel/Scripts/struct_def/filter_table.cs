@@ -11,10 +11,9 @@ namespace ExportExcel
 {
     public class FilterTable
     {
-        public List<(TableField, int)> _header;
-        public string[,] _body;
-        public int _row_count = 0;
-        public int _col_count = 0;
+        private string[,] _Body;
+
+        public List<(TableField, int)> Header;
         public string SheetName;
         public bool MultiLang;
 
@@ -25,14 +24,12 @@ namespace ExportExcel
             if ((table.TableExportFlag & flag) == 0)
                 return;
 
-            var header = _filter_header(table, flag);
+            var header = _FilterHeader(table, flag);
             if (header.Count == 0)
                 return;
 
-            _header = header;
-            _body = table.Body;
-            _row_count = _body.GetLength(0);
-            _col_count = _header.Count;
+            Header = header;
+            _Body = table.Body;
             if (table.MultiLangBody != null)
                 MultiLang = true;
         }
@@ -52,22 +49,39 @@ namespace ExportExcel
             return ret;
         }
 
+        public static List<FilterTable> SplitMultiLangTable(Table table, EExportFlag flag)
+        {
+            List<FilterTable> ret = new List<FilterTable>();
+            if (table.MultiLangBody == null)
+            {
+                ret.Add(new FilterTable(table, flag));
+                return ret;
+            }
 
-        public int RowCount { get { return _row_count; } }
+            foreach (var p in table.MultiLangBody)
+            {
+                FilterTable t = new FilterTable(table, flag);
+                t._Body = p.Value;
+                t.SheetName = table.SheetName + "_" + p.Key;
+                ret.Add(t);
+            }
+            return ret;
+        }         
 
-        public int ColCount { get { return _col_count; } }
+        public int ColCount { get { return Header.Count; } }
+        public int RowCount { get { return _Body == null ? 0 : _Body.GetLength(0); } }
 
         public string this[int r, int c]
         {
             get
             {
-                if (r < 0 || r >= _row_count)
+                if (r < 0 || r >= RowCount)
                     return null;
-                if (c < 0 || c >= _col_count)
+                if (c < 0 || c >= ColCount)
                     return null;
 
-                c = _header[c].Item2;
-                return _body[r, c];
+                c = Header[c].Item2;
+                return _Body[r, c];
             }
         }
 
@@ -75,7 +89,7 @@ namespace ExportExcel
         {
             get
             {
-                foreach (var p in _header)
+                foreach (var p in Header)
                 {
                     if (p.Item1.AttrPK != null)
                         return p.Item1;
@@ -86,15 +100,15 @@ namespace ExportExcel
 
         public List<TableField> GetHeader()
         {
-            if (_header == null)
+            if (Header == null)
                 return null;
-            List<TableField> ret = new List<TableField>(_header.Count);
-            foreach (var p in _header)
+            List<TableField> ret = new List<TableField>(Header.Count);
+            foreach (var p in Header)
                 ret.Add(p.Item1);
             return ret;
         }
 
-        public List<ValueTuple<TableField, int>> _filter_header(Table table, EExportFlag flag)
+        private List<ValueTuple<TableField, int>> _FilterHeader(Table table, EExportFlag flag)
         {
             List<(TableField, int)> ret = new List<(TableField, int)>();
 

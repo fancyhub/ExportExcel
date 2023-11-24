@@ -15,7 +15,7 @@ namespace ExportExcel
 
         public string GetName()
         {
-            return "Export Schema";
+            return "Export Schema.json";
         }
 
         public void Process(DataBase data_base)

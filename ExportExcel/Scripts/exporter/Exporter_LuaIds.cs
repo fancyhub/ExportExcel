@@ -23,7 +23,7 @@ namespace ExportExcel
 
         public string GetName()
         {
-            return "Export";
+            return "Export Lua Loc Ids";
         }
         public void Process(DataBase data)
         {

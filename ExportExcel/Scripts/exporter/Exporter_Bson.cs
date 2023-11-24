@@ -33,7 +33,7 @@ namespace ExportExcel
                 if ((p.Value.TableExportFlag & _flag) == 0)
                     continue;
 
-                List<FilterTable> multi_lang_tables = Exporter_Json.GetMultiLangTable(p.Value, _flag);
+                List<FilterTable> multi_lang_tables = FilterTable.SplitMultiLangTable(p.Value, _flag);
 
                 foreach (var table in multi_lang_tables)
                 {

@@ -27,7 +27,7 @@ namespace ExportExcel
 
         public string GetName()
         {
-            return "Export CS";
+            return "Export C++ Struct";
         }
 
         public void Process(DataBase data)

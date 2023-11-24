@@ -12,14 +12,14 @@ using OfficeOpenXml.Table.PivotTable;
 *************************************************************************************/
 namespace ExportExcel
 {
-    public class ExporterGOStruct : IProcessNode
+    public class Exporter_GoStruct : IProcessNode
     {
         public const string C_FILE_NAME = "table_struct.go";
         public StringFormater _formater = new StringFormater();
         public EExportFlag _flag;
         public Config.GoConfig _config;
 
-        public ExporterGOStruct(EExportFlag flag, Config.GoConfig config)
+        public Exporter_GoStruct(EExportFlag flag, Config.GoConfig config)
         {
             _flag = flag;
             _config = config;
@@ -27,7 +27,7 @@ namespace ExportExcel
 
         public string GetName()
         {
-            return "Export";
+            return "Export Go Struct";
         }
         public void Process(DataBase data)
         {
@@ -149,7 +149,7 @@ type CsvDataMgr struct {
 
             foreach (var p in tables)
             {
-                foreach (var p2 in p._header)
+                foreach (var p2 in p.Header)
                 {
                     DataType t = p2.Item1.DataType;
                     if (!t.IsTuple)

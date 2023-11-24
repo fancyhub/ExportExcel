@@ -25,7 +25,7 @@ namespace ExportExcel
 
         public string GetName()
         {
-            return "Export";
+            return "Export Lua Loader";
         }
         
         public void Process(DataBase data)

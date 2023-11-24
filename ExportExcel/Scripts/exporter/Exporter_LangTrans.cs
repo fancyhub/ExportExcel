@@ -19,8 +19,9 @@ namespace ExportExcel
         }
         public string GetName()
         {
-            return "Export";
+            return "Export Localization Translation  Sheet";
         }
+
         public void Process(DataBase data_base)
         {
             //1. 检查, 并创建对应的dir

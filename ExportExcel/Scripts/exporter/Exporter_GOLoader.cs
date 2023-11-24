@@ -11,21 +11,21 @@ using System.Collections.Generic;
 *************************************************************************************/
 namespace ExportExcel
 {
-    public class ExporterGOLoader : IProcessNode
+    public class Exporter_GoLoader : IProcessNode
     {
         public const string C_FILE_NAME = "table_loader.go";
         public StringFormater _formater = new StringFormater();
         public EExportFlag _flag;
         public Config.GoConfig _config;
 
-        public ExporterGOLoader(EExportFlag flag, Config.GoConfig config)
+        public Exporter_GoLoader(EExportFlag flag, Config.GoConfig config)
         {
             _flag = flag;
             _config = config;
         }
         public string GetName()
         {
-            return "Export";
+            return "Export Go Loader";
         }
         public void Process(DataBase data)
         {
@@ -129,7 +129,7 @@ func CreateCsvDataMgr(logger ILogger,reader IDataReader) (*CsvDataMgr, error) {
             List<DataType> all_types = new List<DataType>();
             foreach (var p in table_list)
             {
-                foreach (var p2 in p._header)
+                foreach (var p2 in p.Header)
                 {
                     DataType t = p2.Item1.DataType;
                     if (t.IsTuple)
@@ -162,7 +162,7 @@ func CreateCsvDataMgr(logger ILogger,reader IDataReader) (*CsvDataMgr, error) {
             List<DataType> all_types = new List<DataType>();
             foreach (var p in table_list)
             {
-                foreach (var p2 in p._header)
+                foreach (var p2 in p.Header)
                 {
                     DataType t = p2.Item1.DataType;
                     if (t.IsList)

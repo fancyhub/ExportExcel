@@ -19,7 +19,7 @@ namespace ExportExcel
 
         public string GetName()
         {
-            return "Export";
+            return "Export Rule Excel File";
         }
         public void Process(DataBase data)
         {

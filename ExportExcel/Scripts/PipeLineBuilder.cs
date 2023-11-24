@@ -80,13 +80,13 @@ namespace ExportExcel
             node_list.Add(new Exporter_LuaLoader(flag, config.lua));
             node_list.Add(new Exporter_LuaStructDef(flag, config.lua));
 
-            node_list.Add(new ExporterCSV(flag, config.csv));
+            node_list.Add(new Exporter_CSV(flag, config.csv));
             node_list.Add(new Exporter_BinData(flag, config.bin));
             node_list.Add(new Exporter_Json(flag, config.json));
             node_list.Add(new Exporter_Bson(flag, config.bson));
 
-            node_list.Add(new ExporterGOStruct(flag, config.go));
-            node_list.Add(new ExporterGOLoader(flag, config.go));
+            node_list.Add(new Exporter_GoStruct(flag, config.go));
+            node_list.Add(new Exporter_GoLoader(flag, config.go));
 
         }
     }
