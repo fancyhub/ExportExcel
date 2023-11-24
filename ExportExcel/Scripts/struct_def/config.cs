@@ -267,7 +267,6 @@ namespace ExportExcel
         public class BsonConfig
         {
             public bool enable;
-            public bool header = false;
             public string dir = "";
         }
 

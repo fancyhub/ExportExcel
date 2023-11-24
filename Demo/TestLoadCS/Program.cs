@@ -9,14 +9,11 @@ public class MainProgram
 
     public static int Main(string[] args)
     {
-        var converts = new List<Newtonsoft.Json.JsonConverter>()
-        {
-            new JsonLocIdConverter()
-        };
+
+        TestLoadJson();
+        TestLoadBson();
 
         string dir = Path.GetFullPath(dirPath2);
-        string json_data = System.IO.File.ReadAllText(System.IO.Path.Combine(dirPath2, "ItemData.json"));
-        List<TItemData> list_item_data = Newtonsoft.Json.JsonConvert.DeserializeObject<List<TItemData>>(json_data, converts.ToArray());
 
 
         LocLang.Lang = TableLoaderMgr.LangList[0];
@@ -36,6 +33,40 @@ public class MainProgram
 
         return 0;
     }
+
+    public static void TestLoadBson()
+    {
+        Newtonsoft.Json.JsonSerializerSettings ser_settings = new Newtonsoft.Json.JsonSerializerSettings();
+        ser_settings.Converters.Add(new JsonLocIdConverter());
+        byte[] bson_data = System.IO.File.ReadAllBytes(System.IO.Path.Combine(dirPath2, "ItemData.bson"));
+        using MemoryStream ms = new MemoryStream(bson_data);
+        using Newtonsoft.Json.Bson.BsonReader reader = new Newtonsoft.Json.Bson.BsonReader(ms);
+        Newtonsoft.Json.JsonSerializer serializer = Newtonsoft.Json.JsonSerializer.Create(ser_settings);
+
+        BsonTable<TItemData> bson_list_item = serializer.Deserialize<BsonTable<TItemData>>(reader);
+
+        Console.WriteLine("TestLoadBson");
+    }
+
+
+    public static void TestLoadJson()
+    {
+        var json_converts = new List<Newtonsoft.Json.JsonConverter>()
+        {
+            new JsonLocIdConverter()
+        };
+
+        
+        string json_data = System.IO.File.ReadAllText(System.IO.Path.Combine(dirPath2, "ItemData.json"));
+        List<TItemData> json_list_item = Newtonsoft.Json.JsonConvert.DeserializeObject<List<TItemData>>(json_data, json_converts.ToArray());
+
+        Console.WriteLine("TestLoadJson");
+    }
+}
+
+public class BsonTable<T> where T:class
+{
+    public List<T> Data= new List<T>();
 }
 
 public class JsonLocIdConverter : Newtonsoft.Json.Converters.CustomCreationConverter<LocId>

@@ -48,7 +48,6 @@
         },
 		"bson": {
             "enable": true,
-			"header": false,
             "dir": "Output/Client/Data"
         },
         "csharp": {
