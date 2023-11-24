@@ -1,4 +1,4 @@
-﻿//#define USE_LOC_CLASS
+//#define USE_LOC_CLASS
 
 using System;
 using System.Collections.Generic;
@@ -176,7 +176,7 @@ namespace Test
 
     public struct LocId
     {
-        public int id;
+        public readonly int id;
         public LocId(int id)
         {
             this.id = id;

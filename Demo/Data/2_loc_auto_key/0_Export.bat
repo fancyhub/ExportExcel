@@ -5,6 +5,7 @@ echo ===========================0.clear Output============================
 del /F /S /Q Output\*.bin
 del /F /S /Q Output\*.csv
 del /F /S /Q Output\*.json
+del /F /S /Q Output\*.bson
 del /F /S /Q Output\*.cs
 del /F /S /Q Output\*.go
 del /F /S /Q Output\*.lua

@@ -156,6 +156,7 @@ namespace ExportExcel
             public CsvConfig csv = new CsvConfig();
             public BinConfig bin = new BinConfig();
             public JsonConfig json = new JsonConfig();
+            public BsonConfig bson = new BsonConfig();
             public CSharpConfig csharp = new CSharpConfig();
             public LuaConfig lua = new LuaConfig();
             public GoConfig go = new GoConfig();
@@ -257,6 +258,13 @@ namespace ExportExcel
 
 
         public class JsonConfig
+        {
+            public bool enable;
+            public bool header = false;
+            public string dir = "";
+        }
+
+        public class BsonConfig
         {
             public bool enable;
             public bool header = false;

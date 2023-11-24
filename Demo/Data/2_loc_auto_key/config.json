@@ -43,7 +43,12 @@
         },
 		"json": {
             "enable": true,
-			"header": true,
+			"header": false,
+            "dir": "Output/Client/Data"
+        },
+		"bson": {
+            "enable": true,
+			"header": false,
             "dir": "Output/Client/Data"
         },
         "csharp": {

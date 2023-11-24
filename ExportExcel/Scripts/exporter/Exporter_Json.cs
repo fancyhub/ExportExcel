@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
-using System.Text.Json.Nodes;
+using Newtonsoft.Json.Linq;
 
 namespace ExportExcel
 {
@@ -33,53 +32,70 @@ namespace ExportExcel
                 if ((p.Value.TableExportFlag & _flag) == 0)
                     continue;
 
-                List<FilterTable> multi_lang_tables = _GetMultiLangTable(p.Value);
+                List<FilterTable> multi_lang_tables = GetMultiLangTable(p.Value, _flag);
 
                 foreach (var table in multi_lang_tables)
                 {
                     string out_file_path = Path.Combine(_config.dir, table.SheetName + ".json");
                     FileUtil.CreateFileDir(out_file_path);
 
-                    JsonNode root = _CreateTableData(table);
-                    if(_config.header)
+                    var data = ConvertToJsonObj(table, _config.header);
+                    using (StreamWriter sw = new StreamWriter(out_file_path, false, System.Text.Encoding.UTF8))
                     {
-                        var temp= new JsonObject();
-                        temp["Header"] = _CreateTableHeader(table.GetHeader());
-                        temp["Data"] = root;
-                        root = temp;
-                    }
-
-                    using (Stream sw = new FileStream(out_file_path, FileMode.Create, FileAccess.Write))
-                    {
-                        Utf8JsonWriter writer = new Utf8JsonWriter(sw, new JsonWriterOptions()
-                        {
-                            Indented = true,
-                            Encoder = Encoder,
-                        });
-                        root.WriteTo(writer);
-                        writer.Flush();
-                    }
+                        sw.Write(data.ToString(Newtonsoft.Json.Formatting.Indented));
+                    } 
                 }
             }
         }
 
-        private static JsonNode _CreateTableData(FilterTable table)
+        public static List<FilterTable> GetMultiLangTable(Table table, EExportFlag flag)
+        {
+            List<FilterTable> ret = new List<FilterTable>();
+            if (table.MultiLangBody == null)
+            {
+                ret.Add(new FilterTable(table, flag));
+                return ret;
+            }
+
+            foreach (var p in table.MultiLangBody)
+            {
+                FilterTable t = new FilterTable(table, flag);
+                t._body = p.Value;
+                t.SheetName = table.SheetName + "_" + p.Key;
+                t._row_count = p.Value.GetLength(0);
+                ret.Add(t);
+            }
+            return ret;
+        }
+
+        public static JToken ConvertToJsonObj(FilterTable table, bool with_header)
+        {
+            JToken ret = _CreateTableData(table);
+            if (!with_header)
+                return ret;
+
+            var temp = new JObject();
+            temp["Header"] = _CreateTableHeader(table.GetHeader());
+            temp["Data"] = ret;
+            return temp;
+        }
+
+        private static JArray _CreateTableData(FilterTable table)
         {
             int row_count = table.RowCount;
             var header = table.GetHeader();
 
-            List<JsonNode> array = new List<JsonNode>(row_count);
+            JArray array = new JArray();
             for (int i = 0; i < row_count; i++)
             {
                 array.Add(_CreateRowData(table, header, i));
             }
-
-            return new JsonArray(array.ToArray());
+            return array;
         }
 
-        private static JsonNode _CreateRowData(FilterTable table, List<TableField> header, int row)
+        private static JToken _CreateRowData(FilterTable table, List<TableField> header, int row)
         {
-            JsonObject ret = new JsonObject();
+            JObject ret = new JObject();
             for (int i = 0; i < header.Count; i++)
             {
                 var header_item = header[i];
@@ -88,12 +104,12 @@ namespace ExportExcel
             return ret;
         }
 
-        private static JsonNode _ParseCellData(string data, TableField header_item)
+        private static JToken _ParseCellData(string data, TableField header_item)
         {
             if (header_item.DataType.IsList)
             {
                 string[] array = data.Split(';', StringSplitOptions.RemoveEmptyEntries);
-                JsonArray ret = new JsonArray();
+                JArray ret = new JArray();
 
                 if (header_item.DataType.IsTuple)
                 {
@@ -117,10 +133,10 @@ namespace ExportExcel
             }
         }
 
-        private static JsonNode _ParseTuple(string data, DataType data_type)
+        private static JObject _ParseTuple(string data, DataType data_type)
         {
             string[] array = data.Split('|');
-            JsonObject ret = new JsonObject();
+            JObject ret = new JObject();
             for (int i = 0; i < array.Length; i++)
             {
                 ret["Item" + (i + 1)] = _ParseBaseData(array[i], data_type.Get(i));
@@ -128,43 +144,44 @@ namespace ExportExcel
             return ret;
         }
 
-        private static JsonNode _ParseBaseData(string data, EDataType data_type)
+        private static JValue _ParseBaseData(string data, EDataType data_type)
         {
             switch (data_type)
             {
                 case EDataType.String:
                 case EDataType.LocStr:
-                    return data;
+                    return new JValue(data);
                 case EDataType.Bool:
-                    return data == "1";
+                    return new JValue(data == "1");
+
+                case EDataType.Int32:
+                case EDataType.LocId:
+                    return string.IsNullOrEmpty(data) ? new JValue((int)0) : new JValue(int.Parse(data));
+                case EDataType.UInt32:
+                    return string.IsNullOrEmpty(data) ? new JValue((uint)0) : new JValue(uint.Parse(data));
 
                 case EDataType.Int64:
+                    return string.IsNullOrEmpty(data) ? new JValue((long)0) : new JValue(long.Parse(data));
                 case EDataType.UInt64:
-                case EDataType.LocId:
-                case EDataType.Int32:
-                case EDataType.UInt32:
-                    if (string.IsNullOrEmpty(data))
-                        return 0;
-                    return long.Parse(data);
+                    return string.IsNullOrEmpty(data) ? new JValue((ulong)0) : new JValue(ulong.Parse(data));
 
                 case EDataType.Float32:
+                    return string.IsNullOrEmpty(data) ? new JValue((float)0) : new JValue(float.Parse(data));
                 case EDataType.Float64:
-                    if (string.IsNullOrEmpty(data))
-                        return 0;
-                    return double.Parse(data);
+                    return string.IsNullOrEmpty(data) ? new JValue((double)0) : new JValue(double.Parse(data));
 
                 default:
                     throw new Exception("未知类型 " + data_type);
             }
         }
 
-        private static JsonNode _CreateTableHeader(List<TableField> list)
+        private static JArray _CreateTableHeader(List<TableField> list)
         {
-            JsonArray ret = new JsonArray();
+            JArray ret = new JArray();
 
             foreach (var p in list)
             {
-                JsonObject node = new JsonObject();
+                JObject node = new JObject();
                 node["Name"] = p.Name;
                 node["Type"] = p.DataType.ToCsvStr();
 
@@ -173,24 +190,6 @@ namespace ExportExcel
             return ret;
         }
 
-        private List<FilterTable> _GetMultiLangTable(Table table)
-        {
-            List<FilterTable> ret = new List<FilterTable>();
-            if (table.MultiLangBody == null)
-            {
-                ret.Add(new FilterTable(table, _flag));
-                return ret;
-            }
 
-            foreach (var p in table.MultiLangBody)
-            {
-                FilterTable t = new FilterTable(table, _flag);
-                t._body = p.Value;
-                t.SheetName = table.SheetName + "_" + p.Key;
-                t._row_count = p.Value.GetLength(0);
-                ret.Add(t);
-            }
-            return ret;
-        }
     }
 }
