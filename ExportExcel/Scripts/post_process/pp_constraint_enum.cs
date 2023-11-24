@@ -28,7 +28,7 @@ namespace ExportExcel
 
                 col.ForeachCell((cell) =>
                 {
-                    string new_v = _convert(cell.Value, data_type, temp);
+                    string new_v = _Convert(cell.Value, data_type, temp);
                     if (!string.IsNullOrEmpty(new_v))
                     {
                         cell.Value = new_v;
@@ -40,7 +40,7 @@ namespace ExportExcel
             });
         }
 
-        public static string _convert(string v, DataType data_type, List<int> temp_list)
+        public static string _Convert(string v, DataType data_type, List<int> temp_list)
         {
             //1. 先把string 转换成list int
             temp_list.Clear();

@@ -11,7 +11,7 @@ namespace ExportExcel
 {
     public class DataBase
     {
-        public ExeConfig Config;
+        public Config Config;
 
         public DBRef RefDB;
         public DBEnum EnumDB;
@@ -22,7 +22,7 @@ namespace ExportExcel
         public Dictionary<string, string> LangDefault;
         public List<string> LangList;
 
-        public DataBase(ExeConfig config)
+        public DataBase(Config config)
         {
             Config = config;
             RefDB = new DBRef();

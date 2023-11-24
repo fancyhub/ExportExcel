@@ -12,9 +12,9 @@ namespace ExportExcel
 {
     public class Exporter_CSIds : IProcessNode
     {
-        public ExeConfig.CSharpConfig _config;
+        public Config.CSharpConfig _config;
         public EExportFlag _flag;
-        public Exporter_CSIds(EExportFlag flag, ExeConfig.CSharpConfig config)
+        public Exporter_CSIds(EExportFlag flag, Config.CSharpConfig config)
         {
             _flag = flag;
             _config = config;
@@ -30,7 +30,7 @@ namespace ExportExcel
             if (_config == null || !_config.enable || !_config.locId.enable)
                 return;
 
-            if (data.Config.localization.Mode == ExeConfig.ELocalizationMode.None)
+            if (data.Config.localization.Mode == Config.ELocalizationMode.None)
                 return;
 
             string dest_file_path = System.IO.Path.Combine(_config.dir, "LocDef.cs");

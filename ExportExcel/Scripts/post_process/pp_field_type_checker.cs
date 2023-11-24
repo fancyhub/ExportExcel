@@ -34,20 +34,20 @@ namespace ExportExcel
         public void _process_cell(TableCell cell, FTC_TypeGroup type_checker)
         {
             string cell_v = cell.Value;
-            E_FTC_RESULT result = type_checker.Valid(ref cell_v);
+            EFtcResult result = type_checker.Valid(ref cell_v);
             switch (result)
             {
-                case E_FTC_RESULT.valid:
+                case EFtcResult.valid:
                     cell.Value = cell_v;
                     break;
-                case E_FTC_RESULT.valid_modify:
+                case EFtcResult.valid_modify:
                     cell.Value = cell_v;
                     break;
 
-                case E_FTC_RESULT.invalid:
+                case EFtcResult.invalid:
                     ErrSet.E(cell, $"数据 {cell_v} 不符合格式 {cell.Col.DataType.ToCsvStr()}");
                     break;
-                case E_FTC_RESULT.invalid_blank:
+                case EFtcResult.invalid_blank:
                     ErrSet.E(cell, "该字段被标记为不允许空");
                     break;
                 default:
@@ -60,11 +60,11 @@ namespace ExportExcel
 
     public class FTC_TypeGroup
     {
-        public Dictionary<EDataType, I_FieldTypeCheck> _checker = new Dictionary<EDataType, I_FieldTypeCheck>();
+        public Dictionary<EDataType, IFieldTypeCheck> _checker = new Dictionary<EDataType, IFieldTypeCheck>();
         public FTC_Tuple _tuple_checker = new FTC_Tuple();
         public FTC_List _list_checker = new FTC_List();
 
-        public I_FieldTypeCheck _cur_checker;
+        public IFieldTypeCheck _cur_checker;
         public bool _blank_forbid;
 
         public FTC_TypeGroup()
@@ -103,20 +103,20 @@ namespace ExportExcel
             _blank_forbid = col.AttrBlankForbid;
         }
 
-        public E_FTC_RESULT Valid(ref string v)
+        public EFtcResult Valid(ref string v)
         {
             if (!string.IsNullOrEmpty(v))
                 return _cur_checker.Valid(true, ref v);
 
             if (_blank_forbid)
-                return E_FTC_RESULT.invalid_blank;
+                return EFtcResult.invalid_blank;
 
             v = _cur_checker.DefaultVal();
-            return E_FTC_RESULT.valid_modify;
+            return EFtcResult.valid_modify;
         }
     }
 
-    public enum E_FTC_RESULT
+    public enum EFtcResult
     {
         valid,          //合法
         valid_modify,   //合法，但是需要修改
@@ -124,169 +124,169 @@ namespace ExportExcel
         invalid_blank, //非法,空
     }
 
-    public interface I_FieldTypeCheck
+    public interface IFieldTypeCheck
     {
-        E_FTC_RESULT Valid(bool enable_empty, ref string v);
+        EFtcResult Valid(bool enable_empty, ref string v);
         string DefaultVal();
     }
 
-    public class FTC_None : I_FieldTypeCheck
+    public class FTC_None : IFieldTypeCheck
     {
-        public E_FTC_RESULT Valid(bool enable_empty, ref string v) { return E_FTC_RESULT.valid; }
+        public EFtcResult Valid(bool enable_empty, ref string v) { return EFtcResult.valid; }
         public string DefaultVal() { return ""; }
     }
 
-    public class FTC_Bool : I_FieldTypeCheck
+    public class FTC_Bool : IFieldTypeCheck
     {
         //只要是里面的数值,都是true, 转换成1,其他的全部变成 0
         public static HashSet<string> TRUE_SET = new HashSet<string>() { "1", "yes", "true", "是" };
-        public E_FTC_RESULT Valid(bool enable_empty, ref string v)
+        public EFtcResult Valid(bool enable_empty, ref string v)
         {
             bool contain = TRUE_SET.Contains(v.ToLower());
             string new_v = contain ? "1" : "0";
             if (v == new_v)
-                return E_FTC_RESULT.valid;
+                return EFtcResult.valid;
 
             v = new_v;
-            return E_FTC_RESULT.valid_modify;
+            return EFtcResult.valid_modify;
         }
         public string DefaultVal() { return "0"; }
     }
 
-    public class FTC_Int32 : I_FieldTypeCheck
+    public class FTC_Int32 : IFieldTypeCheck
     {
-        public E_FTC_RESULT Valid(bool enable_empty, ref string v)
+        public EFtcResult Valid(bool enable_empty, ref string v)
         {
             if (string.IsNullOrEmpty(v))
             {
                 v = "0";
                 //但是需要修改
-                return E_FTC_RESULT.valid_modify;
+                return EFtcResult.valid_modify;
             }
             if (int.TryParse(v, out _))
-                return E_FTC_RESULT.valid;
-            return E_FTC_RESULT.invalid;
+                return EFtcResult.valid;
+            return EFtcResult.invalid;
         }
         public string DefaultVal() { return "0"; }
     }
 
-    public class FTC_UInt32 : I_FieldTypeCheck
+    public class FTC_UInt32 : IFieldTypeCheck
     {
-        public E_FTC_RESULT Valid(bool enable_empty, ref string v)
+        public EFtcResult Valid(bool enable_empty, ref string v)
         {
             if (string.IsNullOrEmpty(v))
             {
                 v = "0";
                 //但是需要修改
-                return E_FTC_RESULT.valid_modify;
+                return EFtcResult.valid_modify;
             }
             if (int.TryParse(v, out _))
-                return E_FTC_RESULT.valid;
-            return E_FTC_RESULT.invalid;
+                return EFtcResult.valid;
+            return EFtcResult.invalid;
         }
         public string DefaultVal() { return "0"; }
     }
 
-    public class FTC_Int64 : I_FieldTypeCheck
+    public class FTC_Int64 : IFieldTypeCheck
     {
-        public E_FTC_RESULT Valid(bool enable_empty, ref string v)
+        public EFtcResult Valid(bool enable_empty, ref string v)
         {
             if (string.IsNullOrEmpty(v))
             {
                 v = "0";
                 //但是需要修改
-                return E_FTC_RESULT.valid_modify;
+                return EFtcResult.valid_modify;
             }
             if (uint.TryParse(v, out _))
-                return E_FTC_RESULT.valid;
-            return E_FTC_RESULT.invalid;
+                return EFtcResult.valid;
+            return EFtcResult.invalid;
         }
         public string DefaultVal() { return "0"; }
     }
 
-    public class FTC_UInt64 : I_FieldTypeCheck
+    public class FTC_UInt64 : IFieldTypeCheck
     {
-        public E_FTC_RESULT Valid(bool enable_empty, ref string v)
+        public EFtcResult Valid(bool enable_empty, ref string v)
         {
             if (string.IsNullOrEmpty(v))
             {
                 v = "0";
                 //但是需要修改
-                return E_FTC_RESULT.valid_modify;
+                return EFtcResult.valid_modify;
             }
             if (ulong.TryParse(v, out _))
-                return E_FTC_RESULT.valid;
-            return E_FTC_RESULT.invalid;
+                return EFtcResult.valid;
+            return EFtcResult.invalid;
         }
         public string DefaultVal() { return "0"; }
     }
 
-    public class FTC_Float : I_FieldTypeCheck
+    public class FTC_Float : IFieldTypeCheck
     {
-        public E_FTC_RESULT Valid(bool enable_empty, ref string v)
+        public EFtcResult Valid(bool enable_empty, ref string v)
         {
             if (string.IsNullOrEmpty(v))
             {
                 v = "0";
                 //但是需要修改
-                return E_FTC_RESULT.valid_modify;
+                return EFtcResult.valid_modify;
             }
             if (float.TryParse(v, out _))
-                return E_FTC_RESULT.valid;
-            return E_FTC_RESULT.invalid;
+                return EFtcResult.valid;
+            return EFtcResult.invalid;
         }
         public string DefaultVal() { return "0"; }
     }
 
-    public class FTC_Double : I_FieldTypeCheck
+    public class FTC_Double : IFieldTypeCheck
     {
-        public E_FTC_RESULT Valid(bool enable_empty, ref string v)
+        public EFtcResult Valid(bool enable_empty, ref string v)
         {
             if (string.IsNullOrEmpty(v))
             {
                 v = "0";
                 //但是需要修改
-                return E_FTC_RESULT.valid_modify;
+                return EFtcResult.valid_modify;
             }
             if (double.TryParse(v, out _))
-                return E_FTC_RESULT.valid;
-            return E_FTC_RESULT.invalid;
+                return EFtcResult.valid;
+            return EFtcResult.invalid;
         }
 
         public string DefaultVal() { return "0"; }
     }
 
-    public class FTC_String : I_FieldTypeCheck
+    public class FTC_String : IFieldTypeCheck
     {
-        public E_FTC_RESULT Valid(bool enable_empty, ref string v) { return E_FTC_RESULT.valid; }
+        public EFtcResult Valid(bool enable_empty, ref string v) { return EFtcResult.valid; }
         public string DefaultVal() { return ""; }
     }
 
-    public class FTC_LocStr : I_FieldTypeCheck
+    public class FTC_LocStr : IFieldTypeCheck
     {
-        public E_FTC_RESULT Valid(bool enable_empty, ref string v) { return E_FTC_RESULT.valid; }
+        public EFtcResult Valid(bool enable_empty, ref string v) { return EFtcResult.valid; }
         public string DefaultVal() { return ""; }
     }
 
     //Pair 类型
-    public class FTC_Tuple : I_FieldTypeCheck
+    public class FTC_Tuple : IFieldTypeCheck
     {
-        public List<I_FieldTypeCheck> _types = new List<I_FieldTypeCheck>(DataType.C_MAX_COUNT);
-        public List<E_FTC_RESULT> _result = new List<E_FTC_RESULT>();
-        public E_FTC_RESULT Valid(bool enable_empty, ref string v)
+        public List<IFieldTypeCheck> _types = new List<IFieldTypeCheck>(DataType.C_MAX_COUNT);
+        public List<EFtcResult> _result = new List<EFtcResult>();
+        public EFtcResult Valid(bool enable_empty, ref string v)
         {
             if (string.IsNullOrEmpty(v))
             {
                 if (enable_empty)
-                    return E_FTC_RESULT.valid;
+                    return EFtcResult.valid;
                 else
-                    return E_FTC_RESULT.invalid;
+                    return EFtcResult.invalid;
             }
 
             var temp = v.Split(ConstDef.C_TUPLE_SPLIT);
             if (temp.Length != _types.Count)
             {
-                return E_FTC_RESULT.invalid;
+                return EFtcResult.invalid;
             }
 
 
@@ -294,55 +294,55 @@ namespace ExportExcel
             for (int i = 0; i < _types.Count; i++)
             {
                 var sub_result = _types[i].Valid(enable_empty, ref temp[i]);
-                if (sub_result == E_FTC_RESULT.invalid)
-                    return E_FTC_RESULT.invalid;
+                if (sub_result == EFtcResult.invalid)
+                    return EFtcResult.invalid;
                 _result.Add(sub_result);
             }
 
             foreach (var p in _result)
             {
-                if (p != E_FTC_RESULT.valid)
+                if (p != EFtcResult.valid)
                 {
                     v = string.Join(ConstDef.C_TUPLE_SPLIT, temp);
-                    return E_FTC_RESULT.valid_modify;
+                    return EFtcResult.valid_modify;
                 }
             }
 
-            return E_FTC_RESULT.valid;
+            return EFtcResult.valid;
         }
 
         public string DefaultVal() { return string.Empty; }
     }
 
-    public class FTC_List : I_FieldTypeCheck
+    public class FTC_List : IFieldTypeCheck
     {
-        public I_FieldTypeCheck _type;
-        public List<E_FTC_RESULT> _result = new List<E_FTC_RESULT>();
-        public E_FTC_RESULT Valid(bool enable_empty, ref string v)
+        public IFieldTypeCheck _type;
+        public List<EFtcResult> _result = new List<EFtcResult>();
+        public EFtcResult Valid(bool enable_empty, ref string v)
         {
             if (string.IsNullOrEmpty(v))
-                return E_FTC_RESULT.valid;
+                return EFtcResult.valid;
             var temp = v.Split(ConstDef.C_LIST_SPLIT);
             _result.Clear();
 
-            E_FTC_RESULT ret = E_FTC_RESULT.valid;
+            EFtcResult ret = EFtcResult.valid;
             for (int i = 0; i < temp.Length; i++)
             {
                 var sub_result = _type.Valid(false, ref temp[i]);
-                if (sub_result == E_FTC_RESULT.invalid)
-                    return E_FTC_RESULT.invalid;
+                if (sub_result == EFtcResult.invalid)
+                    return EFtcResult.invalid;
                 _result.Add(sub_result);
             }
 
             foreach (var p in _result)
             {
-                if (p != E_FTC_RESULT.valid)
+                if (p != EFtcResult.valid)
                 {
                     v = string.Join(ConstDef.C_LIST_SPLIT, temp);
-                    return E_FTC_RESULT.valid_modify;
+                    return EFtcResult.valid_modify;
                 }
             }
-            return E_FTC_RESULT.valid;
+            return EFtcResult.valid;
         }
 
         public string DefaultVal()

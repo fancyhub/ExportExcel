@@ -16,10 +16,10 @@ namespace ExportExcel
     {
         public const string C_FILE_NAME = "table_struct.h";
         public StringFormater _formater = new StringFormater();
-        public ExeConfig.CppConfig _config;
+        public Config.CppConfig _config;
         public EExportFlag _flag;
 
-        public Exporter_CppStruct(EExportFlag flag, ExeConfig.CppConfig config)
+        public Exporter_CppStruct(EExportFlag flag, Config.CppConfig config)
         {
             _flag = flag;
             _config = config;

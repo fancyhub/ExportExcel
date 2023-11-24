@@ -58,20 +58,26 @@ namespace ExportExcel
         }
 
         public bool Convert(string v, out int result)
-        {
-            EnumField field = null;
-            _dict.TryGetValue(v, out field);
-            if (field == null)
+        {            
+            if(_dict.TryGetValue(v, out EnumField field) && field!=null)
             {
-                if (int.TryParse(v, out result) && _all_vals.Contains(result))
-                {
-                    return true;
-                }
-                result = 0;
-                return false;
+                result = field.Val;
+                return true;
             }
-            result = field.Val;
-            return true;
+
+            if (string.IsNullOrEmpty(v) && _all_vals.Contains(0))
+            {
+                result = 0;
+                return true;
+            }
+
+            if (int.TryParse(v, out result) && _all_vals.Contains(result))
+            {
+                return true;
+            }
+
+            result = 0;
+            return false;
         }
     }
 

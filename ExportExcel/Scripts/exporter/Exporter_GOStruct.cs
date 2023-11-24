@@ -17,9 +17,9 @@ namespace ExportExcel
         public const string C_FILE_NAME = "table_struct.go";
         public StringFormater _formater = new StringFormater();
         public EExportFlag _flag;
-        public ExeConfig.GoConfig _config;
+        public Config.GoConfig _config;
 
-        public ExporterGOStruct(EExportFlag flag, ExeConfig.GoConfig config)
+        public ExporterGOStruct(EExportFlag flag, Config.GoConfig config)
         {
             _flag = flag;
             _config = config;

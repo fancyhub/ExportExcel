@@ -29,12 +29,12 @@ namespace ExportExcel
                     return 0;
 
                 case ECmdArg.CreateConfig:
-                    new ExeConfig().Save(GetConfigFilePath());
+                    new Config().Save(GetConfigFilePath());
                     return 0;                     
 
                 case ECmdArg.WatchMode:
                 case ECmdArg.NormalMode:
-                    ExeConfig config = ExeConfig.Load(GetConfigFilePath());
+                    Config config = Config.Load(GetConfigFilePath());
                     if (config == null)
                     {
                         DisplayUsage();

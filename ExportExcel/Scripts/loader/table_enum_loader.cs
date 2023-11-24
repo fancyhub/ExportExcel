@@ -16,7 +16,7 @@ namespace ExportExcel
         private static Regex S_ENUM_FIELD_NAME_REGEX = new Regex("^[a-zA-Z][a-zA-Z0-9_]*$");
 
 
-        public TableEnumLoader(ExeConfig config)
+        public TableEnumLoader(Config config)
         {
             S_ENUM_NAME_REGEX = new Regex(config.validation.enumNameReg);
             S_ENUM_FIELD_NAME_REGEX = new Regex(config.validation.enumFieldNameReg);

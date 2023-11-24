@@ -16,10 +16,10 @@ namespace ExportExcel
 
         public StringFormater _formater = new StringFormater();
 
-        public ExeConfig.CppConfig _config;
+        public Config.CppConfig _config;
         public EExportFlag _flag;
 
-        public Exporter_CppGetter(EExportFlag flag, ExeConfig.CppConfig config)
+        public Exporter_CppGetter(EExportFlag flag, Config.CppConfig config)
         {
             _flag = flag;
             _config = config;

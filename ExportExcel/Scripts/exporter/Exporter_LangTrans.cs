@@ -12,8 +12,8 @@ namespace ExportExcel
     //导出 翻译语言表
     public class Exporter_LangTrans : IProcessNode
     {
-        public ExeConfig.LocTransConfig _config;
-        public Exporter_LangTrans(ExeConfig.LocTransConfig config)
+        public Config.LocTransConfig _config;
+        public Exporter_LangTrans(Config.LocTransConfig config)
         {
             _config = config;
         }
@@ -24,7 +24,7 @@ namespace ExportExcel
         public void Process(DataBase data_base)
         {
             //1. 检查, 并创建对应的dir
-            if (_config == null || !_config.enable || data_base.Config.localization.Mode != ExeConfig.ELocalizationMode.AutoGenKey)
+            if (_config == null || !_config.enable || data_base.Config.localization.Mode != Config.ELocalizationMode.AutoGenKey)
                 return;
             var loc_config = data_base.Config.localization;
 

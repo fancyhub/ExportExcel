@@ -18,8 +18,8 @@ namespace ExportExcel
 
         public TableHeaderCompareResult _header_compare_result = new TableHeaderCompareResult();
         public List<List<string>> _temp_data = new List<List<string>>(100000);
-        public ExeConfig _config;
-        public TableDataLoader(ExeConfig config)
+        public Config _config;
+        public TableDataLoader(Config config)
         {
             _config = config;
 

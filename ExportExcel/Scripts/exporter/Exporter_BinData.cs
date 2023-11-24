@@ -29,9 +29,9 @@ namespace ExportExcel
         public const string C_FILE_LANG_NAME = "data_{0}.bin";
         public static uint S_SIGN;
         public EExportFlag _flag;
-        public ExeConfig.BinConfig _config;
+        public Config.BinConfig _config;
 
-        public Exporter_BinData(EExportFlag flag, ExeConfig.BinConfig config)
+        public Exporter_BinData(EExportFlag flag, Config.BinConfig config)
         {
             _flag = flag;
             _config = config;

@@ -12,10 +12,10 @@ namespace ExportExcel
 {
     public class Exporter_LuaIds : IProcessNode
     {
-        public ExeConfig.LuaConfig _config;
+        public Config.LuaConfig _config;
         public EExportFlag _flag;
 
-        public Exporter_LuaIds(EExportFlag flag, ExeConfig.LuaConfig config)
+        public Exporter_LuaIds(EExportFlag flag, Config.LuaConfig config)
         {
             _flag = flag;
             _config = config;
@@ -29,7 +29,7 @@ namespace ExportExcel
         {
             if (_config == null || !_config.enable || string.IsNullOrEmpty(_config.locIdStartWith))
                 return;
-            if (data.Config.localization.Mode == ExeConfig.ELocalizationMode.None)
+            if (data.Config.localization.Mode == Config.ELocalizationMode.None)
                 return;
 
             string dest_file_path = System.IO.Path.Combine(_config.dir, "LocDef.lua");

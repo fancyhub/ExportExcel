@@ -9,7 +9,6 @@ using System;
 using System.IO;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace ExportExcel
 {
@@ -17,7 +16,7 @@ namespace ExportExcel
     /// 工具设置类，记录运行工具需要的关键路径等信息。
     /// 序列化文件保存在exe同路径下的 config.json 里。
     /// </summary>
-    public class ExeConfig
+    public class Config
     {
         public List<string> excelPaths = new List<string>();
         public ValidationConfig validation = new ValidationConfig();
@@ -28,7 +27,7 @@ namespace ExportExcel
 
 
 
-        public static ExeConfig Load(string file_path)
+        public static Config Load(string file_path)
         {
             if (!File.Exists(file_path))
             {
@@ -39,7 +38,7 @@ namespace ExportExcel
             try
             {
                 string text = File.ReadAllText(file_path, System.Text.Encoding.UTF8);
-                ExeConfig ret = JsonConvert.DeserializeObject<ExeConfig>(text);
+                Config ret = JsonConvert.DeserializeObject<Config>(text);
                 ret.localization.Validate();
                 return ret;
             }

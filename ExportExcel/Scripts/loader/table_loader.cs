@@ -30,7 +30,7 @@ namespace ExportExcel
         public TableEnumLoader _enum_loader;
         public TableDataLoader _data_loader;
 
-        public TableLoader(ExeConfig config)
+        public TableLoader(Config config)
         {
             S_SHEET_NAME_REGEX = new Regex(config.validation.sheetNameReg);
             _ref_loader = new TableRefLoader();

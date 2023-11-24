@@ -16,9 +16,9 @@ namespace ExportExcel
         public const string C_FILE_NAME = "table_loader.go";
         public StringFormater _formater = new StringFormater();
         public EExportFlag _flag;
-        public ExeConfig.GoConfig _config;
+        public Config.GoConfig _config;
 
-        public ExporterGOLoader(EExportFlag flag, ExeConfig.GoConfig config)
+        public ExporterGOLoader(EExportFlag flag, Config.GoConfig config)
         {
             _flag = flag;
             _config = config;

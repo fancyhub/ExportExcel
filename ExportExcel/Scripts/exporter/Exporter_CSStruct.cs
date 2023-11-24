@@ -16,10 +16,10 @@ namespace ExportExcel
     {
         public const string C_FILE_NAME = "table_struct.cs";
         public StringFormater _formater = new StringFormater();
-        public ExeConfig.CSharpConfig _config;
+        public Config.CSharpConfig _config;
         public EExportFlag _flag;
 
-        public Exporter_CSStruct(EExportFlag flag, ExeConfig.CSharpConfig config)
+        public Exporter_CSStruct(EExportFlag flag, Config.CSharpConfig config)
         {
             _flag = flag;
             _config = config;

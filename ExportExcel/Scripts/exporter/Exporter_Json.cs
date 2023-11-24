@@ -10,8 +10,8 @@ namespace ExportExcel
     {
         public static System.Text.Encodings.Web.JavaScriptEncoder Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All);
         public EExportFlag _flag;
-        public ExeConfig.JsonConfig _config;
-        public Exporter_Json(EExportFlag flag, ExeConfig.JsonConfig config)
+        public Config.JsonConfig _config;
+        public Exporter_Json(EExportFlag flag, Config.JsonConfig config)
         {
             _flag = flag;
             _config = config;

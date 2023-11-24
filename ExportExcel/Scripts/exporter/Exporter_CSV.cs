@@ -16,9 +16,9 @@ namespace ExportExcel
     {
         
         public EExportFlag _flag;
-        public ExeConfig.CsvConfig _config;
+        public Config.CsvConfig _config;
 
-        public ExporterCSV(EExportFlag flag, ExeConfig.CsvConfig config)
+        public ExporterCSV(EExportFlag flag, Config.CsvConfig config)
         {
             _flag = flag;
             _config = config;

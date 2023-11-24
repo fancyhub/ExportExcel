@@ -15,10 +15,10 @@ namespace ExportExcel
     {
         public const string C_FILE_NAME = "table_getter.lua";
         public StringFormater _formater = new StringFormater();
-        public ExeConfig.LuaConfig _config;
+        public Config.LuaConfig _config;
         public EExportFlag _flag;
 
-        public Exporter_LuaGetter(EExportFlag flag, ExeConfig.LuaConfig config)
+        public Exporter_LuaGetter(EExportFlag flag, Config.LuaConfig config)
         {
             _flag = flag;
             _config = config;

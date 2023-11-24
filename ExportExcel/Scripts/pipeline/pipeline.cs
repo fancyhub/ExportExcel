@@ -45,8 +45,8 @@ namespace ExportExcel
     public class PipeLine
     {
         public List<IProcessNode> _node_list = new List<IProcessNode>();
-        public ExeConfig _config;
-        public PipeLine(ExeConfig conf)
+        public Config _config;
+        public PipeLine(Config conf)
         {
             _config = conf;
         }

@@ -7,8 +7,8 @@ namespace ExportExcel
 
     public class Exporter_Schema : IProcessNode
     {
-        public ExeConfig.SchemaConfig _config;
-        public Exporter_Schema(ExeConfig.SchemaConfig config)
+        public Config.SchemaConfig _config;
+        public Exporter_Schema(Config.SchemaConfig config)
         {
             _config = config;
         }

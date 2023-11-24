@@ -25,7 +25,7 @@ namespace ExportExcel
         {
             //1. 如果 Loc 的表没有, 直接不处理了
             var config_loc = data_base.Config.localization;
-            if (config_loc.Mode == ExeConfig.ELocalizationMode.None)
+            if (config_loc.Mode == Config.ELocalizationMode.None)
                 return;
 
             string loc_sheet_name = config_loc.GetLocSheetName();
@@ -79,7 +79,7 @@ namespace ExportExcel
             //3. 翻译表不存在, 直接分表
             switch (config_loc.Mode)
             {
-                case ExeConfig.ELocalizationMode.Normal:
+                case Config.ELocalizationMode.Normal:
                     {
                         Dictionary<string, string[,]> multi_lang_body = _SplitBody2MultiLangBody(table_loc);
                         newLocTable.MultiLangBody = multi_lang_body;
@@ -107,7 +107,7 @@ namespace ExportExcel
                     }
                     break;
 
-                case ExeConfig.ELocalizationMode.AutoGenKey:
+                case Config.ELocalizationMode.AutoGenKey:
                     {
                         //3.1 生成Loc的key
                         Dictionary<string, string> default_lang_dict = _GenAutoLangDict(data_base);

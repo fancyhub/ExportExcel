@@ -56,7 +56,7 @@ namespace ExportExcel
         {
         }
 
-        public static FileWatcher Create(ExeConfig setting)
+        public static FileWatcher Create(Config setting)
         {
             FileWatcher watcher = new FileWatcher();
 

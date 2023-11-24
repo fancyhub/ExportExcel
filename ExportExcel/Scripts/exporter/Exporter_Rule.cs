@@ -11,8 +11,8 @@ namespace ExportExcel
 {
     public class Exporter_Rule : IProcessNode
     {
-        public ExeConfig.RuleConfig _config;
-        public Exporter_Rule(ExeConfig.RuleConfig config)
+        public Config.RuleConfig _config;
+        public Exporter_Rule(Config.RuleConfig config)
         {
             _config = config;
         }

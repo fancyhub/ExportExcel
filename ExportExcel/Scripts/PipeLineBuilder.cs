@@ -11,7 +11,7 @@ namespace ExportExcel
 {
     public class PipelineBuilder
     {
-        public static PipeLine CreatePipeLine(ExeConfig config)
+        public static PipeLine CreatePipeLine(Config config)
         {
             PipeLine ret = new PipeLine(config);
 
@@ -64,7 +64,7 @@ namespace ExportExcel
             return ret;
         }
 
-        private static void _AddExporter(ProcessNodeList node_list, EExportFlag flag, ExeConfig.ExportConfig config)
+        private static void _AddExporter(ProcessNodeList node_list, EExportFlag flag, Config.ExportConfig config)
         {
             node_list.Add(new Exporter_CSStruct(flag, config.csharp));
             node_list.Add(new Exporter_CSLoader(flag, config.csharp));
