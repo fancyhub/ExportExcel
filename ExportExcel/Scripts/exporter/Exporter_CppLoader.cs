@@ -371,7 +371,7 @@ TableLoaderMgr::TableLoaderMgr()
          
         public void _ExportLoaderFunc(FilterTable table, StreamWriter sw)
         {
-            List<TableField> header_list = table.GetHeader();
+            List<TableField> header_list = table.FiltedHeader;
             string multi_name = "";
             if (!table.MultiLang)
                 multi_name = "lang = \"\";";

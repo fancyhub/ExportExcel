@@ -57,7 +57,7 @@ namespace ExportExcel
                 return ret;
 
             var temp = new BsonDocument();
-            temp["Header"] = _CreateTableHeader(table.GetHeader());
+            temp["Header"] = _CreateTableHeader(table.FiltedHeader);
             temp["Data"] = ret;            
             return temp;
         }
@@ -65,7 +65,7 @@ namespace ExportExcel
         private static BsonArray _CreateTableData(FilterTable table)
         {
             int row_count = table.RowCount;
-            var header = table.GetHeader();
+            var header = table.FiltedHeader;
 
             BsonArray array = new BsonArray();
             for (int i = 0; i < row_count; i++)

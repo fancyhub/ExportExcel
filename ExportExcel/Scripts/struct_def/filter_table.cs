@@ -13,7 +13,8 @@ namespace ExportExcel
     {
         private string[,] _Body;
 
-        public List<(TableField, int)> Header;
+        public readonly List<TableField> FiltedHeader=new List<TableField>();
+        private List<int> _FieltedHeaderIndex=new List<int>();
         public string SheetName;
         public bool MultiLang;
 
@@ -24,11 +25,9 @@ namespace ExportExcel
             if ((table.TableExportFlag & flag) == 0)
                 return;
 
-            var header = _FilterHeader(table, flag);
-            if (header.Count == 0)
+            _FilterHeader(table, flag, ref FiltedHeader, ref _FieltedHeaderIndex);
+            if (FiltedHeader.Count == 0)
                 return;
-
-            Header = header;
             _Body = table.Body;
             if (table.MultiLangBody != null)
                 MultiLang = true;
@@ -68,7 +67,7 @@ namespace ExportExcel
             return ret;
         }         
 
-        public int ColCount { get { return Header.Count; } }
+        public int ColCount { get { return FiltedHeader.Count; } }
         public int RowCount { get { return _Body == null ? 0 : _Body.GetLength(0); } }
 
         public string this[int r, int c]
@@ -80,7 +79,7 @@ namespace ExportExcel
                 if (c < 0 || c >= ColCount)
                     return null;
 
-                c = Header[c].Item2;
+                c = _FieltedHeaderIndex[c];
                 return _Body[r, c];
             }
         }
@@ -89,38 +88,26 @@ namespace ExportExcel
         {
             get
             {
-                foreach (var p in Header)
+                foreach (var p in FiltedHeader)
                 {
-                    if (p.Item1.AttrPK != null)
-                        return p.Item1;
+                    if (p.AttrPK != null)
+                        return p;
                 }
                 return null;
             }
-        }
+        } 
 
-        public List<TableField> GetHeader()
+        private void _FilterHeader(Table table, EExportFlag flag,ref List<TableField> header,ref List<int> header_index)
         {
-            if (Header == null)
-                return null;
-            List<TableField> ret = new List<TableField>(Header.Count);
-            foreach (var p in Header)
-                ret.Add(p.Item1);
-            return ret;
-        }
-
-        private List<ValueTuple<TableField, int>> _FilterHeader(Table table, EExportFlag flag)
-        {
-            List<(TableField, int)> ret = new List<(TableField, int)>();
-
             var col_list = table.Header.List;
             for (int i = 0; i < col_list.Count; i++)
             {
                 var col = col_list[i];
                 if ((col.ExportFlag & flag) == 0)
                     continue;
-                ret.Add((col, i));
+                header.Add(col);
+                header_index.Add(i);
             }
-            return ret;
         }
     }
 }

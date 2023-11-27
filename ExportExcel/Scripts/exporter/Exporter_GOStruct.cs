@@ -78,7 +78,7 @@ import (
                 _formater["class_name"] = _config.GetClassName(t.SheetName);
                 sw.WriteLineExt(_formater, "type {class_name} struct {");
 
-                foreach (TableField c in t.GetHeader())
+                foreach (TableField c in t.FiltedHeader)
                 {
                     //写注释                    
                     if (c.AttrPK != null)
@@ -149,9 +149,9 @@ type CsvDataMgr struct {
 
             foreach (var p in tables)
             {
-                foreach (var p2 in p.Header)
+                foreach (var p2 in p.FiltedHeader)
                 {
-                    DataType t = p2.Item1.DataType;
+                    DataType t = p2.DataType;
                     if (!t.IsTuple)
                         continue;
 

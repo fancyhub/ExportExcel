@@ -47,7 +47,7 @@ namespace ExportExcel
                 string class_name = _config.classPrefix + table.SheetName;
 
                 sw.WriteLine($"---@class {class_name}");
-                foreach (var c in table.GetHeader())
+                foreach (var c in table.FiltedHeader)
                 {
                     string field_name = c.Name;
                     string field_type = c.ToLuaStr();

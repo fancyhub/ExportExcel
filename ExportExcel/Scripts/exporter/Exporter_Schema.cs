@@ -29,7 +29,7 @@ namespace ExportExcel
                 schema.Enums.Add(_CreateEnumSchema(p.Value));
             }
             foreach (var p in data_base.Tables)
-            {                
+            {
                 schema.Tables.Add(_CreateTableSchema(p.Value));
             }
 
@@ -42,7 +42,7 @@ namespace ExportExcel
         {
             SchemaEnum ret = new SchemaEnum();
             ret.Name = enumType.Name;
-            foreach (var child in enumType._dict)
+            foreach (var child in enumType.Dict)
             {
                 SchemaEnumField field = new SchemaEnumField();
                 field.Name = child.Value.Name;
@@ -59,6 +59,7 @@ namespace ExportExcel
             ret.SheetName = table.SheetName;
             ret.ExportServer = (table.TableExportFlag & EExportFlag.svr) != EExportFlag.none;
             ret.ExportClient = (table.TableExportFlag & EExportFlag.client) != EExportFlag.none;
+            ret.IsMultiLang = table.MultiLangBody != null;
 
             var pk = table.Header.Pk;
             string secKey = null;
@@ -139,6 +140,7 @@ namespace ExportExcel
             public string SheetName;
             public bool ExportClient;
             public bool ExportServer;
+            public bool IsMultiLang;
             public List<SchemaColumn> Columns = new List<SchemaColumn>();
         }
 

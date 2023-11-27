@@ -67,7 +67,7 @@ this._name_2_loader = name_2_loader");
 
         public void _export_load_func(FilterTable table, StreamWriter sw)
         {
-            List<TableField> header = table.GetHeader();
+            List<TableField> header = table.FiltedHeader;
             string multi_name = "";
             if (table.MultiLang)
                 multi_name = "sheet_name = sheet_name ..\"_\".. lang;";

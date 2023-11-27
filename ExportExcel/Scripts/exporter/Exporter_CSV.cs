@@ -44,7 +44,7 @@ namespace ExportExcel
 
                 foreach (var table in multi_lang_tables)
                 {
-                    List<TableField> header = table.GetHeader();
+                    List<TableField> header = table.FiltedHeader;
                     string out_file_path = Path.Combine(_config.dir, table.SheetName + ".csv");
                     FileUtil.CreateFileDir(out_file_path);
                     using (StreamWriter sw = new StreamWriter(out_file_path, false, encoding))

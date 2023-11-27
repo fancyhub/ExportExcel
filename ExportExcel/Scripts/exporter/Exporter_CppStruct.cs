@@ -252,7 +252,7 @@ enum class {enum_name}
                 _formater["sheet_name"] = table.SheetName;
 				_formater["class_name"] = _config.GetClassName(table.SheetName);
 
-                List<TableField> header = table.GetHeader();
+                List<TableField> header = table.FiltedHeader;
 
                 sw.WriteLineExt(_formater,
                     @"

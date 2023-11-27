@@ -22,12 +22,12 @@ namespace ExportExcel
         public string Name;
 
         //Key: excel val
-        public Dictionary<string, EnumField> _dict = new Dictionary<string, EnumField>();
+        public Dictionary<string, EnumField> Dict = new Dictionary<string, EnumField>();
         public HashSet<int> _all_vals = new HashSet<int>();
 
         public IEnumerable<EnumField> GetAllFields()
         {
-            return _dict.Values;
+            return Dict.Values;
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace ExportExcel
         /// </summary>
         public bool IsFieldNameExist(string field_name)
         {
-            foreach (var p in _dict)
+            foreach (var p in Dict)
             {
                 if (p.Value.Name == field_name)
                     return true;
@@ -48,18 +48,18 @@ namespace ExportExcel
         /// </summary>        
         public bool IsFieldStrValueExist(string filed_str_val)
         {
-            return _dict.ContainsKey(filed_str_val);
+            return Dict.ContainsKey(filed_str_val);
         }
 
         public void Add(EnumField field)
         {
-            _dict.Add(field.ExcelVal, field);
+            Dict.Add(field.ExcelVal, field);
             _all_vals.Add(field.Val);
         }
 
         public bool Convert(string v, out int result)
         {            
-            if(_dict.TryGetValue(v, out EnumField field) && field!=null)
+            if(Dict.TryGetValue(v, out EnumField field) && field!=null)
             {
                 result = field.Val;
                 return true;

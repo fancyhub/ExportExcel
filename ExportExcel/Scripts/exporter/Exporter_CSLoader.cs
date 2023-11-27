@@ -185,7 +185,7 @@ namespace ExportExcel
             Dictionary<(string aliasName, string name), DataType> tuple_types = new Dictionary<(string, string), DataType>();
             foreach (var table in table_list)
             {
-                List<TableField> header_list = table.GetHeader();
+                List<TableField> header_list = table.FiltedHeader;
                 foreach (var field in header_list)
                 {
                     DataType data_type = field.DataType;
@@ -310,7 +310,7 @@ namespace ExportExcel
 
         public void _ExportLoaderFunc(FilterTable table, StreamWriter sw)
         {
-            List<TableField> header_list = table.GetHeader();
+            List<TableField> header_list = table.FiltedHeader;
             string multi_name = "";
             if (!table.MultiLang)
                 multi_name = "lang = null;";

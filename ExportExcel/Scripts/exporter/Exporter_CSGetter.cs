@@ -77,7 +77,7 @@ namespace ExportExcel
 
         public void _ExportGetterFunc(FilterTable table, StreamWriter sw)
         {
-            List<TableField> header = table.GetHeader();
+            List<TableField> header = table.FiltedHeader;
             string multi_name = "";
             if (!table.MultiLang)
                 multi_name = "lang = null;";

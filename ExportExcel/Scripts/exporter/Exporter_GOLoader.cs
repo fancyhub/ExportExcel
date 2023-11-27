@@ -129,9 +129,9 @@ func CreateCsvDataMgr(logger ILogger,reader IDataReader) (*CsvDataMgr, error) {
             List<DataType> all_types = new List<DataType>();
             foreach (var p in table_list)
             {
-                foreach (var p2 in p.Header)
+                foreach (var p2 in p.FiltedHeader)
                 {
-                    DataType t = p2.Item1.DataType;
+                    DataType t = p2.DataType;
                     if (t.IsTuple)
                     {
                         t.IsList = false;
@@ -162,9 +162,9 @@ func CreateCsvDataMgr(logger ILogger,reader IDataReader) (*CsvDataMgr, error) {
             List<DataType> all_types = new List<DataType>();
             foreach (var p in table_list)
             {
-                foreach (var p2 in p.Header)
+                foreach (var p2 in p.FiltedHeader)
                 {
-                    DataType t = p2.Item1.DataType;
+                    DataType t = p2.DataType;
                     if (t.IsList)
                     {
                         _AddType(all_types, t);
@@ -285,7 +285,7 @@ func (cd *CsvDataMgr) load{sheet_name}() error {
     }
 ");
 
-            List<TableField> header = table.GetHeader();
+            List<TableField> header = table.FiltedHeader;
             _formater["col_count"] = header.Count.ToString();
             for (int i = 0; i < header.Count; i++)
             {
