@@ -1,6 +1,6 @@
 # ExportExcel
 support C#, Go, Cpp, Lua  
-Support Csv, Bin, Json
+Support Csv, Bin, Json, Bson
 
 # 数据表   
 ## 概述
@@ -102,7 +102,21 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
  |LookUp[TarSheetName.ColName]|查找约束<br>支持 int,uint,list_int,list_uint,int64,uint64, list_int64,string,list_string 不支持枚举<br>注意: TarSheetName.ColName 必须为 BlankForbid / Unique /PK 约束<br>自己字段可以为空<br>中间是点连接符|
  |FilePath[LookUpDir ,Suffix ]|文件路径检查<br>只是支持 string类型, 不支持 list_string<br>比如  FilePath[Assets/Res/Hero,prefab]  该字段的内容填写 file_name<br>工具会检查 Assets/Res/Hero/file_name.prefab 是否存在,同时检查大小写|
  |Range[min,max]|范围检查<br>支持 int32,uint32,int64,uint64, floag,double 以及对应的list 类型|
- |TupleAlias[AliasName]|给Tuple类型增加别名, 目前只有CSharp的导出支持, 对应的别名需要实现对应的 静态方法 CreateInst|  
+ 
+
+# Alias 表格
+表名 @Alias 或者 @Alias_xxx , 可以分表  
+
+|CodeType|SheetName|ColumnName|Client|Server
+|------|------|------|-----|-----|
+|CSharp|ItemData|PairField2|PairItemIntBool||
+|CSharp|ItemData|PairFieldList2|PairItemIntInt64||
+
+
+CodeType 支持 CSharp, Go, Lua, Cpp
+
+目前只是支持 CSharp, 并且目标类型是 Tuple (不管是否List)
+
 
  # 引用表
 表名 @RefTable, 或者 @RefTable_xxx , 可以分表
@@ -293,6 +307,11 @@ key 的生成规则 是 {sheet_name}\_{col_name}\_{pk_val}
             "dir": "Output/Client/Data"
         },
         "json": {
+            "enable": true,
+            "header":false,
+            "dir": "Output/Client/Data"
+        },
+        "bson": {
             "enable": true,
             "dir": "Output/Client/Data"
         },
