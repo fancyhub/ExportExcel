@@ -90,7 +90,7 @@ namespace ExportExcel
                         //做检查
                         data_base.ForeachCol((col) =>
                         {
-                            if (col.Col.DataType.type0 != EDataType.LocStr)
+                            if (col.Field.DataType.type0 != EDataType.LocStr)
                                 return;
 
                             col.ForeachCell((cell) =>
@@ -182,7 +182,7 @@ namespace ExportExcel
 
             //3. 生成表头
             Table table_trans = new Table();
-            table_trans.TableExportFlag = EExportFlag.none;
+            table_trans.TableExportFlag = EExportFlagMask.None;
             table_trans.Header.Add(table_loc.Header.Pk.Clone());
             table_trans.SheetName = table_loc.SheetName;
 
@@ -306,7 +306,7 @@ namespace ExportExcel
             //1. 获取符合规则的col
             List<TableCol> col_list = data_base.GetAllCols((col) =>
             {
-                if (col.Col.DataType.type0 != EDataType.LocStr)
+                if (col.Field.DataType.type0 != EDataType.LocStr)
                     return false;
 
                 int pk_idx = col.Table.Header.PkIdx;

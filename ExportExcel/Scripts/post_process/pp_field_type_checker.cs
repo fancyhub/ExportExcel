@@ -26,7 +26,7 @@ namespace ExportExcel
         {
             data_base.ForeachCol((col) =>
             {
-                _type_group.SetCurCol(col.Col);
+                _type_group.SetCurCol(col.Field);
                 col.ForeachCell(_process_cell, _type_group);
             });
         }

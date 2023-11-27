@@ -9,13 +9,29 @@ using System.Collections.Generic;
 *************************************************************************************/
 namespace ExportExcel
 {
-    [Flags]
     public enum EExportFlag
     {
-        none = 0,
-        client = 1 << 0,
-        svr = 1 << 1,
-        all = client | svr
+        Client = 0,
+        Server = 1,
+    }
+
+    [Flags]
+    public enum EExportFlagMask
+    {
+        None = 0,
+        Client = 1,
+        Server = 2,
+        All = Client | Server
+    }
+
+
+    public static class ExportFlagExt
+    {
+        public static bool ExtContains(this EExportFlagMask mask, EExportFlag flag)
+        {
+            var mask2 = (EExportFlagMask)(1 << (int)flag);
+            return (mask & mask2) != EExportFlagMask.None;
+        }
     }
 
 
@@ -26,7 +42,7 @@ namespace ExportExcel
         public int ExcelColIdx;
         public string[] StrConstraints;
 
-        public EExportFlag ExportFlag = EExportFlag.all; //默认全部导出
+        public EExportFlagMask ExportFlag = EExportFlagMask.All; //默认全部导出
         public DataType DataType;
 
         public ConAttrPK AttrPK; //主key
@@ -35,7 +51,6 @@ namespace ExportExcel
         public ConAttrLookup AttrLookUp; //
         public ConAttrFilePath AttrFilePath; //路径检查
         public ConAttrRange AttrRange; //范围检查
-        public ConAttrTupleAlias AttrTupleAlias;
         public EnumType AttrEnum;
 
         public TableField Clone()

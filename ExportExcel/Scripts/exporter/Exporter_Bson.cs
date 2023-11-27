@@ -30,7 +30,7 @@ namespace ExportExcel
             foreach (var p in data_base.Tables)
             {
                 //判断是否需要导出
-                if ((p.Value.TableExportFlag & _flag) == 0)
+                if (!p.Value.TableExportFlag.ExtContains(_flag))
                     continue;
 
                 List<FilterTable> multi_lang_tables = FilterTable.SplitMultiLangTable(p.Value, _flag);
@@ -39,7 +39,7 @@ namespace ExportExcel
                 {
                     string out_file_path = Path.Combine(_config.dir, table.SheetName + ".bson");
                     FileUtil.CreateFileDir(out_file_path);
-                    
+
                     var data = ConvertToBsonObj(table, true);
 
                     using FileStream fs = new FileStream(out_file_path, FileMode.Create, FileAccess.Write);
@@ -51,14 +51,14 @@ namespace ExportExcel
 
 
         public static BsonValue ConvertToBsonObj(FilterTable table, bool with_header)
-        {            
+        {
             BsonValue ret = _CreateTableData(table);
             if (!with_header)
                 return ret;
 
             var temp = new BsonDocument();
             temp["Header"] = _CreateTableHeader(table.FiltedHeader);
-            temp["Data"] = ret;            
+            temp["Data"] = ret;
             return temp;
         }
 

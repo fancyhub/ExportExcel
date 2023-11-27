@@ -26,9 +26,8 @@ namespace ExportExcel
             S_COL_NAME_REGEX = new Regex(config.validation.colNameReg);
         }
 
-        public void Load(DataBase data_base, ISheet sheet, string sheet_name, EExportFlag export_flag)
+        public void Load(DataBase data_base, ISheet sheet, string sheet_name, EExportFlagMask export_flag)
         {
-            sheet.CalculateFormula();
             Table rule_table = data_base.FindTable(sheet_name);
             Table data_table = _create_rule_table(sheet, sheet_name, export_flag);
 
@@ -82,7 +81,7 @@ namespace ExportExcel
             }
         }
 
-        public Table _create_rule_table(ISheet sheet, string sheet_name, EExportFlag export_flag)
+        public Table _create_rule_table(ISheet sheet, string sheet_name, EExportFlagMask export_flag)
         {
             //1. 先生成表格
             Table rule_table = new Table();

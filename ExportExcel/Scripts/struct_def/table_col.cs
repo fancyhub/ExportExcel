@@ -7,19 +7,19 @@ namespace ExportExcel
     public struct TableCol
     {
         public Table Table;
-        public TableField Col;
+        public TableField Field;
         public int ColIndex;
 
         public TableCol(Table table, int col_index)
         {
             Table = table;
             ColIndex = col_index;
-            Col = table.Header[col_index];
+            Field = table.Header[col_index];
         }
 
         public string SheetName { get { return Table.SheetName; } }
-        public string ColName { get { return Col.Name; } }
-        public string SheetColName { get { return $"{Table.SheetName}.{Col.Name}"; } }
+        public string ColName { get { return Field.Name; } }
+        public string SheetColName { get { return $"{Table.SheetName}.{Field.Name}"; } }
 
         public int GetDataLen()
         {

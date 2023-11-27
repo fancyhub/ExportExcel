@@ -16,7 +16,7 @@ namespace ExportExcel
             DBRef number_db = data_base.RefDB;
             data_base.ForeachCol((col) =>
             {
-                if (!_is_type_can_ref(col.Col.DataType))
+                if (!_is_type_can_ref(col.Field.DataType))
                     return;
 
                 col.ForeachCell((cell) =>

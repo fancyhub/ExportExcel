@@ -166,7 +166,7 @@ namespace Test{
 				_Read(rowReader, ref row.Id);
 				_Read(rowReader, ref row.Level);
 				_Read(rowReader, ref row.Name);
-				_ReadTuple(rowReader.BeginTuple(), ref row.Pos);
+				_ReadTuple(rowReader.BeginTuple(), ref row.Pos, out (float,float,float) __Pos);
 				_Read(rowReader, ref row.Flags);
 
                 _temp.Add(row);
@@ -323,13 +323,13 @@ namespace Test{
             v2=default;
             if(tupleReader==null)
             {
-                v= PairItemIntBool.CreateInst(false,v2);
+                TableAlias.Create(ref v, false,v2);                
                 return;
             }
 			_Read(tupleReader,ref v2.Item1);
 			_Read(tupleReader,ref v2.Item2);
 
-             v = PairItemIntBool.CreateInst(true,v2);
+             TableAlias.Create(ref v,false,v2);
         }
 
         private static void _ReadTuple(ITableTupleReader tupleReader, ref PairItemIntBool v, out (int,int) v2)
@@ -337,13 +337,13 @@ namespace Test{
             v2=default;
             if(tupleReader==null)
             {
-                v= PairItemIntBool.CreateInst(false,v2);
+                TableAlias.Create(ref v, false,v2);                
                 return;
             }
 			_Read(tupleReader,ref v2.Item1);
 			_Read(tupleReader,ref v2.Item2);
 
-             v = PairItemIntBool.CreateInst(true,v2);
+             TableAlias.Create(ref v,false,v2);
         }
 
         private static void _ReadTuple(ITableTupleReader tupleReader, ref (int,long) v)
@@ -360,24 +360,29 @@ namespace Test{
             v2=default;
             if(tupleReader==null)
             {
-                v= PairItemIntInt64.CreateInst(false,v2);
+                TableAlias.Create(ref v, false,v2);                
                 return;
             }
 			_Read(tupleReader,ref v2.Item1);
 			_Read(tupleReader,ref v2.Item2);
 
-             v = PairItemIntInt64.CreateInst(true,v2);
+             TableAlias.Create(ref v,false,v2);
         }
 
-        private static void _ReadTuple(ITableTupleReader tupleReader, ref (float,float,float) v)
+        private static void _ReadTuple(ITableTupleReader tupleReader, ref UnityEngine.Vector3 v, out (float,float,float) v2)
         {
+            v2=default;
             if(tupleReader==null)
+            {
+                TableAlias.Create(ref v, false,v2);                
                 return;
+            }
+			_Read(tupleReader,ref v2.Item1);
+			_Read(tupleReader,ref v2.Item2);
+			_Read(tupleReader,ref v2.Item3);
 
-			_Read(tupleReader,ref v.Item1);
-			_Read(tupleReader,ref v.Item2);
-			_Read(tupleReader,ref v.Item3);
-		}
+             TableAlias.Create(ref v,false,v2);
+        }
 		#endregion
 
 		#region List Reader

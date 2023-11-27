@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 /*************************************************************************************
@@ -19,6 +20,7 @@ namespace ExportExcel
 
         public Config.CSharpConfig _config;
         public EExportFlag _flag;
+        public AliasDict _aliasDict;
 
         public Exporter_CSLoader(EExportFlag flag, Config.CSharpConfig config)
         {
@@ -35,7 +37,7 @@ namespace ExportExcel
         {
             if (_config == null || !_config.enable || !_config.loader.enable)
                 return;
-
+            _aliasDict = data.AliasDB.GetAliasDict(EAliasCode.CSharp, _flag);
             List<FilterTable> tables = FilterTable.Filter(data, _flag);
 
             string name_space = _config.namespaceName;
@@ -189,19 +191,23 @@ namespace ExportExcel
                 foreach (var field in header_list)
                 {
                     DataType data_type = field.DataType;
+                    string alias_name = null;
+                    if (data_type.IsTuple)
+                        alias_name = _aliasDict.ExtGetAliasName(table.SheetName, field.Name);
+
                     if (data_type.IsList)
                     {
                         data_type.IsList = false;
-                        if (field.AttrTupleAlias != null)
-                            list_types[(field.AttrTupleAlias.AliasName, data_type.ToCSharpStr())] = data_type.IsTuple;
+                        if (alias_name != null)
+                            list_types[(alias_name, data_type.ToCSharpStr())] = data_type.IsTuple;
                         else
                             list_types[(string.Empty, data_type.ToCSharpStr())] = data_type.IsTuple;
                     }
 
                     if (data_type.IsTuple)
                     {
-                        if (field.AttrTupleAlias != null)
-                            tuple_types[(field.AttrTupleAlias.AliasName, data_type.ToCSharpStr())] = data_type;
+                        if (alias_name != null)
+                            tuple_types[(alias_name, data_type.ToCSharpStr())] = data_type;
                         else
                             tuple_types[(string.Empty, data_type.ToCSharpStr())] = data_type;
                     }
@@ -236,7 +242,7 @@ namespace ExportExcel
             v2=default;
             if(tupleReader==null)
             {
-                v= {alias_name}.CreateInst(false,v2);
+                TableAlias.Create(ref v, false,v2);                
                 return;
             }");
                     for (int i = 0; i < p.Value.Count; i++)
@@ -245,7 +251,7 @@ namespace ExportExcel
                     }
 
                     sw.WriteLineExt(_formater, @"
-             v = {alias_name}.CreateInst(true,v2);
+             TableAlias.Create(ref v,false,v2);
         }");
                 }
             }
@@ -364,18 +370,22 @@ namespace ExportExcel
             for (int i = 0; i < header_list.Count; i++)
             {
                 TableField field = header_list[i];
+                string alias_name = null;
+                if (field.DataType.IsTuple)
+                    alias_name = _aliasDict.ExtGetAliasName(table.SheetName, field.Name);
+
                 DataType data_type = field.DataType;
                 if (data_type.IsList)
                 {
                     data_type.IsList = false;
-                    if (field.AttrTupleAlias != null)
+                    if (alias_name != null)
                         sw.WriteLine($"\t\t\t\t_ReadList(rowReader, ref row.{field.Name},out {data_type.ToCSharpStr()} __{field.Name});");
                     else
                         sw.WriteLine($"\t\t\t\t_ReadList(rowReader, ref row.{field.Name});");
                 }
                 else if (data_type.IsTuple)
                 {
-                    if (field.AttrTupleAlias != null)
+                    if (alias_name != null)
                         sw.WriteLine($"\t\t\t\t_ReadTuple(rowReader.BeginTuple(), ref row.{field.Name}, out {data_type.ToCSharpStr()} __{field.Name});");
                     else
                         sw.WriteLine($"\t\t\t\t_ReadTuple(rowReader.BeginTuple(), ref row.{field.Name});");
@@ -404,7 +414,7 @@ namespace ExportExcel
             if (pk != null)
             {
                 _formater["pk_name"] = pk.Name;
-                _formater["pk_type"] = pk.ToCSharpStr();
+                _formater["pk_type"] = pk.ToCSharpStr(_aliasDict, table.SheetName);
 
                 if (!pk.AttrPK.IsCompose())
                 {
@@ -426,7 +436,7 @@ namespace ExportExcel
                 else
                 {
                     _formater["pk_sec_name"] = pk.AttrPK._sec_key.Name;
-                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToCSharpStr();
+                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToCSharpStr(_aliasDict, table.SheetName);
                     sw.WriteLineExt(_formater,
                        @"
             var dict = new Dictionary<({pk_type},{pk_sec_type}), {class_name}>(list.Count);

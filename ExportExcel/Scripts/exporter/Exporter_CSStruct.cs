@@ -18,6 +18,7 @@ namespace ExportExcel
         public StringFormater _formater = new StringFormater();
         public Config.CSharpConfig _config;
         public EExportFlag _flag;
+        public AliasDict _aliasDict;
 
         public Exporter_CSStruct(EExportFlag flag, Config.CSharpConfig config)
         {
@@ -33,7 +34,8 @@ namespace ExportExcel
         public void Process(DataBase data)
         {
             if (_config == null || !_config.enable)
-                return;            
+                return;
+            _aliasDict = data.AliasDB.GetAliasDict(EAliasCode.CSharp, _flag);
 
             string name_space = _config.namespaceName;
             List<FilterTable> tables = FilterTable.Filter(data, _flag);
@@ -95,7 +97,7 @@ namespace ExportExcel
                         sw.WriteLine("\t\t/// " + col.AttrPK.ToString());
                     sw.WriteLine("\t\t/// " + col.Desc.Replace("\n", "\n\t\t/// "));
                     sw.WriteLine("\t\t/// </summary>");
-                    sw.WriteLine("\t\tpublic " + col.ToCSharpStr() + " " + col.Name + ";");
+                    sw.WriteLine("\t\tpublic " + col.ToCSharpStr(_aliasDict, table.SheetName) + " " + col.Name + ";");
                 }
                 sw.WriteLine(@"
     }");

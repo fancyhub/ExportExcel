@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 
 namespace ExportExcel
 {
-
     public class Exporter_Schema : IProcessNode
     {
         public Config.SchemaConfig _config;
@@ -28,10 +27,16 @@ namespace ExportExcel
             {
                 schema.Enums.Add(_CreateEnumSchema(p.Value));
             }
+            foreach(var p in data_base.AliasDB.AliasList)
+            {
+                schema.Alias.Add(new SchemaAlias(p));
+            }
+
             foreach (var p in data_base.Tables)
             {
                 schema.Tables.Add(_CreateTableSchema(p.Value));
             }
+            
 
             string file_path = System.IO.Path.Combine(_config.dir, "schema.json");
             FileUtil.CreateFileDir(file_path);
@@ -57,8 +62,8 @@ namespace ExportExcel
         {
             SchemaTable ret = new SchemaTable();
             ret.SheetName = table.SheetName;
-            ret.ExportServer = (table.TableExportFlag & EExportFlag.svr) != EExportFlag.none;
-            ret.ExportClient = (table.TableExportFlag & EExportFlag.client) != EExportFlag.none;
+            ret.ExportServer = (table.TableExportFlag & EExportFlagMask.Server) != EExportFlagMask.None;
+            ret.ExportClient = (table.TableExportFlag & EExportFlagMask.Client) != EExportFlagMask.None;
             ret.IsMultiLang = table.MultiLangBody != null;
 
             var pk = table.Header.Pk;
@@ -80,8 +85,8 @@ namespace ExportExcel
             SchemaColumn ret = new SchemaColumn();
             ret.Name = item.Name;
             ret.Desc = item.Desc;
-            ret.ExportServer = (item.ExportFlag & EExportFlag.svr) != EExportFlag.none;
-            ret.ExportClient = (item.ExportFlag & EExportFlag.client) != EExportFlag.none;
+            ret.ExportServer = (item.ExportFlag & EExportFlagMask.Server) != EExportFlagMask.None;
+            ret.ExportClient = (item.ExportFlag & EExportFlagMask.Client) != EExportFlagMask.None;
             ret.Constraint = _CreateSchemaConstraint(item, sec_key_name);
 
             DataType data_type = item.DataType;
@@ -112,11 +117,6 @@ namespace ExportExcel
                 ret.Enum = item.AttrEnum.Name;
             }
 
-            if (item.AttrTupleAlias != null)
-            {
-                ret.TupleAlias = item.AttrTupleAlias.AliasName;
-            }
-
             ret.Unique = item.AttrUnique;
             ret.BlankForbid = item.AttrBlankForbid;
             return ret;
@@ -133,6 +133,7 @@ namespace ExportExcel
         {
             public List<SchemaEnum> Enums = new List<SchemaEnum>();
             public List<SchemaTable> Tables = new List<SchemaTable>();
+            public List<SchemaAlias> Alias= new List<SchemaAlias>();
         }
 
         public class SchemaTable
@@ -144,6 +145,23 @@ namespace ExportExcel
             public List<SchemaColumn> Columns = new List<SchemaColumn>();
         }
 
+        public class SchemaAlias
+        {
+            public string Code;
+            public string SheetName;
+            public string ColumnName;
+            public string Client;
+            public string Server;
+
+            public SchemaAlias(AliasValue value)
+            {
+                Code = value.Code.ToString();
+                SheetName = value.SheetName;
+                ColumnName = value.ColumnName;
+                Client = value.Client;
+                Server = value.Server;
+            }
+        }
 
         public class SchemaEnum
         {
@@ -174,7 +192,6 @@ namespace ExportExcel
         {
             public string Key;
             public string Enum;
-            public string TupleAlias;
             public bool Unique = false;
             public bool BlankForbid = false;
 

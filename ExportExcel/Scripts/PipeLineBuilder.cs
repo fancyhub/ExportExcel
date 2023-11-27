@@ -53,8 +53,8 @@ namespace ExportExcel
             {
                 ProcessNodeList node_list = new ProcessNodeList("导出");
                 ret.Add(node_list);
-                _AddExporter(node_list, EExportFlag.client, config.exportClient);
-                _AddExporter(node_list, EExportFlag.svr, config.exportServer);
+                _AddExporter(node_list, EExportFlag.Client, config.exportClient);
+                _AddExporter(node_list, EExportFlag.Server, config.exportServer);
 
 
                 node_list.Add(new Exporter_LangTrans(config.exportCommon.localizationTranslate));

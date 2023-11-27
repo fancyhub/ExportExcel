@@ -113,15 +113,15 @@ namespace ExportExcel
         public string _BuildSheetName(Table table)
         {
             string ret = table.SheetName;
-            if (table.TableExportFlag == EExportFlag.client)
+            if (table.TableExportFlag == EExportFlagMask.Client)
             {
                 ret = ret + " | Export_Client";
             }
-            else if (table.TableExportFlag == EExportFlag.svr)
+            else if (table.TableExportFlag == EExportFlagMask.Server)
             {
                 ret = ret + " | Export_Svr";
             }
-            else if (table.TableExportFlag == EExportFlag.none)
+            else if (table.TableExportFlag == EExportFlagMask.None)
             {
                 ret = ret + " | Export_None";
             }
@@ -135,11 +135,11 @@ namespace ExportExcel
             {
                 ret.Add(col.AttrPK.ToString());
             }
-            if (col.ExportFlag == EExportFlag.client)
+            if (col.ExportFlag == EExportFlagMask.Client)
             {
                 ret.Add("Export[Client]");
             }
-            else if (col.ExportFlag == EExportFlag.svr)
+            else if (col.ExportFlag == EExportFlagMask.Server)
             {
                 ret.Add("Export[Svr]");
             }

@@ -21,12 +21,12 @@ namespace ExportExcel
             List<int> temp = new List<int>();
             data_base.ForeachCol((col) =>
             {
-                if (col.Col.AttrEnum == null)
+                if (col.Field.AttrEnum == null)
                     return;
 
                 col.ForeachCell((cell) =>
                 {
-                    string new_v = _Convert(cell.Value, col.Col, temp);
+                    string new_v = _Convert(cell.Value, col.Field, temp);
                     if (!string.IsNullOrEmpty(new_v))
                     {
                         cell.Value = new_v;

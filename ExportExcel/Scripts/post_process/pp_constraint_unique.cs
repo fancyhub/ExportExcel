@@ -57,7 +57,7 @@ namespace ExportExcel
                 //2.2 检查 以data_col 为目标的LookUp 列
                 data_base.ForeachCol((col) =>
                 {
-                    ConAttrLookup attr = col.Col.AttrLookUp;
+                    ConAttrLookup attr = col.Field.AttrLookUp;
                     if (attr == null || attr._sheet_name != data_col.SheetName || attr._col_name != data_col.ColName)
                         return;
 
@@ -72,7 +72,7 @@ namespace ExportExcel
 
         public static void _check_compose_pk(TableCol col, HashSet<ulong> dict)
         {
-            var attr = col.Col.AttrPK;
+            var attr = col.Field.AttrPK;
             if (attr == null || !attr.IsCompose())
                 return;
             dict.Clear();
@@ -109,11 +109,11 @@ namespace ExportExcel
         public static void _collect_all_target_cols(TableCol col, Dictionary<string, TableCol> dict, DataBase db)
         {
             //1. 如果col 是 unique的, 添加到dict里面
-            if (col.Col.AttrUnique)
+            if (col.Field.AttrUnique)
                 dict[col.SheetName] = col;
 
             //2. 如果自身有lookup 属性
-            ConAttrLookup attr = col.Col.AttrLookUp;
+            ConAttrLookup attr = col.Field.AttrLookUp;
             if (attr == null)
                 return;
 
@@ -125,7 +125,7 @@ namespace ExportExcel
             }
 
             //4. 检查目标列的属性,是否 包含BlankForbid
-            if (!tar_col.Col.AttrBlankForbid)
+            if (!tar_col.Field.AttrBlankForbid)
             {
                 ErrSet.E(col, $"对应的约束，{attr}, 目标列 必须标记为 PK 或 Unique 或 BlankForbid, " + tar_col.Table.FilePath);
                 return;

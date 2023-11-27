@@ -16,7 +16,7 @@ namespace ExportExcel
         {
             data_base.ForeachCol((col) =>
             {
-                if (!_range.SetCol(col.Col))
+                if (!_range.SetCol(col.Field))
                     return;
 
                 //3. 开始遍历字段，检查了

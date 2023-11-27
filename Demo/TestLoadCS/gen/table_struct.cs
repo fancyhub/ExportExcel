@@ -140,7 +140,7 @@ namespace Test{
 		/// <summary>
 		/// 位置
 		/// </summary>
-		public (float,float,float) Pos;
+		public UnityEngine.Vector3 Pos;
 		/// <summary>
 		/// 标记位
 		/// </summary>

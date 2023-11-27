@@ -15,6 +15,8 @@ namespace ExportExcel
 
         public DBRef RefDB;
         public DBEnum EnumDB;
+        public DBAlias AliasDB;
+
         public Dictionary<string, Table> Tables;
 
         public Table TableLocTrans;
@@ -27,6 +29,7 @@ namespace ExportExcel
             Config = config;
             RefDB = new DBRef();
             EnumDB = new DBEnum();
+            AliasDB = new DBAlias();
             Tables = new Dictionary<string, Table>();
             LangDefault = new Dictionary<string, string>();
             LangList = new List<string>();

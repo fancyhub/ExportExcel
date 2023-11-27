@@ -18,6 +18,7 @@ namespace ExportExcel
             DataTable,
             EnumConfig,
             RefTable,
+            AliasTable,
             Invalid,
         }
 
@@ -29,6 +30,7 @@ namespace ExportExcel
         public TableRefLoader _ref_loader;
         public TableEnumLoader _enum_loader;
         public TableDataLoader _data_loader;
+        public TableAliasLoader _alias_loader;
 
         public TableLoader(Config config)
         {
@@ -36,6 +38,7 @@ namespace ExportExcel
             _ref_loader = new TableRefLoader();
             _enum_loader = new TableEnumLoader(config);
             _data_loader = new TableDataLoader(config);
+            _alias_loader = new TableAliasLoader(config);
         }
 
         public string GetName()
@@ -60,21 +63,28 @@ namespace ExportExcel
                 for (int i = 0; i < sheet_count; i++)
                 {
                     ISheet sheet = wk.GetSheetAt(i);
-                    ETableNameType sheet_name_type = _ParseSheetName(sheet, out string sheet_name, out EExportFlag flag);
+                    ETableNameType sheet_name_type = _ParseSheetName(sheet, out string sheet_name, out EExportFlagMask flag);
                     switch (sheet_name_type)
                     {
+
+                        case ETableNameType.Ignore:
+                            break;
+
+
                         case ETableNameType.RefTable:
                             sheet.CalculateFormula();
                             _ref_loader.Load(data_base, sheet);
+                            break;
+
+                        case ETableNameType.AliasTable:
+                            sheet.CalculateFormula();
+                            _alias_loader.Load(data_base, sheet);
                             break;
 
                         case ETableNameType.EnumConfig:
                             sheet.CalculateFormula();
                             _enum_loader.Load(data_base, sheet);
                             break;
-
-                        case ETableNameType.Ignore:
-                            break;                             
 
                         case ETableNameType.DataTable:
                             sheet.CalculateFormula();
@@ -96,10 +106,10 @@ namespace ExportExcel
         }
 
 
-        private static ETableNameType _ParseSheetName(ISheet sheet, out string sheet_name, out EExportFlag flag)
+        private static ETableNameType _ParseSheetName(ISheet sheet, out string sheet_name, out EExportFlagMask flag)
         {
             sheet_name = null;
-            flag = EExportFlag.all;
+            flag = EExportFlagMask.All;
 
             if (sheet == null || !sheet.IsVisible())
                 return ETableNameType.Ignore;
@@ -116,7 +126,10 @@ namespace ExportExcel
                 if (name == "@EnumConfig" || name.StartsWith("@EnumConfig_"))
                     return ETableNameType.EnumConfig;
                 else if (name == "@RefTable" || name.StartsWith("@RefTable_"))
-                    return ETableNameType.RefTable;                
+                    return ETableNameType.RefTable;
+                else if (name == "@Alias" || name.StartsWith("@Alias_"))
+                    return ETableNameType.AliasTable;
+
                 ErrSet.E($"非法表格名 {sheet.SheetName} ", sheet.Workbook.FilePath);
                 return ETableNameType.Invalid;
             }
@@ -135,7 +148,7 @@ namespace ExportExcel
             }
         }
 
-        private static EExportFlag _ParseTableExportFlag(string[] sheet_name_array)
+        private static EExportFlagMask _ParseTableExportFlag(string[] sheet_name_array)
         {
             for (int i = 1; i < sheet_name_array.Length; i++)
             {
@@ -143,16 +156,16 @@ namespace ExportExcel
                 switch (temp)
                 {
                     case "export_client":
-                        return EExportFlag.client;
+                        return EExportFlagMask.Client;
                     case "export_svr":
-                        return EExportFlag.svr;
+                        return EExportFlagMask.Server;
                     case "export_none":
-                        return EExportFlag.none;
+                        return EExportFlagMask.None;
                     default:
                         break;
                 }
             }
-            return EExportFlag.all;
+            return EExportFlagMask.All;
         }
 
     }

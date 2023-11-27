@@ -52,14 +52,4 @@ namespace ExportExcel
                 return "PK[" + _sec_key_col_name + "]";
         }
     }
-
-    public class ConAttrTupleAlias : ConstraintAttr
-    {
-        public string AliasName;
-
-        public ConAttrTupleAlias(string name)
-        {
-            AliasName = name;
-        }
-    }
 }

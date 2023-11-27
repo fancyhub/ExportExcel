@@ -43,10 +43,10 @@ namespace ExportExcel
             //3. 修改所有LocId
             data_base.ForeachCol((col) =>
             {
-                if (col.Col.DataType.type0 != EDataType.LocStr)
+                if (col.Field.DataType.type0 != EDataType.LocStr)
                     return;
 
-                col.Col.DataType.type0 = EDataType.LocId;
+                col.Field.DataType.type0 = EDataType.LocId;
                 col.ForeachCell((cell) =>
                 {
                     cell.Value = cell.Value.ToLocId().ToString();

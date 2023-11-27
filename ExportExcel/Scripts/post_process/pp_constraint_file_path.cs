@@ -29,9 +29,9 @@ namespace ExportExcel
             List<string> path_list = new List<string>();
             data_base.ForeachCol((col) =>
             {
-                if (!_checker.SetAttr(col.Col.AttrFilePath))
+                if (!_checker.SetAttr(col.Field.AttrFilePath))
                     return;
-                bool is_list = col.Col.DataType.IsList;
+                bool is_list = col.Field.DataType.IsList;
 
                 col.ForeachCell((cell) =>
                 {

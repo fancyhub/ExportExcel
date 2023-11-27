@@ -37,7 +37,7 @@ namespace ExportExcel
             foreach (var p in data.Tables)
             {
                 //判断是否需要导出
-                if ((p.Value.TableExportFlag & _flag) == 0)
+                if (!p.Value.TableExportFlag.ExtContains(_flag))
                     continue;
 
                 List<FilterTable> multi_lang_tables = FilterTable.SplitMultiLangTable(p.Value, _flag);

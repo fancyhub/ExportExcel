@@ -29,14 +29,18 @@ namespace ExportExcel
 
         private static StringBuilder _sb = new StringBuilder();
 
-        public static string ToCSharpStr(this TableField item)
+        public static string ToCSharpStr(this TableField item, AliasDict dict, string sheet_name)
         {
-            if (item.AttrTupleAlias != null)
+            if(item.DataType.IsTuple)
             {
-                if (item.DataType.IsList)
-                    return item.AttrTupleAlias.AliasName + "[]";
-                return item.AttrTupleAlias.AliasName;
-            }
+                string alias_name = dict.ExtGetAliasName(sheet_name, item.Name);
+                if (alias_name != null)
+                {
+                    if (item.DataType.IsList)
+                        return alias_name + "[]";
+                    return alias_name;
+                }
+            }            
 
             var type = item.DataType;
             _sb.Clear();

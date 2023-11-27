@@ -13,8 +13,8 @@ namespace ExportExcel
     {
         private string[,] _Body;
 
-        public readonly List<TableField> FiltedHeader=new List<TableField>();
-        private List<int> _FieltedHeaderIndex=new List<int>();
+        public readonly List<TableField> FiltedHeader = new List<TableField>();
+        private List<int> _FieltedHeaderIndex = new List<int>();
         public string SheetName;
         public bool MultiLang;
 
@@ -22,7 +22,7 @@ namespace ExportExcel
         {
             MultiLang = false;
             SheetName = table.SheetName;
-            if ((table.TableExportFlag & flag) == 0)
+            if (!table.TableExportFlag.ExtContains(flag))
                 return;
 
             _FilterHeader(table, flag, ref FiltedHeader, ref _FieltedHeaderIndex);
@@ -38,7 +38,7 @@ namespace ExportExcel
             List<FilterTable> ret = new List<FilterTable>();
             foreach (var t in data.Tables)
             {
-                if ((t.Value.TableExportFlag & flag) == 0)
+                if (!t.Value.TableExportFlag.ExtContains(flag))
                     continue;
 
                 var new_table = new FilterTable(t.Value, flag);
@@ -65,7 +65,7 @@ namespace ExportExcel
                 ret.Add(t);
             }
             return ret;
-        }         
+        }
 
         public int ColCount { get { return FiltedHeader.Count; } }
         public int RowCount { get { return _Body == null ? 0 : _Body.GetLength(0); } }
@@ -95,15 +95,15 @@ namespace ExportExcel
                 }
                 return null;
             }
-        } 
+        }
 
-        private void _FilterHeader(Table table, EExportFlag flag,ref List<TableField> header,ref List<int> header_index)
+        private void _FilterHeader(Table table, EExportFlag flag, ref List<TableField> header, ref List<int> header_index)
         {
             var col_list = table.Header.List;
             for (int i = 0; i < col_list.Count; i++)
             {
                 var col = col_list[i];
-                if ((col.ExportFlag & flag) == 0)
+                if (!col.ExportFlag.ExtContains(flag))
                     continue;
                 header.Add(col);
                 header_index.Add(i);

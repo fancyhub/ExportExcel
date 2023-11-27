@@ -16,7 +16,6 @@ namespace ExportExcel
                 new ConParserFilePath(),
                 new ConParserLookUp(),
                 new ConParserExportFlag(),
-                new ConParserTupleAlias(),
             };
 
         public string GetName()
@@ -44,7 +43,7 @@ namespace ExportExcel
             public override void Process(TableCol db_col, DataBase db)
             {
                 //1. 解析 PK
-                TableField col = db_col.Col;
+                TableField col = db_col.Field;
                 ConAttrPK attr_pk = _parse_pk(col);
                 if (attr_pk == null)
                     return;
@@ -128,7 +127,7 @@ namespace ExportExcel
         {
             public override void Process(TableCol db_col, DataBase db)
             {
-                TableField col = db_col.Col;
+                TableField col = db_col.Field;
                 string ref_enum_name = _parse_enum(col);
                 if (string.IsNullOrEmpty(ref_enum_name))
                     return;
@@ -188,7 +187,7 @@ namespace ExportExcel
         {
             public override void Process(TableCol db_col, DataBase db)
             {
-                var col = db_col.Col;
+                var col = db_col.Field;
                 if (col.AttrUnique)
                     return;
 
@@ -196,7 +195,7 @@ namespace ExportExcel
                 if (col.AttrUnique)
                     col.AttrBlankForbid = true;
 
-                if (col.AttrUnique && !IsDataTypeValid(db_col.Col.DataType))
+                if (col.AttrUnique && !IsDataTypeValid(db_col.Field.DataType))
                     ErrSet.E(db_col, $"该字段是 pk 或者 Unique 约束的情况下, 只能支持 int,uint,int64,uint64,string 这几种类型");
             }
 
@@ -235,7 +234,7 @@ namespace ExportExcel
         {
             public override void Process(TableCol db_col, DataBase db)
             {
-                var col = db_col.Col;
+                var col = db_col.Field;
                 if (col.AttrBlankForbid)
                     return;
 
@@ -259,13 +258,13 @@ namespace ExportExcel
         {
             public override void Process(TableCol db_col, DataBase db)
             {
-                var col = db_col.Col;
+                var col = db_col.Field;
                 col.ExportFlag = ParseExport(col);
             }
 
             // 格式: Export[Client], Export[Svr], Export[None]
             // 不填写 默认all
-            public static EExportFlag ParseExport(TableField col)
+            public static EExportFlagMask ParseExport(TableField col)
             {
                 foreach (var str in col.StrConstraints)
                 {
@@ -273,18 +272,18 @@ namespace ExportExcel
                     switch (temp)
                     {
                         case "export[client]":
-                            return EExportFlag.client;
+                            return EExportFlagMask.Client;
                         case "export[svr]":
-                            return EExportFlag.svr;
+                            return EExportFlagMask.Server;
                         case "export[none]":
-                            return EExportFlag.none;
+                            return EExportFlagMask.None;
                         case "export[all]":
-                            return EExportFlag.all;
+                            return EExportFlagMask.All;
                         default:
                             continue;
                     }
                 }
-                return EExportFlag.all;
+                return EExportFlagMask.All;
             }
         }
 
@@ -292,7 +291,7 @@ namespace ExportExcel
         {
             public override void Process(TableCol db_col, DataBase db)
             {
-                var col = db_col.Col;
+                var col = db_col.Field;
                 col.AttrFilePath = ParseFilePath(col);
                 if (col.AttrFilePath == null)
                     return;
@@ -351,7 +350,7 @@ namespace ExportExcel
         {
             public override void Process(TableCol db_col, DataBase db)
             {
-                var col = db_col.Col;
+                var col = db_col.Field;
                 try
                 {
                     col.AttrLookUp = ParseLookUp(col);
@@ -415,7 +414,7 @@ namespace ExportExcel
         {
             public override void Process(TableCol db_col, DataBase db)
             {
-                var col = db_col.Col;
+                var col = db_col.Field;
                 col.AttrRange = ParseRange(col);
                 if (col.AttrRange == null)
                     return;
@@ -462,47 +461,6 @@ namespace ExportExcel
                 }
                 return null;
             }
-        }
-
-        public class ConParserTupleAlias : ConstraintParser
-        {
-            public override void Process(TableCol db_col, DataBase db)
-            {
-                var col = db_col.Col;
-                col.AttrTupleAlias = _ParseTupleAlias(col);
-                if (col.AttrTupleAlias == null)
-                    return;
-
-                if (!_IsDataTypeValid(col))
-                    ErrSet.E(db_col, $"TupleAlias[],只能支持 tuple");
-            }
-
-            private static bool _IsDataTypeValid(TableField field)
-            {
-                if (field.AttrEnum != null)
-                    return false;
-
-                return field.DataType.IsTuple;
-            }
-
-            // 格式: TupleAlias[name]
-            private static ConAttrTupleAlias _ParseTupleAlias(TableField col)
-            {
-                foreach (var p in col.StrConstraints)
-                {
-                    var temp = p.Trim();
-                    if (!temp.ToLower().StartsWith("tuplealias["))
-                        continue;
-
-                    int start_index = "tuplealias[".Length;
-                    int end_index = temp.Length - 1;
-                    var ret = temp.Substring(start_index, end_index - start_index).Trim();
-                    if (string.IsNullOrEmpty(ret))
-                        return null;
-                    return new ConAttrTupleAlias(ret);
-                }
-                return null;
-            }
-        }
+        }         
     }
 }

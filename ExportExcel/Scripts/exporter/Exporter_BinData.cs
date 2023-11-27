@@ -40,7 +40,7 @@ namespace ExportExcel
             {
                 S_SIGN = S_SIGN << 8;
                 S_SIGN |= (uint)(p);
-            }            
+            }
         }
         public string GetName()
         {
@@ -50,7 +50,7 @@ namespace ExportExcel
         public void Process(DataBase data_base)
         {
             if (_config == null || !_config.enable)
-                return;            
+                return;
 
             string path = Path.Combine(_config.dir, C_FILE_NAME);
             FileUtil.CreateFileDir(path);
@@ -70,7 +70,7 @@ namespace ExportExcel
             List<BinTable> bin_table_list = new List<BinTable>();
             data_base.ForeachTable((table) =>
             {
-                if ((table.TableExportFlag & _flag) == EExportFlag.none)
+                if (!table.TableExportFlag.ExtContains(_flag))
                     return;
 
                 if (table.MultiLangBody == null && lang == null)
@@ -233,20 +233,20 @@ namespace ExportExcel
                 int count = 0;
                 foreach (var p in Table.Header.List)
                 {
-                    if ((p.ExportFlag & _flag) == EExportFlag.none)
+                    if (!p.ExportFlag.ExtContains(_flag))
                         continue;
                     count++;
                 }
                 bw.Write7BitEncodedInt(count * 2);
                 foreach (var p in Table.Header.List)
                 {
-                    if ((p.ExportFlag & _flag) == EExportFlag.none)
+                    if (!p.ExportFlag.ExtContains(_flag))
                         continue;
                     bw.Write7BitEncodedInt(_str_dict.GetIndex(p.Name));
                 }
                 foreach (var p in Table.Header.List)
                 {
-                    if ((p.ExportFlag & _flag) == EExportFlag.none)
+                    if (!p.ExportFlag.ExtContains(_flag))
                         continue;
                     bw.Write7BitEncodedInt(_str_dict.GetIndex(p.DataType.ToCsvStr()));
                 }
@@ -282,7 +282,7 @@ namespace ExportExcel
 
                 for (int i = 0; i < header.Count; i++)
                 {
-                    if ((header[i].ExportFlag & flag) == EExportFlag.none)
+                    if (!header[i].ExportFlag.ExtContains(flag))
                         continue;
 
                     _WriteCell(header[i].DataType, body[row_index, i], str_dict);
@@ -390,7 +390,8 @@ namespace ExportExcel
                             ErrSet.E($"写入出错 {type},{v}");
                             break;
                     }
-                }catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     ErrSet.E($"写入出错 {type},{v}");
                 }

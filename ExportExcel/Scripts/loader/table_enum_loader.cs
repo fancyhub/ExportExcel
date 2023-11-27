@@ -4,79 +4,52 @@ using System.Text.RegularExpressions;
 
 namespace ExportExcel
 {
-    /// <summary>
-    /// 枚举表的加载器
-    /// </summary>
-    public class TableEnumLoader
+    public class TableAliasLoader
     {
-        //枚举名的检查
-        private static Regex S_ENUM_NAME_REGEX = new Regex("^[A-Z][A-Z0-9_]*$");
+        public const string SuppertLangList = "CSharp, Go, Lua, Cpp,";
 
-        //枚举字段名的检查
-        private static Regex S_ENUM_FIELD_NAME_REGEX = new Regex("^[a-zA-Z][a-zA-Z0-9_]*$");
-
-
-        public TableEnumLoader(Config config)
+        public TableAliasLoader(Config config)
         {
-            S_ENUM_NAME_REGEX = new Regex(config.validation.enumNameReg);
-            S_ENUM_FIELD_NAME_REGEX = new Regex(config.validation.enumFieldNameReg);
-        }
 
-        public static bool ValidEnumName(string enum_name)
-        {
-            return S_ENUM_NAME_REGEX.IsMatch(enum_name);
-        }
-
-
-        public static bool ValidEnumFieldName(string enum_field_name)
-        {
-            return S_ENUM_FIELD_NAME_REGEX.IsMatch(enum_field_name);
         }
 
         public void Load(DataBase data_base, ISheet sheet)
         {
-            sheet.CalculateFormula();
             int row_count = sheet.RowCount;
             for (int i = 1; i < row_count; i++)
             {
                 IRow row = sheet.GetRow(i);
-                string enum_name = row.CellStrExt(0);
-                if (string.IsNullOrEmpty(enum_name) || enum_name.StartsWith("#"))
+
+                string code_name = row.CellStrExt(0);
+                if (string.IsNullOrEmpty(code_name) || code_name.StartsWith("#"))
                     continue;
 
-                string enum_field_name = row.CellStrExt(1);
-                string excel_val = row.CellStrExt(2);
-                if (!int.TryParse(row.CellStrExt(3), out int enum_val))
+                EAliasCode code_type = DBAlias.ToAliasCode(code_name);
+                if (code_type == EAliasCode.None)
                 {
-                    ErrSet.E($"{sheet.SheetName} 枚举 {enum_field_name}.{excel_val} 对应的int解析失败 {row.CellStrExt(3)} ", sheet.Workbook.FilePath);
-                    continue;
-                }
-
-                if (!ValidEnumName(enum_name))
-                {
-                    ErrSet.E($"{sheet.SheetName} 枚举 {enum_name} 不符合命名规范", sheet.Workbook.FilePath);
+                    ErrSet.E($"{sheet.SheetName} Alias, [{i + 1} : A] 对应的CodeType {code_name} 解析出错, 目前只支持 {SuppertLangList} ", sheet.Workbook.FilePath);
                     continue;
                 }
 
-                if (!ValidEnumFieldName(enum_field_name))
+                string sheet_name = row.CellStrExt(1);
+                string col_name = row.CellStrExt(2);
+
+                string client_name = row.CellStrExt(3);
+                string svr_name = row.CellStrExt(4);
+
+                if (string.IsNullOrEmpty(sheet_name))
                 {
-                    ErrSet.E($"{sheet.SheetName} 枚举 {enum_name}.{enum_field_name} 不符合命名规范", sheet.Workbook.FilePath);
+                    ErrSet.E($"{sheet.SheetName} Alias,  [{i + 1} : B]  对应的 SheetName is empty", sheet.Workbook.FilePath);
                     continue;
                 }
 
-                var rslt = data_base.EnumDB.AddEnumField(enum_name, enum_field_name, excel_val, enum_val);
-                switch (rslt)
+                if (string.IsNullOrEmpty(col_name))
                 {
-                    case EEnumAddError.DuplicateExcelVal:
-                        ErrSet.E($"{sheet.SheetName} 枚举 {enum_name}.{excel_val} 该名字重复", sheet.Workbook.FilePath);
-                        break;
-
-                    case EEnumAddError.DuplicateFieldName:
-                        ErrSet.E($"{sheet.SheetName} 枚举 {enum_name}.{enum_field_name} 该名字重复", sheet.Workbook.FilePath);
-                        break;
-                    case EEnumAddError.Succ:
-                        break;
+                    ErrSet.E($"{sheet.SheetName} Alias,  [{i + 1} : C]  对应的 Column is empty", sheet.Workbook.FilePath);
+                    continue;
                 }
+
+                data_base.AliasDB.Add(code_type, sheet_name, col_name, client_name, svr_name);
             }
         }
     }

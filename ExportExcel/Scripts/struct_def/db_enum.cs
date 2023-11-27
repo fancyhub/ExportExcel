@@ -88,7 +88,7 @@ namespace ExportExcel
         DuplicateExcelVal,
     }
 
-    public class DBEnum : IEnumerable<KeyValuePair<string, EnumType>>
+    public sealed class DBEnum : IEnumerable<KeyValuePair<string, EnumType>>
     {
         public Dictionary<string, EnumType> _dict = new Dictionary<string, EnumType>();
 
