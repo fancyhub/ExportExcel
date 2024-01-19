@@ -166,12 +166,11 @@ namespace ExportExcel
         }
         private static void _Read(ITableDataReader reader, ref LocStr v)
         {
-            string s = reader.ReadString();
-            v = s;
+            v = new LocStr(reader.ReadString());
         }
         private static void _Read(ITableDataReader reader, ref LocId v)
         {
-            v = reader.ReadInt32();
+            v =new LocId(reader.ReadInt32());
         }
         private static void _Read<T>(ITableDataReader reader, ref T v) where T : Enum
         {
