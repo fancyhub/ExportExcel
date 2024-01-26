@@ -114,9 +114,9 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
 |V3|x\|y\|z|UnityEngine.Vector3|*gmath.Vector3||
 |KVPair|Key\|Value|||
 
-Fields 在生成Json的时候, 会展开
-CSharp字段如果没有填写, 会生成 (type1 field1,type2 field2,type3 )  对象会变成该类型
-GO字段如果没有填写, 就是无效的, 会自动生成 TupleType1Type2 类型
+Fields 在生成Json的时候, 会展开  
+CSharp字段如果没有填写, 会生成 (type1 field1,type2 field2,type3 )  对象会变成该类型  
+Go字段如果没有填写, 就是无效的, 会自动生成 TupleType1Type2 类型  
 Cpp没有实现
 
 
