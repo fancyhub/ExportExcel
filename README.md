@@ -96,26 +96,28 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
  |----|----|
  |PK <br> PK[sec_key_name] | 主Key,<br>不允许重复, 不允许空,<br>只能支持 int,int64,string 这三种类型,不支持Enum约束,<br>如果有sec_key 为组合key, 目前只支持 int,int的组合|
  |Unique|唯一, <br>不允许重复,不允许空,<br>只能支持 int,int64,string 这三种类型, 不支持Enum约束<br> PK 约束包含了 Unique|
- |Export[] | 控制导出的约束<br>Export[Client]   只导出客户端<br>Export[Svr]   只导出服务器<br>没有填写,默认服务器客户端一起导出<br>如果该字段不想导出, 把该字段的名字改为 #FieldName, 该字段就不再导出了|
+ |Export[flag] | 控制导出的约束<br>Export[Client]   只导出客户端<br>Export[Svr]   只导出服务器<br>没有填写,默认服务器客户端一起导出<br>如果该字段不想导出, 把该字段的名字改为 #FieldName, 该字段就不再导出了|
  |BlankForbid|不允许为空,<br>标记为PK 或者 Unique的时候, 也包含了 BlankForbid|
  |Enum[Enum_Define_Name] | 枚举类型<br>支持 int 其他类型不支持<br>字段名 可以填写定义的枚举名,也可以填写对应的int值, 如果该int值没有定义,报错|
  |LookUp[TarSheetName.ColName]|查找约束<br>支持 int,uint,list_int,list_uint,int64,uint64, list_int64,string,list_string 不支持枚举<br>注意: TarSheetName.ColName 必须为 BlankForbid / Unique /PK 约束<br>自己字段可以为空<br>中间是点连接符|
  |FilePath[LookUpDir ,Suffix ]|文件路径检查<br>只是支持 string类型, 不支持 list_string<br>比如  FilePath[Assets/Res/Hero,prefab]  该字段的内容填写 file_name<br>工具会检查 Assets/Res/Hero/file_name.prefab 是否存在,同时检查大小写|
  |Range[min,max]|范围检查<br>支持 int32,uint32,int64,uint64, floag,double 以及对应的list 类型|
+ Default[DefaultValue]| 填写默认值
+ Alias[AliasName]| 对应Alias表格的Name
  
 
 # Alias 表格
 表名 @Alias 或者 @Alias_xxx , 可以分表  
 
-|CodeType|SheetName|ColumnName|Client|Server
+|Name|Fields|CSharp|Go|Cpp
 |------|------|------|-----|-----|
-|CSharp|ItemData|PairField2|PairItemIntBool||
-|CSharp|ItemData|PairFieldList2|PairItemIntInt64||
+|V3|x\|y\|z|UnityEngine.Vector3|*gmath.Vector3||
+|KVPair|Key\|Value|||
 
-
-CodeType 支持 CSharp, Go, Lua, Cpp
-
-目前只是支持 CSharp, 并且目标类型是 Tuple (不管是否List)
+Fields 在生成Json的时候, 会展开
+CSharp字段如果没有填写, 会生成 (type1 field1,type2 field2,type3 )  对象会变成该类型
+GO字段如果没有填写, 就是无效的, 会自动生成 TupleType1Type2 类型
+Cpp没有实现
 
 
  # 引用表

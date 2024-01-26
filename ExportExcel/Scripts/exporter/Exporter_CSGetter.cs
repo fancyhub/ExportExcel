@@ -17,7 +17,6 @@ namespace ExportExcel
 
         public StringFormater _formater = new StringFormater();
 
-        public AliasDict _aliasDict;
 
         public Config.CSharpConfig _config;
         public EExportFlag _flag;
@@ -37,7 +36,6 @@ namespace ExportExcel
         {
             if (_config == null || !_config.enable || !_config.getter.enable)
                 return;
-            _aliasDict = data.AliasDB.GetAliasDict(EAliasCode.CSharp, _flag);
 
             List<FilterTable> tables = FilterTable.Filter(data, _flag);
 
@@ -103,7 +101,7 @@ namespace ExportExcel
             if (pk != null)
             {
                 _formater["pk_name"] = pk.Name;
-                _formater["pk_type"] = pk.ToCSharpStr(_aliasDict, table.SheetName);
+                _formater["pk_type"] = pk.ToCSharpStr();
 
                 if (!pk.AttrPK.IsCompose())
                 {
@@ -123,7 +121,7 @@ namespace ExportExcel
                 else
                 {
                     _formater["pk_sec_name"] = pk.AttrPK._sec_key.Name;
-                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToCSharpStr(_aliasDict, table.SheetName);
+                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToCSharpStr();
                     sw.WriteLineExt(_formater,
                     @"
         public {static_flag} {class_name} Get{class_name}({pk_type} {pk_name},{pk_sec_type} {pk_sec_name})

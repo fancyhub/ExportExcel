@@ -152,7 +152,7 @@ namespace ExportExcel
                     func(cell);
                 }
             }
-        }        
+        }
 
         #endregion
 
@@ -176,6 +176,17 @@ namespace ExportExcel
                 func(cell, user_data);
             }
         }
+
+        public static void ForeachCell<T1, T2>(this TableCol self, Action<TableCell, T1, T2> func, T1 user_data1, T2 user_data2)
+        {
+            int row_count = self.Table.Body.GetLength(0);
+            for (int r = 0; r < row_count; r++)
+            {
+                TableCell cell = new TableCell(self.Table, self.ColIndex, r);
+                func(cell, user_data1, user_data2);
+            }
+        }
+
         #endregion
 
 

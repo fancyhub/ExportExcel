@@ -20,7 +20,7 @@ namespace ExportExcel
 
         public Config.CSharpConfig _config;
         public EExportFlag _flag;
-        public AliasDict _aliasDict;
+        public DBAlias _AliasDB;
 
         public Exporter_CSLoader(EExportFlag flag, Config.CSharpConfig config)
         {
@@ -37,7 +37,7 @@ namespace ExportExcel
         {
             if (_config == null || !_config.enable || !_config.loader.enable)
                 return;
-            _aliasDict = data.AliasDB.GetAliasDict(EAliasCode.CSharp, _flag);
+            _AliasDB = data.AliasDB;
             List<FilterTable> tables = FilterTable.Filter(data, _flag);
 
             string name_space = _config.namespaceName;
@@ -190,9 +190,7 @@ namespace ExportExcel
                 foreach (var field in header_list)
                 {
                     DataType data_type = field.DataType;
-                    string alias_name = null;
-                    if (data_type.IsTuple)
-                        alias_name = _aliasDict.ExtGetAliasName(table.SheetName, field.Name);
+                    string alias_name = field.AliasCSharp;                    
 
                     if (data_type.IsList)
                     {
@@ -369,9 +367,7 @@ namespace ExportExcel
             for (int i = 0; i < header_list.Count; i++)
             {
                 TableField field = header_list[i];
-                string alias_name = null;
-                if (field.DataType.IsTuple)
-                    alias_name = _aliasDict.ExtGetAliasName(table.SheetName, field.Name);
+                string alias_name = field.AliasCSharp;                
 
                 DataType data_type = field.DataType;
                 if (data_type.IsList)
@@ -413,7 +409,7 @@ namespace ExportExcel
             if (pk != null)
             {
                 _formater["pk_name"] = pk.Name;
-                _formater["pk_type"] = pk.ToCSharpStr(_aliasDict, table.SheetName);
+                _formater["pk_type"] = pk.ToCSharpStr();
 
                 if (!pk.AttrPK.IsCompose())
                 {
@@ -435,7 +431,7 @@ namespace ExportExcel
                 else
                 {
                     _formater["pk_sec_name"] = pk.AttrPK._sec_key.Name;
-                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToCSharpStr(_aliasDict, table.SheetName);
+                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToCSharpStr();
                     sw.WriteLineExt(_formater,
                        @"
             var dict = new Dictionary<({pk_type},{pk_sec_type}), {class_name}>(list.Count);

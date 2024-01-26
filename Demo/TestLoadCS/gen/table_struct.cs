@@ -98,23 +98,23 @@ namespace Test{
 		/// <summary>
 		/// 测试Pair
 		/// </summary>
-		public (int,bool) PairField;
+		public PairItemIntBool PairField;
 		/// <summary>
 		/// 测试Pair
 		/// </summary>
-		public PairItemIntBool PairField2;
+		public (int,bool) PairField2;
 		/// <summary>
 		/// 测试Pair
 		/// </summary>
-		public PairItemIntBool PairField3;
+		public (int Id,int Value) PairField3;
 		/// <summary>
 		/// 测试PairList
 		/// </summary>
-		public (int,long)[] PairFieldList;
+		public (int Id,long Value)[] PairFieldList;
 		/// <summary>
 		/// 测试PairList
 		/// </summary>
-		public PairItemIntInt64[] PairFieldList2;
+		public (int Id,long Value)[] PairFieldList2;
 		/// <summary>
 		/// 测试List
 		/// </summary>

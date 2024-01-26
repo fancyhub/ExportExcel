@@ -36,6 +36,16 @@ namespace ExportExcel
 
         public static string ToGoStr(this TableField field)
         {
+            if (field.DataType.IsTuple && field.AttrAlias != null)
+            {
+                if (field.AttrAlias.Go != null)
+                {
+                    if (field.DataType.IsList)
+                        return field.AttrAlias.Go + "[]";
+                    return field.AttrAlias.Go;
+                }
+            }
+
             _sb.Clear();
             var type = field.DataType;
             if (type.IsList)

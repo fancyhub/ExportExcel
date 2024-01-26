@@ -24,9 +24,10 @@ namespace ExportExcel
             {
                 ret.Add(new PPconstraintParser());
             }
-
+            
             //3. 处理引用
             {
+                ret.Add(new PPConstraintDefault());                
                 ret.Add(new PostProcessRef());
             }
 
@@ -86,7 +87,6 @@ namespace ExportExcel
             node_list.Add(new Exporter_Bson(flag, config.bson));
 
             node_list.Add(new Exporter_GoStruct(flag, config.go));
-            node_list.Add(new Exporter_GoLoader(flag, config.go));
 
         }
     }

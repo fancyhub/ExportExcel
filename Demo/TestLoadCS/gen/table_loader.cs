@@ -94,11 +94,11 @@ namespace Test{
 				_Read(rowReader, ref row.Type);
 				_Read(rowReader, ref row.SubType);
 				_Read(rowReader, ref row.Quality);
-				_ReadTuple(rowReader.BeginTuple(), ref row.PairField);
-				_ReadTuple(rowReader.BeginTuple(), ref row.PairField2, out (int,bool) __PairField2);
-				_ReadTuple(rowReader.BeginTuple(), ref row.PairField3, out (int,int) __PairField3);
+				_ReadTuple(rowReader.BeginTuple(), ref row.PairField, out (int,bool) __PairField);
+				_ReadTuple(rowReader.BeginTuple(), ref row.PairField2);
+				_ReadTuple(rowReader.BeginTuple(), ref row.PairField3);
 				_ReadList(rowReader, ref row.PairFieldList);
-				_ReadList(rowReader, ref row.PairFieldList2,out (int,long) __PairFieldList2);
+				_ReadList(rowReader, ref row.PairFieldList2);
 				_ReadList(rowReader, ref row.ListField);
 
                 _temp.Add(row);
@@ -292,12 +292,11 @@ namespace Test{
         }
         private static void _Read(ITableDataReader reader, ref LocStr v)
         {
-            string s = reader.ReadString();
-            v = s;
+            v = new LocStr(reader.ReadString());
         }
         private static void _Read(ITableDataReader reader, ref LocId v)
         {
-            v = reader.ReadInt32();
+            v =new LocId(reader.ReadInt32());
         }
         private static void _Read<T>(ITableDataReader reader, ref T v) where T : Enum
         {
@@ -308,15 +307,6 @@ namespace Test{
         }
         #endregion
 		#region Tuple Reader
-
-        private static void _ReadTuple(ITableTupleReader tupleReader, ref (int,bool) v)
-        {
-            if(tupleReader==null)
-                return;
-
-			_Read(tupleReader,ref v.Item1);
-			_Read(tupleReader,ref v.Item2);
-		}
 
         private static void _ReadTuple(ITableTupleReader tupleReader, ref PairItemIntBool v, out (int,bool) v2)
         {
@@ -332,19 +322,23 @@ namespace Test{
              TableAlias.Create(ref v,false,v2);
         }
 
-        private static void _ReadTuple(ITableTupleReader tupleReader, ref PairItemIntBool v, out (int,int) v2)
+        private static void _ReadTuple(ITableTupleReader tupleReader, ref (int,bool) v)
         {
-            v2=default;
             if(tupleReader==null)
-            {
-                TableAlias.Create(ref v, false,v2);                
                 return;
-            }
-			_Read(tupleReader,ref v2.Item1);
-			_Read(tupleReader,ref v2.Item2);
 
-             TableAlias.Create(ref v,false,v2);
-        }
+			_Read(tupleReader,ref v.Item1);
+			_Read(tupleReader,ref v.Item2);
+		}
+
+        private static void _ReadTuple(ITableTupleReader tupleReader, ref (int,int) v)
+        {
+            if(tupleReader==null)
+                return;
+
+			_Read(tupleReader,ref v.Item1);
+			_Read(tupleReader,ref v.Item2);
+		}
 
         private static void _ReadTuple(ITableTupleReader tupleReader, ref (int,long) v)
         {
@@ -354,20 +348,6 @@ namespace Test{
 			_Read(tupleReader,ref v.Item1);
 			_Read(tupleReader,ref v.Item2);
 		}
-
-        private static void _ReadTuple(ITableTupleReader tupleReader, ref PairItemIntInt64 v, out (int,long) v2)
-        {
-            v2=default;
-            if(tupleReader==null)
-            {
-                TableAlias.Create(ref v, false,v2);                
-                return;
-            }
-			_Read(tupleReader,ref v2.Item1);
-			_Read(tupleReader,ref v2.Item2);
-
-             TableAlias.Create(ref v,false,v2);
-        }
 
         private static void _ReadTuple(ITableTupleReader tupleReader, ref UnityEngine.Vector3 v, out (float,float,float) v2)
         {
@@ -400,25 +380,6 @@ namespace Test{
                 {
                     (int,long) item = default;
                     _ReadTuple(listReader.BeginTuple(), ref item);                    
-                    v[i] = item;
-                }
-            }
-        }
-
-        private static void _ReadList(ITableRowReader rowReader, ref PairItemIntInt64[] v, out (int,long) v2)
-        {
-            v2=default;
-            var listReader = rowReader.BeginList();
-            int count = listReader != null ? listReader.GetCount() : 0;
-            if (count == 0)
-                v = Array.Empty<PairItemIntInt64>();
-            else
-            {
-                v = new PairItemIntInt64[count];
-                for (int i = 0; i < count; i++)
-                {
-                    PairItemIntInt64 item = default;
-                    _ReadTuple(listReader.BeginTuple(), ref item, out v2);
                     v[i] = item;
                 }
             }

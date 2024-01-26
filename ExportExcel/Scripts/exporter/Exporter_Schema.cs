@@ -27,16 +27,13 @@ namespace ExportExcel
             {
                 schema.Enums.Add(_CreateEnumSchema(p.Value));
             }
-            foreach(var p in data_base.AliasDB.AliasList)
-            {
-                schema.Alias.Add(new SchemaAlias(p));
-            }
+            schema.TupleAlias = new List<AliasItem>(data_base.AliasDB._Dict.Values);
 
             foreach (var p in data_base.Tables)
             {
                 schema.Tables.Add(_CreateTableSchema(p.Value));
             }
-            
+
 
             string file_path = System.IO.Path.Combine(_config.dir, "schema.json");
             FileUtil.CreateFileDir(file_path);
@@ -119,6 +116,9 @@ namespace ExportExcel
 
             ret.Unique = item.AttrUnique;
             ret.BlankForbid = item.AttrBlankForbid;
+            ret.Default = item.AttrDefault;
+            if (item.AttrAlias != null)
+                ret.TupleAlias = item.AttrAlias.Name;
             return ret;
         }
 
@@ -132,8 +132,8 @@ namespace ExportExcel
         public class Schema
         {
             public List<SchemaEnum> Enums = new List<SchemaEnum>();
+            public List<AliasItem> TupleAlias = new List<AliasItem>();
             public List<SchemaTable> Tables = new List<SchemaTable>();
-            public List<SchemaAlias> Alias= new List<SchemaAlias>();
         }
 
         public class SchemaTable
@@ -143,25 +143,7 @@ namespace ExportExcel
             public bool ExportServer;
             public bool IsMultiLang;
             public List<SchemaColumn> Columns = new List<SchemaColumn>();
-        }
-
-        public class SchemaAlias
-        {
-            public string Code;
-            public string SheetName;
-            public string ColumnName;
-            public string Client;
-            public string Server;
-
-            public SchemaAlias(AliasValue value)
-            {
-                Code = value.Code.ToString();
-                SheetName = value.SheetName;
-                ColumnName = value.ColumnName;
-                Client = value.Client;
-                Server = value.Server;
-            }
-        }
+        }         
 
         public class SchemaEnum
         {
@@ -194,6 +176,8 @@ namespace ExportExcel
             public string Enum;
             public bool Unique = false;
             public bool BlankForbid = false;
+            public string Default;
+            public string TupleAlias;
 
             public List<string> Constraints = new List<string>();
         }

@@ -15,5 +15,9 @@ echo.
 
 echo ===========================1.gen data and code ===============
 ..\..\Tool\ExportExcel.exe
+if %errorlevel% == 0 (echo Succ) else (
+	echo HasError!
+	pause
+)
 echo.
 echo.

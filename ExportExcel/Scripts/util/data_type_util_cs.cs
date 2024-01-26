@@ -29,18 +29,17 @@ namespace ExportExcel
 
         private static StringBuilder _sb = new StringBuilder();
 
-        public static string ToCSharpStr(this TableField item, AliasDict dict, string sheet_name)
+        public static string ToCSharpStr(this TableField item)
         {
-            if(item.DataType.IsTuple)
+            if (item.DataType.IsTuple && item.AttrAlias != null)
             {
-                string alias_name = dict.ExtGetAliasName(sheet_name, item.Name);
-                if (alias_name != null)
+                if (item.AttrAlias.CSharp != null)
                 {
                     if (item.DataType.IsList)
-                        return alias_name + "[]";
-                    return alias_name;
+                        return item.AttrAlias.CSharp + "[]";
+                    return item.AttrAlias.CSharp;
                 }
-            }            
+            }
 
             var type = item.DataType;
             _sb.Clear();
@@ -48,11 +47,24 @@ namespace ExportExcel
             {
                 _sb.Append("(");
                 _sb.Append(_data_type_2_csharp_str[type.type0]);
+                string field_name = item.GetAliasCsharpFieldName(0);
+                if (field_name != null)
+                {
+                    _sb.Append(' ');
+                    _sb.Append(field_name);
+                }
 
                 for (int i = 1; i < type.Count; i++)
                 {
                     _sb.Append(",");
                     _sb.Append(_data_type_2_csharp_str[type.Get(i)]);
+
+                    field_name = item.GetAliasCsharpFieldName(i);
+                    if (field_name != null)
+                    {
+                        _sb.Append(' ');
+                        _sb.Append(field_name);
+                    }
                 }
                 _sb.Append(")");
             }

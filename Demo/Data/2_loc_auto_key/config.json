@@ -43,7 +43,7 @@
         },
 		"json": {
             "enable": true,
-			"header": false,
+			"header": true,
             "dir": "Output/Client/Data"
         },
 		"bson": {

@@ -1,82 +1,97 @@
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace ExportExcel
 {
-    /// <summary>
-    /// 枚举表的加载器
-    /// </summary>
-    public class TableEnumLoader
+    public class TableAliasLoader
     {
-        //枚举名的检查
-        private static Regex S_ENUM_NAME_REGEX = new Regex("^[A-Z][A-Z0-9_]*$");
+        public const string CName = "name";
+        public const string CFields = "fields";
+        public static List<string> SuppertLangList = new() { "csharp", "cpp", "go" };
 
-        //枚举字段名的检查
-        private static Regex S_ENUM_FIELD_NAME_REGEX = new Regex("^[a-zA-Z][a-zA-Z0-9_]*$");
-
-
-        public TableEnumLoader(Config config)
+        public TableAliasLoader(Config config)
         {
-            S_ENUM_NAME_REGEX = new Regex(config.validation.enumNameReg);
-            S_ENUM_FIELD_NAME_REGEX = new Regex(config.validation.enumFieldNameReg);
-        }
-
-        public static bool ValidEnumName(string enum_name)
-        {
-            return S_ENUM_NAME_REGEX.IsMatch(enum_name);
-        }
-
-
-        public static bool ValidEnumFieldName(string enum_field_name)
-        {
-            return S_ENUM_FIELD_NAME_REGEX.IsMatch(enum_field_name);
         }
 
         public void Load(DataBase data_base, ISheet sheet)
         {
+            if (!_ParseHeader(sheet, out var fields_index, out var lang_index_map))
+            {
+                return;
+            }
+
             int row_count = sheet.RowCount;
             for (int i = 1; i < row_count; i++)
             {
                 IRow row = sheet.GetRow(i);
-                string enum_name = row.CellStrExt(0);
-                if (string.IsNullOrEmpty(enum_name) || enum_name.StartsWith("#"))
+
+                string name = row.CellStrExt(0);
+                if (string.IsNullOrEmpty(name) || name.StartsWith("#"))
                     continue;
 
-                string enum_field_name = row.CellStrExt(1);
-                string excel_val = row.CellStrExt(2);
-                if (!int.TryParse(row.CellStrExt(3), out int enum_val))
+                string[] fields = row.CellStrExt(fields_index).Split("|", StringSplitOptions.RemoveEmptyEntries);
+                if (fields.Length == 0)
                 {
-                    ErrSet.E($"{sheet.SheetName} 枚举 {enum_field_name}.{excel_val} 对应的int解析失败 {row.CellStrExt(3)} ", sheet.Workbook.FilePath);
-                    continue;
-                }
-
-                if (!ValidEnumName(enum_name))
-                {
-                    ErrSet.E($"{sheet.SheetName} 枚举 {enum_name} 不符合命名规范", sheet.Workbook.FilePath);
+                    ErrSet.E($"{sheet.SheetName} 的 {name} 对应的 Fileds 为空");
                     continue;
                 }
 
-                if (!ValidEnumFieldName(enum_field_name))
-                {
-                    ErrSet.E($"{sheet.SheetName} 枚举 {enum_name}.{enum_field_name} 不符合命名规范", sheet.Workbook.FilePath);
-                    continue;
-                }
+                var item = new AliasItem(name, fields);
+                item.CSharp = _GetLang(row, lang_index_map, 0);
+                item.Cpp = _GetLang(row, lang_index_map, 1);
+                item.Go = _GetLang(row, lang_index_map, 2);
+                data_base.AliasDB.Add(item);
+            }
+        }
 
-                var rslt = data_base.EnumDB.AddEnumField(enum_name, enum_field_name, excel_val, enum_val);
-                switch (rslt)
-                {
-                    case EEnumAddError.DuplicateExcelVal:
-                        ErrSet.E($"{sheet.SheetName} 枚举 {enum_name}.{excel_val} 该名字重复", sheet.Workbook.FilePath);
-                        break;
+        private static string _GetLang(IRow row, int[] lang_index_map, int index)
+        {
+            int index_map = lang_index_map[index];
+            if (index_map < 0)
+                return null;
+            string ret = row.CellStrExt(index_map);
+            if (string.IsNullOrEmpty(ret))
+                return null;
+            return ret;
+        }
 
-                    case EEnumAddError.DuplicateFieldName:
-                        ErrSet.E($"{sheet.SheetName} 枚举 {enum_name}.{enum_field_name} 该名字重复", sheet.Workbook.FilePath);
-                        break;
-                    case EEnumAddError.Succ:
-                        break;
+        private static bool _ParseHeader(ISheet sheet, out int fields_index, out int[] lang_index_map)
+        {
+            fields_index = -1;
+            lang_index_map = new int[SuppertLangList.Count];
+            for (int i = 0; i < lang_index_map.Length; i++)
+                lang_index_map[i] = -1;
+
+            int row_count = sheet.RowCount;
+            if (row_count == 0)
+                return false;
+
+            int name_index = -1;
+            IRow header_row = sheet.GetRow(0);
+            int count = header_row.ColCount;
+            for (int i = 0; i < count; i++)
+            {
+                string col_name = header_row.CellStrExt(i).ToLower();
+                if (col_name == CName)
+                    name_index = i;
+                else if (col_name == CFields)
+                    fields_index = i;
+                else
+                {
+                    var index = SuppertLangList.IndexOf(col_name);
+                    if (index >= 0)
+                    {
+                        lang_index_map[index] = i;
+                    }
                 }
             }
+
+            if (name_index != 0)
+                return false;
+
+            if (name_index >= 0 && fields_index >= 0)
+                return true;
+            return false;
         }
     }
 }

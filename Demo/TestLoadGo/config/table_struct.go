@@ -117,28 +117,3 @@ type TTestComposeKey struct {
 	Flags EItemFlag
 
 }
-
-type ILogger interface {
-	Error(msg string)
-}
-type CsvLoader func() error
-type IDataReader interface {
-	Read2Array(file_name string) ([][]string, error)	 
-}
-type CsvDataMgr struct {
-    logger ILogger
-    reader IDataReader
-    FileName2Func map[string]CsvLoader
-    FileName2ListData map[string]interface{}
-    FileName2MapData map[string]interface{}
-    
-
-	TItemDataMux  sync.RWMutex
-	TItemDataList []TItemData
-	TItemDataMap  map[int32]*TItemData
-
-	TTestComposeKeyMux  sync.RWMutex
-	TTestComposeKeyList []TTestComposeKey
-	TTestComposeKeyMap  map[uint32]map[int32]*TTestComposeKey
-
-}

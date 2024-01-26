@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
-using OfficeOpenXml.Table.PivotTable;
 
 /*************************************************************************************
  * Author  : cunyu.fan
@@ -93,52 +92,7 @@ import (
                     sw.WriteLine("");
                 }
                 sw.WriteLine("}");
-            }
-
-
-            sw.WriteLine(@"
-type ILogger interface {
-	Error(msg string)
-}
-type CsvLoader func() error
-type IDataReader interface {
-	Read2Array(file_name string) ([][]string, error)	 
-}
-type CsvDataMgr struct {
-    logger ILogger
-    reader IDataReader
-    FileName2Func map[string]CsvLoader
-    FileName2ListData map[string]interface{}
-    FileName2MapData map[string]interface{}
-    
-"
-);
-            foreach (var t in tables)
-            {
-                _formater["class_name"] = _config.GetClassName(t.SheetName);
-                _formater["sheet_name"] = t.SheetName;
-                sw.WriteLineExt(_formater, "\t{class_name}Mux  sync.RWMutex");
-                sw.WriteLineExt(_formater, "\t{class_name}List []{class_name}");
-                var pk = t.PK;
-                if (t.PK != null)
-                {
-                    _formater["pk_type"] = pk.ToGoStr();
-
-                    if (t.PK.AttrPK.IsCompose())
-                    {
-                        _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToGoStr();
-                        sw.WriteLineExt(_formater, "\t{class_name}Map  map[{pk_type}]map[{pk_sec_type}]*{class_name}");
-                    }
-                    else
-                    {
-                        sw.WriteLineExt(_formater, "\t{class_name}Map  map[{pk_type}]*{class_name}");
-                    }
-
-                }
-
-                sw.WriteLine();
-            }
-            sw.WriteLine("}");
+            }  
 
             sw.Close();
         }

@@ -51,7 +51,26 @@ namespace ExportExcel
         public ConAttrLookup AttrLookUp; //
         public ConAttrFilePath AttrFilePath; //路径检查
         public ConAttrRange AttrRange; //范围检查
+        public string AttrDefault;
         public EnumType AttrEnum;
+        public AliasItem AttrAlias;
+
+        public string GetAliasCsharpFieldName(int index)
+        {
+            if (AttrAlias == null)
+                return null;
+            return AttrAlias.GetField(index);
+        }
+
+        public string AliasCSharp
+        {
+            get
+            {
+                if (AttrAlias == null)
+                    return null;
+                return AttrAlias.CSharp;
+            }
+        }         
 
         public TableField Clone()
         {
@@ -70,6 +89,8 @@ namespace ExportExcel
                 AttrFilePath = AttrFilePath,
                 AttrRange = AttrRange,
                 AttrEnum = AttrEnum,
+                AttrDefault = AttrDefault,
+                AttrAlias = AttrAlias,
             };
         }
     }

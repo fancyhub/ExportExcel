@@ -18,7 +18,7 @@ namespace ExportExcel
             DataTable,
             EnumConfig,
             RefTable,
-            AliasTable,
+            TupleAliasTable,
             Invalid,
         }
 
@@ -76,7 +76,7 @@ namespace ExportExcel
                             _ref_loader.Load(data_base, sheet);
                             break;
 
-                        case ETableNameType.AliasTable:
+                        case ETableNameType.TupleAliasTable:
                             sheet.CalculateFormula();
                             _alias_loader.Load(data_base, sheet);
                             break;
@@ -128,7 +128,7 @@ namespace ExportExcel
                 else if (name == "@RefTable" || name.StartsWith("@RefTable_"))
                     return ETableNameType.RefTable;
                 else if (name == "@Alias" || name.StartsWith("@Alias_"))
-                    return ETableNameType.AliasTable;
+                    return ETableNameType.TupleAliasTable;
 
                 ErrSet.E($"非法表格名 {sheet.SheetName} ", sheet.Workbook.FilePath);
                 return ETableNameType.Invalid;

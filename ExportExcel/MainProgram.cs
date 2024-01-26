@@ -30,7 +30,7 @@ namespace ExportExcel
 
                 case ECmdArg.CreateConfig:
                     new Config().Save(GetConfigFilePath());
-                    return 0;                     
+                    return 0;
 
                 case ECmdArg.WatchMode:
                 case ECmdArg.NormalMode:
@@ -44,7 +44,7 @@ namespace ExportExcel
                     PipeLine pipeline = PipelineBuilder.CreatePipeLine(config);
 
                     if (arg != ECmdArg.WatchMode)
-                        return pipeline.Process(true);
+                        return pipeline.Process(false);
 
                     FileWatcher watcher = FileWatcher.Create(config);
                     Watch(watcher, pipeline);
@@ -90,7 +90,7 @@ namespace ExportExcel
                     return ECmdArg.WatchMode;
                 case "-createconfig":
                 case "createconfig":
-                    return ECmdArg.CreateConfig;                
+                    return ECmdArg.CreateConfig;
             }
         }
 

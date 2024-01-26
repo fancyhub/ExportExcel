@@ -96,7 +96,7 @@ namespace ExportExcel
                 if (header_item.DataType.IsTuple)
                 {
                     foreach (var p in array)
-                        ret.Add(_ParseTuple(p, header_item.DataType));
+                        ret.Add(_ParseTuple(p, header_item));
                 }
                 else
                 {
@@ -107,7 +107,7 @@ namespace ExportExcel
             }
             else if (header_item.DataType.IsTuple)
             {
-                return _ParseTuple(data, header_item.DataType);
+                return _ParseTuple(data, header_item);
             }
             else
             {
@@ -115,13 +115,16 @@ namespace ExportExcel
             }
         }
 
-        private static JObject _ParseTuple(string data, DataType data_type)
+        private static JObject _ParseTuple(string data, TableField field)
         {
             string[] array = data.Split('|');
             JObject ret = new JObject();
             for (int i = 0; i < array.Length; i++)
             {
-                ret["Item" + (i + 1)] = _ParseBaseData(array[i], data_type.Get(i));
+                string name = field.GetAliasCsharpFieldName(i);
+                if (name == null)
+                    name = "Item" + (i + 1);
+                ret[name] = _ParseBaseData(array[i], field.DataType.Get(i));
             }
             return ret;
         }
