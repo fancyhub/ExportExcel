@@ -59,7 +59,7 @@ namespace ExportExcel
 
 
                 node_list.Add(new Exporter_LangTrans(config.exportCommon.localizationTranslate));
-                node_list.Add(new Exporter_Rule(config.exportCommon.ruleExcel));
+                node_list.Add(new Exporter_Rule(config.exportCommon.ruleExcel,config.tableDataRule));
                 node_list.Add(new Exporter_Schema(config.exportCommon.schema));
             }
             return ret;

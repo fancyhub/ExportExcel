@@ -17,6 +17,12 @@
         "autoGenKey": false,
         "useHashId": true,
     },
+	"tableDataRule":{
+		"nameRowIndex":0,
+		"typeRowIndex":1,
+		"descRowIndex":2,
+		"dataStartRowIndex":3,
+	},
     "exportCommon": {
         "localizationTranslate": {
             "enable": true,

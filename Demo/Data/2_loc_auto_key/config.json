@@ -17,6 +17,12 @@
         "useHashId": true,
         "autoGenKey": true
     },
+	"tableDataRule":{
+		"nameRowIndex":0,
+		"typeRowIndex":1,
+		"descRowIndex":2,
+		"dataStartRowIndex":3,
+	},
     "exportCommon": {
         "localizationTranslate": {
             "enable": true,
@@ -53,16 +59,16 @@
         "csharp": {
             "enable": true,
             "namespaceName": "Test",
-            "parentClass": "",
+            "parentClass": "TableBase",
             "classPrefix": "T",
             "classSuffix": "",
             "dir": "Output/Client/CS",
             "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
             "loader": {
-                "enable": true
+                "enable": false
             },
             "getter": {
-                "enable": true,
+                "enable": false,
                 "className": "TableMgr",
                 "useStatic": false
             },

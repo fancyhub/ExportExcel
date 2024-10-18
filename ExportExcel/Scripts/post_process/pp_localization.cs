@@ -370,9 +370,9 @@ namespace ExportExcel
                 return key;
 
             if (_pk_sec_idx >= 0)
-                key = $"{cell.SheetName}_{cell.ColName}_{cell.GetCellValue(_pk_idx)}_{cell.GetCellValue(_pk_sec_idx)}";
+                key = $"TABLE_{cell.SheetName}_{cell.ColName}_{cell.GetCellValue(_pk_idx)}_{cell.GetCellValue(_pk_sec_idx)}";
             else
-                key = $"{cell.SheetName}_{cell.ColName}_{cell.GetCellValue(_pk_idx)}";
+                key = $"TABLE_{cell.SheetName}_{cell.ColName}_{cell.GetCellValue(_pk_idx)}";
             key = key.ToUpper();
 
             if (_can_merge)

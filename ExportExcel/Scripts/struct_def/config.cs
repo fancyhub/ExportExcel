@@ -20,11 +20,11 @@ namespace ExportExcel
     {
         public List<string> excelPaths = new List<string>();
         public ValidationConfig validation = new ValidationConfig();
+        public TableDataLoaderConfig tableDataRule =new TableDataLoaderConfig();
         public LocalizationConfig localization = new LocalizationConfig();
         public ExportCommonConfig exportCommon = new ExportCommonConfig();
         public ExportConfig exportClient = new ExportConfig();
         public ExportConfig exportServer = new ExportConfig();
-
 
 
         public static Config Load(string file_path)
@@ -68,6 +68,14 @@ namespace ExportExcel
             None,
             Normal,
             AutoGenKey,
+        }
+
+        public class TableDataLoaderConfig
+        {
+            public int nameRowIndex = 0;
+            public int typeRowIndex = 1;
+            public int descRowIndex = 2;
+            public int dataStartRowIndex = 3;
         }
 
         public class LocalizationConfig

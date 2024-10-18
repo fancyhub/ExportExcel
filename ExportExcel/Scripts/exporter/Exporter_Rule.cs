@@ -12,9 +12,11 @@ namespace ExportExcel
     public class Exporter_Rule : IProcessNode
     {
         public Config.RuleConfig _config;
-        public Exporter_Rule(Config.RuleConfig config)
+        public Config.TableDataLoaderConfig _tableConfig;
+        public Exporter_Rule(Config.RuleConfig config, Config.TableDataLoaderConfig tableConfig)
         {
             _config = config;
+            _tableConfig = tableConfig;
         }
 
         public string GetName()
@@ -86,16 +88,16 @@ namespace ExportExcel
                 foreach (TableField col in table.Header.List)
                 {
                     //3.1 写名字
-                    _SetValue(work_sheet, 0, col_index, col.Name);
+                    _SetValue(work_sheet, _tableConfig.nameRowIndex, col_index, col.Name);
 
                     //3.2 写类型 & 约束
                     List<string> constraint_list = _build_constraint(col);
                     constraint_list.Insert(0, col.DataType.ToRuleStr());
-                    var cell = _SetValue(work_sheet, 1, col_index, string.Join("\n", constraint_list));
+                    var cell = _SetValue(work_sheet, _tableConfig.typeRowIndex, col_index, string.Join("\n", constraint_list));
                     cell.CellStyle = cell_style;
 
                     //3.3 写注释
-                    _SetValue(work_sheet, 2, col_index, col.Desc);
+                    _SetValue(work_sheet, _tableConfig.descRowIndex, col_index, col.Desc);
 
                     col_index++;
                 }

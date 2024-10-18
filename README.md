@@ -91,7 +91,8 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
 |x_y_z (tuple类型)|list_x_y_z|
 
 # 约束
- 多个约束之间 用 换行 或者 | 分割
+ 多个约束之间 用 换行 或者 | 分割  
+ 
  |约束名|描述|
  |----|----|
  |PK <br> PK[sec_key_name] | 主Key,<br>不允许重复, 不允许空,<br>只能支持 int,int64,string 这三种类型,不支持Enum约束,<br>如果有sec_key 为组合key, 目前只支持 int,int的组合|

@@ -52,7 +52,7 @@ namespace ExportExcel
             List<List<string>> out_data)
         {
             out_data.Clear();
-            int start_row = 3;
+            int start_row = _config.tableDataRule.dataStartRowIndex;
             int end_row = sheet.RowCount;
 
             if (out_data.Capacity < end_row)
@@ -90,9 +90,9 @@ namespace ExportExcel
             rule_table.TableExportFlag = export_flag;
 
             //4. 获取各行,以及多少列
-            IRow row_name = sheet.GetRow(0);   //名字那一行
-            IRow row_type = sheet.GetRow(1);   //类型哪一行
-            IRow row_desc = sheet.GetRow(2);   //描述行
+            IRow row_name = sheet.GetRow(_config.tableDataRule.nameRowIndex);   //名字那一行
+            IRow row_type = sheet.GetRow(_config.tableDataRule.typeRowIndex);   //类型哪一行
+            IRow row_desc = sheet.GetRow(_config.tableDataRule.descRowIndex);   //描述行
             int col_count = row_name.ColCount;
 
             //5. 开始每列的操作
