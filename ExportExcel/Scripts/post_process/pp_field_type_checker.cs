@@ -180,7 +180,7 @@ namespace ExportExcel
                 //但是需要修改
                 return EFtcResult.valid_modify;
             }
-            if (int.TryParse(v, out _))
+            if (uint.TryParse(v, out _))
                 return EFtcResult.valid;
             return EFtcResult.invalid;
         }

@@ -64,43 +64,53 @@ namespace ExportExcel
                 {
                     ISheet sheet = wk.GetSheetAt(i);
                     ETableNameType sheet_name_type = _ParseSheetName(sheet, out string sheet_name, out EExportFlagMask flag);
-                    switch (sheet_name_type)
+
+                    try
                     {
+                        switch (sheet_name_type)
+                        {
+                            case ETableNameType.Ignore:
+                                break;
 
-                        case ETableNameType.Ignore:
-                            break;
+                            case ETableNameType.RefTable:
+                                if(data_base.Config.tableDataRule.calculateFormula)
+                                    sheet.CalculateFormula();
+                                _ref_loader.Load(data_base, sheet);
+                                break;
 
+                            case ETableNameType.TupleAliasTable:
+                                if (data_base.Config.tableDataRule.calculateFormula)
+                                    sheet.CalculateFormula();
+                                _alias_loader.Load(data_base, sheet);
+                                break;
 
-                        case ETableNameType.RefTable:
-                            sheet.CalculateFormula();
-                            _ref_loader.Load(data_base, sheet);
-                            break;
+                            case ETableNameType.EnumConfig:
+                                if (data_base.Config.tableDataRule.calculateFormula)
+                                    sheet.CalculateFormula();
+                                _enum_loader.Load(data_base, sheet);
+                                break;
 
-                        case ETableNameType.TupleAliasTable:
-                            sheet.CalculateFormula();
-                            _alias_loader.Load(data_base, sheet);
-                            break;
+                            case ETableNameType.DataTable:
+                                if (data_base.Config.tableDataRule.calculateFormula)
+                                    sheet.CalculateFormula();
+                                _data_loader.Load(data_base, sheet, sheet_name, flag);
+                                break;
 
-                        case ETableNameType.EnumConfig:
-                            sheet.CalculateFormula();
-                            _enum_loader.Load(data_base, sheet);
-                            break;
+                            case ETableNameType.Invalid:
+                                ErrSet.E($"表名不合法 {sheet.SheetName}", file_path);
+                                break;
 
-                        case ETableNameType.DataTable:
-                            sheet.CalculateFormula();
-                            _data_loader.Load(data_base, sheet, sheet_name, flag);
-                            break;
-
-                        case ETableNameType.Invalid:
-                            ErrSet.E($"表名不合法 {sheet.SheetName}", file_path);
-                            break;
-
-                        default:
-                            ErrSet.E($"未处理类型 {sheet_name_type}, {sheet.SheetName}", file_path);
-                            break;
+                            default:
+                                ErrSet.E($"未处理类型 {sheet_name_type}, {sheet.SheetName}", file_path);
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrSet.E($"表格出错 {sheet.SheetName}", file_path);
+                        ErrSet.E(ex.Message + "\n" + ex.StackTrace);
                     }
                 }
-
                 wk.Close();
             }
         }

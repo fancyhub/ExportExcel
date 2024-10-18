@@ -13,8 +13,11 @@ namespace ExportExcel
 {
     public class TableDataLoader
     {
+        private const int CEmptyRowCountToEnd = 10; //连续多少行, 就不再读取了
+        private const int CEmptyColCountToEnd = 10; //连续多少列为空, 就不再读取了
+
         //列名的检查
-        private static Regex S_COL_NAME_REGEX = new Regex("^[a-zA-Z][a-zA-Z0-9_]*$");        
+        private static Regex S_COL_NAME_REGEX = new Regex("^[a-zA-Z][a-zA-Z0-9_]*$");
 
         public TableHeaderCompareResult _header_compare_result = new TableHeaderCompareResult();
         public List<List<string>> _temp_data = new List<List<string>>(100000);
@@ -58,14 +61,28 @@ namespace ExportExcel
             if (out_data.Capacity < end_row)
                 out_data.Capacity = end_row;
 
+            int empty_row_count = 0;
             for (int i = start_row; i < end_row; i++)
             {
                 var row = sheet.GetRow(i);
                 if (row == null)
+                {
+                    empty_row_count++;
+                    if (empty_row_count > CEmptyRowCountToEnd)
+                        break;
                     continue;
+                }
                 string first_col_cell_str = row.CellStrExt(0);
                 if (string.IsNullOrEmpty(first_col_cell_str))
+                {
+
+                    empty_row_count++;
+                    if (empty_row_count > CEmptyRowCountToEnd)
+                        break;
                     continue;
+                }
+
+                empty_row_count = 0;
                 if (first_col_cell_str.StartsWith("#"))
                     continue;
 
@@ -93,18 +110,30 @@ namespace ExportExcel
             IRow row_name = sheet.GetRow(_config.tableDataRule.nameRowIndex);   //名字那一行
             IRow row_type = sheet.GetRow(_config.tableDataRule.typeRowIndex);   //类型哪一行
             IRow row_desc = sheet.GetRow(_config.tableDataRule.descRowIndex);   //描述行
+            IRow row_first = sheet.GetRow(0);//首行
             int col_count = row_name.ColCount;
 
+            int empty_col_count = 0;
             //5. 开始每列的操作
             for (int i = 0; i < col_count; i++)
             {
                 //5.1 检查,获取字段名,如果名字以#开始,说明不导出
+                string detected_value = row_first.CellStrExt(i);
                 string field_name = row_name.CellStrExt(i);
-                if (string.IsNullOrEmpty(field_name) || field_name.StartsWith("#"))
+                bool field_name_empty = string.IsNullOrEmpty(field_name);
+                bool detected_value_empty = string.IsNullOrEmpty(detected_value);
+                if (detected_value_empty && field_name_empty)
+                {
+                    empty_col_count++;
+                    if (empty_col_count > CEmptyColCountToEnd)
+                        break;
+                }
+                empty_col_count = 0;
+                if (field_name_empty || detected_value_empty || detected_value.StartsWith("#") || field_name.StartsWith("#"))
                     continue;
 
                 //5.2 检查名字是否合法, 多语言表的字段名不检查
-                if (!_config.localization.IsLocalizationSheet(sheet_name)  && !S_COL_NAME_REGEX.IsMatch(field_name))
+                if (!_config.localization.IsLocalizationSheet(sheet_name) && !S_COL_NAME_REGEX.IsMatch(field_name))
                 {
                     ErrSet.E($"{rule_table.SheetName}.{field_name} 该字段不符合命名规范", sheet.Workbook.FilePath);
                     continue;
@@ -132,7 +161,7 @@ namespace ExportExcel
                 }
                 catch (Exception e)
                 {
-                    ErrSet.E($"{rule_table.SheetName}.{field_name} 解析类型出错 " + e.Message,sheet.Workbook.FilePath);
+                    ErrSet.E($"{rule_table.SheetName}.{field_name} 解析类型出错 " + e.Message, sheet.Workbook.FilePath);
                     continue;
                 }
 

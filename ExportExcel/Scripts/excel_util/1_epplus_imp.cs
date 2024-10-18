@@ -21,8 +21,8 @@ namespace ExportExcel.ExcelEPPlus
         }
 
         public static WorkBookImp CreateNew()
-        {
-            OfficeOpenXml.ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+        {            
+            OfficeOpenXml.ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;            
             OfficeOpenXml.ExcelPackage book = new OfficeOpenXml.ExcelPackage();
             return new WorkBookImp(null, book);
         }
@@ -131,7 +131,10 @@ namespace ExportExcel.ExcelEPPlus
 
         public void CalculateFormula()
         {
-            OfficeOpenXml.CalculationExtension.Calculate(_sheet);
+            OfficeOpenXml.CalculationExtension.Calculate(_sheet, new OfficeOpenXml.FormulaParsing.ExcelCalculationOption()
+            {
+                AllowCircularReferences = false,
+            });
         }
 
         public int RowCount
