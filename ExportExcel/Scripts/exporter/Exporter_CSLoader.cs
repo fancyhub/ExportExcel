@@ -182,31 +182,53 @@ namespace ExportExcel
         #endregion
 ");
 
-            Dictionary<(string aliasName, string name), bool> list_types = new Dictionary<(string, string), bool>();
+            const int ListElementType_Normal = 0;
+            const int ListElementType_Tuple = 1;
+            const int ListElementType_StringAlias = 2;
+            Dictionary<(string aliasName, string name), int> list_types = new Dictionary<(string, string), int>();
             Dictionary<(string aliasName, string name), DataType> tuple_types = new Dictionary<(string, string), DataType>();
+            Dictionary<(string aliasName, string name), bool> string_alias_types = new Dictionary<(string, string), bool>();
+
             foreach (var table in table_list)
             {
                 List<TableField> header_list = table.FiltedHeader;
                 foreach (var field in header_list)
                 {
                     DataType data_type = field.DataType;
-                    string alias_name = field.AliasCSharp;                    
+                    string alias_name = field.AliasCSharp;
 
                     if (data_type.IsList)
                     {
                         data_type.IsList = false;
                         if (alias_name != null)
-                            list_types[(alias_name, data_type.ToCSharpStr())] = data_type.IsTuple;
+                        {
+                            if (data_type.IsTuple)
+                                list_types[(alias_name, data_type.ToCSharpStrForLoader())] = ListElementType_Tuple;
+                            else if (data_type.type0 == EDataType.String)
+                                list_types[(alias_name, data_type.ToCSharpStrForLoader())] = ListElementType_StringAlias;
+                            else
+                                list_types[(alias_name, data_type.ToCSharpStrForLoader())] = ListElementType_Normal;
+                        }
                         else
-                            list_types[(string.Empty, data_type.ToCSharpStr())] = data_type.IsTuple;
+                        {
+                            if (data_type.IsTuple)
+                                list_types[(string.Empty, data_type.ToCSharpStrForLoader())] = ListElementType_Tuple;
+                            else
+                                list_types[(string.Empty, data_type.ToCSharpStrForLoader())] = ListElementType_Normal;
+                        }
+
                     }
 
                     if (data_type.IsTuple)
                     {
                         if (alias_name != null)
-                            tuple_types[(alias_name, data_type.ToCSharpStr())] = data_type;
+                            tuple_types[(alias_name, data_type.ToCSharpStrForLoader())] = data_type;
                         else
-                            tuple_types[(string.Empty, data_type.ToCSharpStr())] = data_type;
+                            tuple_types[(string.Empty, data_type.ToCSharpStrForLoader())] = data_type;
+                    }
+                    else if (data_type.type0 == EDataType.String && alias_name != null)
+                    {
+                        string_alias_types[(alias_name, data_type.ToCSharpStrForLoader())] = true;
                     }
                 }
             }
@@ -253,6 +275,7 @@ namespace ExportExcel
                 }
             }
             sw.WriteLine("\t\t#endregion\n");
+
             sw.WriteLine("\t\t#region List Reader");
             foreach (var p in list_types)
             {
@@ -262,8 +285,8 @@ namespace ExportExcel
                 if (string.IsNullOrEmpty(p.Key.aliasName))
                 {
                     _formater["reader_item"] = "_Read(listReader, ref item);";
-                    if (p.Value)
-                        _formater["reader_item"] = "_ReadTuple(listReader.BeginTuple(), ref item);";
+                    if (p.Value == ListElementType_Tuple)
+                        _formater["reader_item"] = "_ReadTuple(listReader.BeginTuple(), ref item);";                    
 
                     sw.WriteLineExt(_formater, @"
         private static void _ReadList(ITableRowReader rowReader, ref {data_type}[]v)
@@ -286,6 +309,10 @@ namespace ExportExcel
                 }
                 else
                 {
+                    _formater["reader_item"] = "_ReadTuple(listReader.BeginTuple(), ref item, out v2);";
+                    if (p.Value == ListElementType_StringAlias)
+                        _formater["reader_item"] = "_ReadStringAlias(listReader.BeginTuple(), ref item);";
+
                     sw.WriteLineExt(_formater, @"
         private static void _ReadList(ITableRowReader rowReader, ref {alias_name}[] v, out {data_type} v2)
         {
@@ -300,7 +327,7 @@ namespace ExportExcel
                 for (int i = 0; i < count; i++)
                 {
                     {alias_name} item = default;
-                    _ReadTuple(listReader.BeginTuple(), ref item, out v2);
+                    {reader_item}
                     v[i] = item;
                 }
             }
@@ -309,6 +336,21 @@ namespace ExportExcel
 
             }
             sw.WriteLine("\t\t#endregion");
+
+            sw.WriteLine("\t\t#region String alias");
+            foreach (var p in string_alias_types)
+            {
+                _formater["alias_name"] = p.Key.aliasName;
+
+                sw.WriteLineExt(_formater, @"
+        private static void _ReadStringAlias(ITableDataReader reader, ref {alias_name} v)
+        {
+            string str= reader.ReadString();
+            TableAlias.Create(ref v, str);
+        }");
+            }
+            sw.WriteLine("\t\t#endregion");
+
         }
 
         public void _ExportLoaderFunc(FilterTable table, StreamWriter sw)
@@ -367,23 +409,27 @@ namespace ExportExcel
             for (int i = 0; i < header_list.Count; i++)
             {
                 TableField field = header_list[i];
-                string alias_name = field.AliasCSharp;                
+                string alias_name = field.AliasCSharp;
 
                 DataType data_type = field.DataType;
                 if (data_type.IsList)
                 {
                     data_type.IsList = false;
                     if (alias_name != null)
-                        sw.WriteLine($"\t\t\t\t_ReadList(rowReader, ref row.{field.Name},out {data_type.ToCSharpStr()} __{field.Name});");
+                        sw.WriteLine($"\t\t\t\t_ReadList(rowReader, ref row.{field.Name},out {data_type.ToCSharpStrForLoader()} __{field.Name});");
                     else
                         sw.WriteLine($"\t\t\t\t_ReadList(rowReader, ref row.{field.Name});");
                 }
                 else if (data_type.IsTuple)
                 {
                     if (alias_name != null)
-                        sw.WriteLine($"\t\t\t\t_ReadTuple(rowReader.BeginTuple(), ref row.{field.Name}, out {data_type.ToCSharpStr()} __{field.Name});");
+                        sw.WriteLine($"\t\t\t\t_ReadTuple(rowReader.BeginTuple(), ref row.{field.Name}, out {data_type.ToCSharpStrForLoader()} __{field.Name});");
                     else
                         sw.WriteLine($"\t\t\t\t_ReadTuple(rowReader.BeginTuple(), ref row.{field.Name});");
+                }
+                else if (data_type.type0 == EDataType.String && alias_name != null)
+                {
+                    sw.WriteLine($"\t\t\t\t_ReadStringAlias(rowReader, ref row.{field.Name});");
                 }
                 else
                 {

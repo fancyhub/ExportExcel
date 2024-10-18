@@ -15,13 +15,15 @@
         "sheetName": "Loc",
         "defaultLang": "zh-Hans",
         "useHashId": true,
-        "autoGenKey": true
+        "autoGenKey": true,
+        "checkKeyExist":true,
     },
 	"tableDataRule":{
 		"nameRowIndex":0,
 		"typeRowIndex":1,
 		"descRowIndex":2,
 		"dataStartRowIndex":3,
+        "calculateFormula":false,
 	},
     "exportCommon": {
         "localizationTranslate": {

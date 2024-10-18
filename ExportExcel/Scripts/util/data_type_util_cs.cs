@@ -31,9 +31,18 @@ namespace ExportExcel
 
         public static string ToCSharpStr(this TableField item)
         {
-            if (item.DataType.IsTuple && item.AttrAlias != null)
+            if (item.DataType.IsTuple)
             {
-                if (item.AttrAlias.CSharp != null)
+                if (item.AttrAlias != null && item.AttrAlias.CSharp != null)
+                {
+                    if (item.DataType.IsList)
+                        return item.AttrAlias.CSharp + "[]";
+                    return item.AttrAlias.CSharp;
+                }
+            }
+            else if(item.DataType.type0 == EDataType.String) 
+            {
+                if (item.AttrAlias != null && item.AttrAlias.CSharp != null)
                 {
                     if (item.DataType.IsList)
                         return item.AttrAlias.CSharp + "[]";
@@ -82,7 +91,7 @@ namespace ExportExcel
             return _sb.ToString();
         }
 
-        public static string ToCSharpStr(this DataType type)
+        public static string ToCSharpStrForLoader(this DataType type)
         {
             _sb.Clear();
             if (type.IsTuple)

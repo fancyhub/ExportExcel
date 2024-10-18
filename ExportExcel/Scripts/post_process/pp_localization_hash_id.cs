@@ -29,7 +29,7 @@ namespace ExportExcel
                 int hash_id = p.Key.ToLocId();
                 if (id_2_str.TryGetValue(hash_id, out string old_key))
                 {
-                    ErrSet.E($"Loc Id {old_key} 和{p.Key} 生成的HashId 冲突");
+                    ErrSet.E($"Loc Id \"{old_key}\" 和 \"{p.Key}\" 生成的 HashId 冲突");
                     has_error = true;
                     continue;
                 }
@@ -47,10 +47,35 @@ namespace ExportExcel
                     return;
 
                 col.Field.DataType.type0 = EDataType.LocId;
-                col.ForeachCell((cell) =>
+                if (col.Field.DataType.IsList)
                 {
-                    cell.Value = cell.Value.ToLocId().ToString();
-                });
+                    col.ForeachCell((cell) =>
+                    {
+                        var tt = cell.Value.Split(ConstDef.C_LIST_SPLIT, StringSplitOptions.RemoveEmptyEntries);
+                        if (tt.Length == 0)
+                        {
+                            cell.Value = string.Empty;
+                        }
+                        else
+                        {
+                            List<int> temp = new List<int>(tt.Length);
+                            foreach (var t in tt)
+                            {
+                                temp.Add(t.ToLocId());
+                            }
+
+                            
+                            cell.Value = string.Join(ConstDef.C_LIST_SPLIT, temp.ToArray());
+                        }
+                    });
+                }
+                else
+                {
+                    col.ForeachCell((cell) =>
+                    {
+                        cell.Value = cell.Value.ToLocId().ToString();
+                    });
+                }
             });
 
 

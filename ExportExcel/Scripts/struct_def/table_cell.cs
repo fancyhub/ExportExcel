@@ -38,7 +38,7 @@ namespace ExportExcel
         public string GetCellValue(int col_index)
         {
             return Table.Body[RowIndex, col_index];
-        }
+        }     
 
         public string FindDataPath()
         {

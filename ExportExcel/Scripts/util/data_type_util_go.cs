@@ -36,15 +36,25 @@ namespace ExportExcel
 
         public static string ToGoStr(this TableField field)
         {
-            if (field.DataType.IsTuple && field.AttrAlias != null)
+            if (field.DataType.IsTuple)
             {
-                if (field.AttrAlias.Go != null)
+                if (field.AttrAlias != null && field.AttrAlias.Go != null)
                 {
                     if (field.DataType.IsList)
                         return field.AttrAlias.Go + "[]";
                     return field.AttrAlias.Go;
                 }
             }
+            else if (field.DataType.type0 == EDataType.String)
+            {
+                if (field.AttrAlias != null && field.AttrAlias.Go != null)
+                {
+                    if (field.DataType.IsList)
+                        return field.AttrAlias.Go + "[]";
+                    return field.AttrAlias.Go;
+                }
+            }
+
 
             _sb.Clear();
             var type = field.DataType;
@@ -84,7 +94,7 @@ namespace ExportExcel
                 _sb.Append("Tuple");
                 _sb.Append(_UpFirst(_data_type_2_go_str[data_type.type0]));
             }
-            else 
+            else
                 _sb.Append(_data_type_2_go_str[data_type.type0]);
 
             for (int i = 1; i < data_type.Count; i++)

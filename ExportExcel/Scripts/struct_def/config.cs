@@ -20,7 +20,7 @@ namespace ExportExcel
     {
         public List<string> excelPaths = new List<string>();
         public ValidationConfig validation = new ValidationConfig();
-        public TableDataLoaderConfig tableDataRule =new TableDataLoaderConfig();
+        public TableDataLoaderConfig tableDataRule = new TableDataLoaderConfig();
         public LocalizationConfig localization = new LocalizationConfig();
         public ExportCommonConfig exportCommon = new ExportCommonConfig();
         public ExportConfig exportClient = new ExportConfig();
@@ -89,6 +89,7 @@ namespace ExportExcel
             public string defaultLang = "";
             public bool useHashId = true;
             public bool autoGenKey = false;
+            public bool checkKeyExist = true;
 
             public bool IsLocalizationSheet(string sheetName)
             {
