@@ -91,6 +91,8 @@ namespace ExportExcel
                 for (int c = 0; c < header.Count; c++)
                 {
                     string cell_str = row.CellStrExt(header[c].ExcelColIdx);
+                    if (cell_str == _config.tableDataRule.emptyPlaceholder)
+                        cell_str = string.Empty;
                     row_data.Add(cell_str);
                 }
 

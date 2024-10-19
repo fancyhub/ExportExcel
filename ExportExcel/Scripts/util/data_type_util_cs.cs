@@ -56,7 +56,7 @@ namespace ExportExcel
             {
                 _sb.Append("(");
                 _sb.Append(_data_type_2_csharp_str[type.type0]);
-                string field_name = item.GetAliasCsharpFieldName(0);
+                string field_name = item.GetAliasFieldName(0);
                 if (field_name != null)
                 {
                     _sb.Append(' ');
@@ -68,7 +68,7 @@ namespace ExportExcel
                     _sb.Append(",");
                     _sb.Append(_data_type_2_csharp_str[type.Get(i)]);
 
-                    field_name = item.GetAliasCsharpFieldName(i);
+                    field_name = item.GetAliasFieldName(i);
                     if (field_name != null)
                     {
                         _sb.Append(' ');

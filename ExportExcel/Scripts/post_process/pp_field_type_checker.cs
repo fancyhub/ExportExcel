@@ -100,7 +100,7 @@ namespace ExportExcel
             }
 
             //2. 
-            _blank_forbid = col.AttrBlankForbid;
+            _blank_forbid = col.AttrBlankForbid != null;
         }
 
         public EFtcResult Valid(ref string v)

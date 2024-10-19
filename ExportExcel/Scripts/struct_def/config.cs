@@ -77,6 +77,7 @@ namespace ExportExcel
             public int descRowIndex = 2;
             public int dataStartRowIndex = 3;
             public bool calculateFormula = true;
+            public string emptyPlaceholder = "null";
         }
 
         public class LocalizationConfig

@@ -85,7 +85,7 @@ import (
                     sw.WriteLine("\t// " + c.Desc.Replace("\n", "\n\t// "));
                     if (c.AttrEnum != null)
                     {
-                        sw.WriteLine("\t{0} {1}", c.Name, c.AttrEnum.Name);
+                        sw.WriteLine("\t{0} {1}", c.Name, c.AttrEnum.Enum.Name);
                     }
                     else
                         sw.WriteLine("\t{0} {1}", c.Name, c.ToGoStr());

@@ -106,14 +106,14 @@ namespace ExportExcel
 
                 //2. 获取dir
                 _search_dir = _search_root;
-                if (!string.IsNullOrEmpty(attr._dir_prefix))
-                    _search_dir = Path.Combine(_search_root, attr._dir_prefix);
+                if (!string.IsNullOrEmpty(attr.DirPrefix))
+                    _search_dir = Path.Combine(_search_root, attr.DirPrefix);
                 _search_dir = _search_dir.Replace('\\', '/');
                 if (!_search_dir.EndsWith("/"))
                     _search_dir = _search_dir + "/";
 
                 //3. 获取后缀
-                _suffix = attr._file_suffix;
+                _suffix = attr.FileSuffix;
                 if (string.IsNullOrEmpty(_suffix))
                     _suffix = string.Empty;
                 else
@@ -183,7 +183,7 @@ namespace ExportExcel
             return true;
         }
 
-        
+
         private static ConAttrFilePath _ParseFilePath(TableField col)
         {
             foreach (var p in col.StrConstraints)
@@ -198,19 +198,9 @@ namespace ExportExcel
 
                 var tt = ret.Split(',');
                 if (tt.Length == 1)
-                {
-                    return new ConAttrFilePath()
-                    {
-                        _dir_prefix = tt[0].Trim(),
-                        _file_suffix = null,
-                    };
-                }
+                    return ConAttrFilePath.Create(tt[0], null);
                 else
-                    return new ConAttrFilePath()
-                    {
-                        _dir_prefix = tt[0].Trim(),
-                        _file_suffix = tt[1].Trim()
-                    };
+                    return ConAttrFilePath.Create(tt[0], tt[1]);
 
             }
             return null;

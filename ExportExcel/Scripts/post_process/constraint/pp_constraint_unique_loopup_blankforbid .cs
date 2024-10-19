@@ -58,7 +58,7 @@ namespace ExportExcel
                 data_base.ForeachCol((col) =>
                 {
                     ConAttrLookup attr = col.Field.AttrLookUp;
-                    if (attr == null || attr._sheet_name != data_col.SheetName || attr._col_name != data_col.ColName)
+                    if (attr == null || attr.SheetName != data_col.SheetName || attr.ColName != data_col.ColName)
                         return;
 
                     col.ForeachCell(_process_lookup, lookup_table);
@@ -66,11 +66,11 @@ namespace ExportExcel
             }
 
             //3. 组合pk
-            HashSet<ulong> temp = new HashSet<ulong>();
+            HashSet<string> temp = new HashSet<string>();
             data_base.ForeachCol(_check_compose_pk, temp);
         }
 
-        private static void _check_compose_pk(TableCol col, HashSet<ulong> dict)
+        private static void _check_compose_pk(TableCol col, HashSet<string> dict)
         {
             var attr = col.Field.AttrPK;
             if (attr == null || !attr.IsCompose())
@@ -82,23 +82,10 @@ namespace ExportExcel
             {
                 string str_v1 = cell.Value;
                 string str_v2 = cell.GetCellValue(sec_key_idx);
-                if (!int.TryParse(str_v1, out int v1) ||
-                    !int.TryParse(str_v2, out int v2))
-                {
-                    ErrSet.E(cell, $"组合key里面的值转换int 失败 {str_v1}, {str_v2} ");
-                    return;
-                }
 
-                if (v1 < 0 || v2 < 0)
-                {
-                    ErrSet.E(cell, $"组合key里面的值不允许小于0 {str_v1}, {str_v2} ");
+                if (dict.Add(string.Concat(str_v1, ConstDef.C_TUPLE_SPLIT, str_v2)))
                     return;
-                }
-
-                ulong k = ValUnion.Convert(v1, v2);
-                if (dict.Add(k))
-                    return;
-                ErrSet.E(cell, $"组合key {v1}, {v2} 存在重复");
+                ErrSet.E(cell, $"组合key {str_v1}, {str_v2} 存在重复");
             });
         }
 
@@ -109,7 +96,7 @@ namespace ExportExcel
         private static void _collect_all_target_cols(TableCol col, Dictionary<string, TableCol> dict, DataBase db)
         {
             //1. 如果col 是 unique的, 添加到dict里面
-            if (col.Field.AttrUnique)
+            if (col.Field.AttrUnique != null)
                 dict[col.SheetName] = col;
 
             //2. 如果自身有lookup 属性
@@ -125,7 +112,7 @@ namespace ExportExcel
             }
 
             //4. 检查目标列的属性,是否 包含BlankForbid
-            if (!tar_col.Field.AttrBlankForbid)
+            if (tar_col.Field.AttrBlankForbid == null)
             {
                 ErrSet.E(col, $"对应的约束，{attr}, 目标列 必须标记为 PK 或 Unique 或 BlankForbid, " + tar_col.Table.FilePath);
                 return;
@@ -168,7 +155,7 @@ namespace ExportExcel
             if (out_lookup_table.Add(cell_v))
                 return;
 
-            if (!cell.Col.AttrUnique)
+            if (cell.Col.AttrUnique == null)
                 return;
 
             ErrSet.E(cell, $"有重复数据 {cell_v}, 该字段不允重复 ");
@@ -181,14 +168,14 @@ namespace ExportExcel
         public void Process(TableCol db_col, DataBase db)
         {
             var col = db_col.Field;
-            if (col.AttrUnique)
+            if (col.AttrUnique != null)
                 return;
 
-            col.AttrUnique = _ParseUnique(col);
-            if (col.AttrUnique)
-                col.AttrBlankForbid = true;
+            col.AttrUnique = _ParseUnique(col) ? ConAttrUnique.Inst : null;
+            if (col.AttrUnique != null)
+                col.AttrBlankForbid = ConAttrBlankForbid.Inst;
 
-            if (col.AttrUnique && !IsDataTypeValid(db_col.Field.DataType))
+            if (col.AttrUnique != null && !IsDataTypeValid(db_col.Field.DataType))
                 ErrSet.E(db_col, $"该字段是 pk 或者 Unique 约束的情况下, 只能支持 int,uint,int64,uint64,string 这几种类型");
         }
 
@@ -209,7 +196,7 @@ namespace ExportExcel
 
             return true;
         }
-        
+
         private static bool _ParseUnique(TableField col)
         {
             foreach (var p in col.StrConstraints)
@@ -241,13 +228,13 @@ namespace ExportExcel
             col.AttrPK = attr_pk;
 
             //3. pk 默认不允许空
-            col.AttrBlankForbid = true;
+            col.AttrBlankForbid = ConAttrBlankForbid.Inst;
 
             //4. 如果是非组合key
             if (!attr_pk.IsCompose())
             {
                 //需要设置为unique
-                col.AttrUnique = true;
+                col.AttrUnique = ConAttrUnique.Inst;
 
                 // 检查数据类型
                 if (!ConParserUnique.IsDataTypeValid(col.DataType))
@@ -270,7 +257,7 @@ namespace ExportExcel
             }
             attr_pk._sec_key = sec_col;
             attr_pk._sec_key_idx = db_col.Table.Header.IndexOfCol(sec_key_name);
-            sec_col.AttrBlankForbid = true; //不允许为空
+            sec_col.AttrBlankForbid = ConAttrBlankForbid.Inst; //不允许为空
 
             if (!_is_data_type_combine(col) || !_is_data_type_combine(sec_col))
                 ErrSet.E(db_col, $"组合PK, 只能支持 int/uint");
@@ -329,7 +316,7 @@ namespace ExportExcel
                 return;
 
             if (!_is_data_type_valid(col))
-                ErrSet.E(db_col, $"LookUp 约束, 只能支持 int,int64,string 以及对应的list类型, 不支持枚举");
+                ErrSet.E(db_col, $"LookUp 约束, 只能支持 int,uint,int64,uint64,string 以及对应的list类型, 不支持枚举");
         }
 
         private bool _is_data_type_valid(TableField field)
@@ -341,7 +328,9 @@ namespace ExportExcel
                 return false;
 
             if (field.DataType.type0 != EDataType.Int32
+                && field.DataType.type0 != EDataType.UInt32
                 && field.DataType.type0 != EDataType.Int64
+                && field.DataType.type0 != EDataType.UInt64
                 && field.DataType.type0 != EDataType.String)
                 return false;
             return true;
@@ -365,11 +354,7 @@ namespace ExportExcel
                 {
                     throw new Exception($"约束 {p} 不符合规则");
                 }
-                return new ConAttrLookup()
-                {
-                    _sheet_name = tt[0].Trim(),
-                    _col_name = tt[1].Trim(),
-                };
+                return new ConAttrLookup(tt[0], tt[1]);
             }
             return null;
         }
@@ -381,7 +366,7 @@ namespace ExportExcel
         public void Process(TableCol db_col, DataBase db)
         {
             var col = db_col.Field;
-            if (col.AttrBlankForbid)
+            if (col.AttrBlankForbid != null)
                 return;
 
             foreach (var p in col.StrConstraints)
@@ -389,11 +374,11 @@ namespace ExportExcel
                 var temp = p.ToLower().Trim();
                 if (temp == "blankforbid")
                 {
-                    col.AttrBlankForbid = true;
+                    col.AttrBlankForbid = ConAttrBlankForbid.Inst;
                     return;
                 }
             }
-            col.AttrBlankForbid = false;
+            col.AttrBlankForbid = null;
         }
     }
 }

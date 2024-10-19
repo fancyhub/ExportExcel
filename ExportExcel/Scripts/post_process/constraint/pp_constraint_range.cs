@@ -54,6 +54,8 @@ namespace ExportExcel
                 Logger.PrintError("未知的类型 {0}", col.DataType.type0);
                 return null;
             }
+
+            _cur.Range = col.AttrRange;
             return _cur;
         }
 
@@ -66,7 +68,7 @@ namespace ExportExcel
             if (range.IsInRange(cell_v))
                 return;
 
-            ErrSet.E(cell, $"{cell_v} 不在范围 Range [{col.AttrRange._min},{col.AttrRange._max}]");
+            ErrSet.E(cell, $"{cell_v} 不在范围 Range {col.AttrRange}");
         }
 
         public interface IDataRange
@@ -91,10 +93,10 @@ namespace ExportExcel
                 set
                 {
                     _range = value;
-                    if (!int.TryParse(_range._min, out _min))
+                    if (!int.TryParse(_range.Min, out _min))
                         _min = int.MaxValue;
 
-                    if (!int.TryParse(_range._max, out _max))
+                    if (!int.TryParse(_range.Max, out _max))
                         _max = int.MinValue;
                 }
                 get => _range;
@@ -102,7 +104,7 @@ namespace ExportExcel
 
             public override string ToString()
             {
-                return $"[{_range._min},{_range._max}]";
+                return _range.ToString();
             }
 
             public bool IsInRange(string v)
@@ -143,10 +145,10 @@ namespace ExportExcel
                 set
                 {
                     _range = value;
-                    if (!uint.TryParse(_range._min, out _min))
+                    if (!uint.TryParse(_range.Min, out _min))
                         _min = uint.MaxValue;
 
-                    if (!uint.TryParse(_range._max, out _max))
+                    if (!uint.TryParse(_range.Max, out _max))
                         _max = uint.MinValue;
                 }
                 get => _range;
@@ -154,7 +156,7 @@ namespace ExportExcel
 
             public override string ToString()
             {
-                return $"[{_range._min},{_range._max}]";
+                return _range.ToString();
             }
 
             public bool IsInRange(string v)
@@ -194,10 +196,10 @@ namespace ExportExcel
                 set
                 {
                     _range = value;
-                    if (!long.TryParse(_range._min, out _min))
+                    if (!long.TryParse(_range.Min, out _min))
                         _min = int.MaxValue;
 
-                    if (!long.TryParse(_range._max, out _max))
+                    if (!long.TryParse(_range.Max, out _max))
                         _max = int.MinValue;
                 }
                 get => _range;
@@ -205,7 +207,7 @@ namespace ExportExcel
 
             public override string ToString()
             {
-                return $"[{_range._min},{_range._max}]";
+                return _range.ToString();
             }
 
             public bool IsInRange(string v)
@@ -245,10 +247,10 @@ namespace ExportExcel
                 set
                 {
                     _range = value;
-                    if (!ulong.TryParse(_range._min, out _min))
+                    if (!ulong.TryParse(_range.Min, out _min))
                         _min = ulong.MaxValue;
 
-                    if (!ulong.TryParse(_range._max, out _max))
+                    if (!ulong.TryParse(_range.Max, out _max))
                         _max = ulong.MinValue;
                 }
                 get => _range;
@@ -256,7 +258,7 @@ namespace ExportExcel
 
             public override string ToString()
             {
-                return $"[{_range._min},{_range._max}]";
+                return _range.ToString();
             }
 
             public bool IsInRange(string v)
@@ -296,10 +298,10 @@ namespace ExportExcel
                 set
                 {
                     _range = value;
-                    if (!float.TryParse(_range._min, out _min))
+                    if (!float.TryParse(_range.Min, out _min))
                         _min = int.MaxValue;
 
-                    if (!float.TryParse(_range._max, out _max))
+                    if (!float.TryParse(_range.Max, out _max))
                         _max = int.MinValue;
                 }
                 get => _range;
@@ -307,7 +309,7 @@ namespace ExportExcel
 
             public override string ToString()
             {
-                return $"[{_range._min},{_range._max}]";
+                return _range.ToString();
             }
 
             public bool IsInRange(string v)
@@ -347,10 +349,10 @@ namespace ExportExcel
                 set
                 {
                     _range = value;
-                    if (!double.TryParse(_range._min, out _min))
+                    if (!double.TryParse(_range.Min, out _min))
                         _min = int.MaxValue;
 
-                    if (!double.TryParse(_range._max, out _max))
+                    if (!double.TryParse(_range.Max, out _max))
                         _max = int.MinValue;
                 }
                 get => _range;
@@ -358,7 +360,7 @@ namespace ExportExcel
 
             public override string ToString()
             {
-                return $"[{_range._min},{_range._max}]";
+                return $"[{_range.Min},{_range.Max}]";
             }
 
             public bool IsInRange(string v)
@@ -395,7 +397,7 @@ namespace ExportExcel
                 return;
 
             if (!_is_data_type_valid(col))
-                ErrSet.E(db_col, $"Range[],只能支持 int,int64,float,double 以及对应的list类型, 不支持枚举");
+                ErrSet.E(db_col, $"Range[],只能支持 int,uint,int64,uint64,float,double 以及对应的list类型, 不支持枚举");
         }
 
         private static bool _is_data_type_valid(TableField field)
@@ -407,7 +409,9 @@ namespace ExportExcel
                 return false;
 
             if (field.DataType.type0 != EDataType.Int32
+                && field.DataType.type0 != EDataType.UInt32
                 && field.DataType.type0 != EDataType.Int64
+                && field.DataType.type0 != EDataType.UInt64
                 && field.DataType.type0 != EDataType.Float32
                 && field.DataType.type0 != EDataType.Float64)
                 return false;
@@ -428,11 +432,7 @@ namespace ExportExcel
                 var ret = temp.Substring(start_index, end_index - start_index);
 
                 var tt = ret.Split(',');
-                return new ConAttrRange()
-                {
-                    _min = tt[0].Trim(),
-                    _max = tt[1].Trim()
-                };
+                return new ConAttrRange(tt[0], tt[1]);
             }
             return null;
         }

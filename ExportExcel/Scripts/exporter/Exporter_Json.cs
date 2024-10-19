@@ -48,8 +48,6 @@ namespace ExportExcel
             }
         }
 
-
-
         public static JToken ConvertToJsonObj(FilterTable table, bool with_header)
         {
             JToken ret = _CreateTableData(table);
@@ -121,7 +119,7 @@ namespace ExportExcel
             JObject ret = new JObject();
             for (int i = 0; i < array.Length; i++)
             {
-                string name = field.GetAliasCsharpFieldName(i);
+                string name = field.GetAliasFieldName(i);
                 if (name == null)
                     name = "Item" + (i + 1);
                 ret[name] = _ParseBaseData(array[i], field.DataType.Get(i));
@@ -174,7 +172,5 @@ namespace ExportExcel
             }
             return ret;
         }
-
-
     }
 }

@@ -50,7 +50,7 @@ namespace ExportExcel
             string alias_name = _parse_alias(col);
             if (string.IsNullOrEmpty(alias_name))
                 return;
-            col.AttrAlias = db.AliasDB.Find(alias_name);
+            col.AttrAlias = ConAttrAlias.Create(db.AliasDB.Find(alias_name));
             if (col.AttrAlias == null)
             {
                 ErrSet.E(db_col, $"找不到Alias \"{alias_name}\"");

@@ -30,7 +30,7 @@ namespace ExportExcel
                         cell.Value = col.Field.AttrDefault;
                 });
             });
-        }         
+        }
     }
 
     // 格式 : Default[default_value] 
@@ -42,7 +42,7 @@ namespace ExportExcel
             string default_value = _parse_default(col);
             if (string.IsNullOrEmpty(default_value))
                 return;
-            col.AttrDefault = default_value;
+            col.AttrDefault = new ConAttrDefault(default_value.Trim());
         }
 
 

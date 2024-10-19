@@ -114,8 +114,8 @@ namespace ExportExcel
                 ret.Enum = item.AttrEnum.Name;
             }
 
-            ret.Unique = item.AttrUnique;
-            ret.BlankForbid = item.AttrBlankForbid;
+            ret.Unique = item.AttrUnique != null;
+            ret.BlankForbid = item.AttrBlankForbid != null;
             ret.Default = item.AttrDefault;
             if (item.AttrAlias != null)
                 ret.TupleAlias = item.AttrAlias.Name;
@@ -143,7 +143,7 @@ namespace ExportExcel
             public bool ExportServer;
             public bool IsMultiLang;
             public List<SchemaColumn> Columns = new List<SchemaColumn>();
-        }         
+        }
 
         public class SchemaEnum
         {

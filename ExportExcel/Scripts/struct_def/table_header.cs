@@ -46,16 +46,16 @@ namespace ExportExcel
         public DataType DataType;
 
         public ConAttrPK AttrPK; //主key
-        public bool AttrUnique = false; //是否唯一, 如果是主key, Unique也是为true
-        public bool AttrBlankForbid = false;  //是否阻止空,如果是Unique,该字段也是为true
+        public ConAttrUnique AttrUnique; //是否唯一, 如果是主key, Unique也是为true
+        public ConAttrBlankForbid AttrBlankForbid;  //是否阻止空,如果是Unique,该字段也是为true
         public ConAttrLookup AttrLookUp; //
         public ConAttrFilePath AttrFilePath; //路径检查
         public ConAttrRange AttrRange; //范围检查
-        public string AttrDefault;
-        public EnumType AttrEnum;
-        public AliasItem AttrAlias;
+        public ConAttrDefault AttrDefault;
+        public ConAttrEnum AttrEnum;
+        public ConAttrAlias AttrAlias;
 
-        public string GetAliasCsharpFieldName(int index)
+        public string GetAliasFieldName(int index)
         {
             if (AttrAlias == null)
                 return null;
@@ -70,7 +70,7 @@ namespace ExportExcel
                     return null;
                 return AttrAlias.CSharp;
             }
-        }         
+        }
 
         public TableField Clone()
         {
@@ -118,7 +118,7 @@ namespace ExportExcel
             foreach (var p in dict_rule)
             {
                 //如果该列不允许为空, 并且在数据表里面没有找到
-                if (p.Value.AttrBlankForbid && !dict_data.ContainsKey(p.Key))
+                if (p.Value.AttrBlankForbid != null && !dict_data.ContainsKey(p.Key))
                 {
                     out_rslt.AddMissing(p.Key);
                 }

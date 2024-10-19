@@ -22,7 +22,9 @@ namespace ExportExcel
             Invalid,
         }
 
-        private static char[] S_SHEET_NAME_SPLIT = new char[] { '|' };
+        private const char CSheetNameConstraintSplit = '|'; //export_client, export_server 的分隔符
+        private const char CSheetNamePartialSplit = '_';   // 表格分表专用的分隔符
+
         //表名的检查
         private static Regex S_SHEET_NAME_REGEX = new Regex("^[A-Z][a-zA-Z0-9]*$");
 
@@ -63,7 +65,7 @@ namespace ExportExcel
                 for (int i = 0; i < sheet_count; i++)
                 {
                     ISheet sheet = wk.GetSheetAt(i);
-                    ETableNameType sheet_name_type = _ParseSheetName(sheet, out string sheet_name, out EExportFlagMask flag);
+                    ETableNameType sheet_name_type = _ParseSheetName(sheet, out string table_name, out EExportFlagMask flag);
 
                     try
                     {
@@ -73,7 +75,7 @@ namespace ExportExcel
                                 break;
 
                             case ETableNameType.RefTable:
-                                if(data_base.Config.tableDataRule.calculateFormula)
+                                if (data_base.Config.tableDataRule.calculateFormula)
                                     sheet.CalculateFormula();
                                 _ref_loader.Load(data_base, sheet);
                                 break;
@@ -93,7 +95,7 @@ namespace ExportExcel
                             case ETableNameType.DataTable:
                                 if (data_base.Config.tableDataRule.calculateFormula)
                                     sheet.CalculateFormula();
-                                _data_loader.Load(data_base, sheet, sheet_name, flag);
+                                _data_loader.Load(data_base, sheet, table_name, flag);
                                 break;
 
                             case ETableNameType.Invalid:
@@ -116,9 +118,9 @@ namespace ExportExcel
         }
 
 
-        private static ETableNameType _ParseSheetName(ISheet sheet, out string sheet_name, out EExportFlagMask flag)
+        private static ETableNameType _ParseSheetName(ISheet sheet, out string table_name, out EExportFlagMask flag)
         {
-            sheet_name = null;
+            table_name = null;
             flag = EExportFlagMask.All;
 
             if (sheet == null || !sheet.IsVisible())
@@ -131,30 +133,33 @@ namespace ExportExcel
 
             if (name.StartsWith("#"))
                 return ETableNameType.Ignore;
-            else if (name.StartsWith("@"))
+
+
+            string[] table_names = name.Split(CSheetNamePartialSplit, StringSplitOptions.RemoveEmptyEntries);
+            table_name = table_names[0].Trim();
+
+            switch (table_name)
             {
-                if (name == "@EnumConfig" || name.StartsWith("@EnumConfig_"))
+                case "@EnumConfig":
                     return ETableNameType.EnumConfig;
-                else if (name == "@RefTable" || name.StartsWith("@RefTable_"))
+
+                case "@RefTable":
                     return ETableNameType.RefTable;
-                else if (name == "@Alias" || name.StartsWith("@Alias_"))
+
+                case "@Alias":
                     return ETableNameType.TupleAliasTable;
 
-                ErrSet.E($"非法表格名 {sheet.SheetName} ", sheet.Workbook.FilePath);
-                return ETableNameType.Invalid;
-            }
-            else
-            {
-                string[] str_arrays = name.Split(S_SHEET_NAME_SPLIT, StringSplitOptions.RemoveEmptyEntries);
-                sheet_name = str_arrays[0].Trim();
-                flag = _ParseTableExportFlag(str_arrays);
+                default:
+                    string[] str_arrays = table_name.Split(CSheetNameConstraintSplit, StringSplitOptions.RemoveEmptyEntries);
+                    table_name = str_arrays[0].Trim();
+                    flag = _ParseTableExportFlag(str_arrays);
 
-                if (!S_SHEET_NAME_REGEX.IsMatch(sheet_name))
-                {
-                    ErrSet.E($"{sheet.SheetName} 表名不符合命名规范", sheet.Workbook.FilePath);
-                    return ETableNameType.Invalid;
-                }
-                return ETableNameType.DataTable;
+                    if (!S_SHEET_NAME_REGEX.IsMatch(table_name))
+                    {
+                        ErrSet.E($"{sheet.SheetName} 表名不符合命名规范", sheet.Workbook.FilePath);
+                        return ETableNameType.Invalid;
+                    }
+                    return ETableNameType.DataTable;
             }
         }
 

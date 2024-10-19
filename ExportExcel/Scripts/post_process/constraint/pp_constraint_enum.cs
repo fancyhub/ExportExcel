@@ -74,7 +74,7 @@ namespace ExportExcel
             if (string.IsNullOrEmpty(ref_enum_name))
                 return;
 
-            col.AttrEnum = db.EnumDB.Find(ref_enum_name);
+            col.AttrEnum = ConAttrEnum.Create(db.EnumDB.Find(ref_enum_name));
             if (col.AttrEnum == null)
             {
                 ErrSet.E(db_col, $"找不到对应的枚举类型 {ref_enum_name}");
@@ -88,7 +88,7 @@ namespace ExportExcel
             }
         }
 
-        
+
         private static string _parse_enum(TableField col)
         {
             foreach (var str in col.StrConstraints)
@@ -122,8 +122,5 @@ namespace ExportExcel
 
             return true;
         }
-
     }
-
-
 }

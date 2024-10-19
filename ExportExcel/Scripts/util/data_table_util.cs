@@ -12,20 +12,20 @@ namespace ExportExcel
             if (self == null || attr == null)
                 return false;
 
-            if (string.IsNullOrEmpty(attr._sheet_name) || string.IsNullOrEmpty(attr._col_name))
+            if (string.IsNullOrEmpty(attr.SheetName) || string.IsNullOrEmpty(attr.ColName))
             {
                 out_data = default;
                 return false;
             }
 
-            self.Tables.TryGetValue(attr._sheet_name, out Table table);
+            self.Tables.TryGetValue(attr.SheetName, out Table table);
             if (table == null)
             {
                 out_data = default;
                 return false;
             }
 
-            int col_idx = table.Header.IndexOfCol(attr._col_name);
+            int col_idx = table.Header.IndexOfCol(attr.ColName);
             if (col_idx < 0)
             {
                 out_data = default;
