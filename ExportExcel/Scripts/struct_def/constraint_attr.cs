@@ -71,7 +71,6 @@ namespace ExportExcel
         }
     }
 
-
     public sealed class ConAttrEnum : ConstraintAttr
     {
         public readonly EnumType Enum;
@@ -111,7 +110,6 @@ namespace ExportExcel
             return v.Enum.Name;
         }
     }
-
 
     public sealed class ConAttrDefault : ConstraintAttr
     {
@@ -166,6 +164,14 @@ namespace ExportExcel
                 fileSuffix = fileSuffix.Trim();
             return new ConAttrFilePath(dirPrefix, fileSuffix);
         }
+
+        public override string ToString()
+        {
+            if (string.IsNullOrEmpty(FileSuffix))
+                return $"FilePath[{DirPrefix}]";
+            else
+                return $"FilePath[{DirPrefix},{FileSuffix}]";
+        }
     }
 
     public sealed class ConAttrRange : ConstraintAttr
@@ -187,13 +193,17 @@ namespace ExportExcel
 
     public sealed class ConAttrPK : ConstraintAttr
     {
-        public string _sec_key_col_name;
-        public TableField _sec_key;
-        public int _sec_key_idx;
-
-        public ConAttrPK()
+        public readonly TableField Field;
+        public readonly TableField[] SubKeys = System.Array.Empty<TableField>();
+        public ConAttrPK(TableField field)
         {
+            Field = field;
+        }
 
+        public ConAttrPK(TableField field, TableField[] sub_keys)
+        {
+            Field = field;
+            SubKeys = sub_keys;
         }
 
         /// <summary>
@@ -201,15 +211,18 @@ namespace ExportExcel
         /// </summary>
         public bool IsCompose()
         {
-            return !string.IsNullOrEmpty(_sec_key_col_name);
+            return SubKeys.Length > 0;
         }
 
         public override string ToString()
         {
-            if (string.IsNullOrEmpty(_sec_key_col_name))
+            if (SubKeys.Length == 0)
                 return "PK";
-            else
-                return "PK[" + _sec_key_col_name + "]";
+
+            List<string> temp = new List<string>();
+            foreach (var p in SubKeys)
+                temp.Add(p.Name);
+            return $"PK[{string.Join(',', temp)}]";
         }
     }
 }

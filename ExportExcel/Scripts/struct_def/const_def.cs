@@ -5,7 +5,7 @@ namespace ExportExcel
 {
     public static class ConstDef
     {
-        public const char C_TUPLE_SPLIT = '|';
-        public const char C_LIST_SPLIT = ';';
+        public static char SeparatorTuple = '|';
+        public static char SeparatorList = ';';
     }
 }

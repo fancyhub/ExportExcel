@@ -77,15 +77,21 @@ namespace ExportExcel
                 return;
             dict.Clear();
 
-            int sec_key_idx = attr._sec_key_idx;
+            List<string> list = new List<string>();
             col.ForeachCell((cell) =>
             {
-                string str_v1 = cell.Value;
-                string str_v2 = cell.GetCellValue(sec_key_idx);
+                list.Clear();
+                list.Add(cell.Value);
+                foreach (var p in attr.SubKeys)
+                {
+                    list.Add(cell.GetCellValue(p.FieldIndex));
+                }
 
-                if (dict.Add(string.Concat(str_v1, ConstDef.C_TUPLE_SPLIT, str_v2)))
+                string compose_key = string.Join(ConstDef.SeparatorTuple, list);
+
+                if (dict.Add(compose_key))
                     return;
-                ErrSet.E(cell, $"组合key {str_v1}, {str_v2} 存在重复");
+                ErrSet.E(cell, $"组合key {string.Join(" , ", list)} 存在重复");
             });
         }
 
@@ -135,7 +141,7 @@ namespace ExportExcel
                 return;
             }
 
-            foreach (var sub_v in cell_v.Split(ConstDef.C_LIST_SPLIT))
+            foreach (var sub_v in cell_v.Split(ConstDef.SeparatorList))
             {
                 if (lookup_table.Contains(sub_v))
                     continue;
@@ -218,7 +224,7 @@ namespace ExportExcel
         {
             //1. 解析 PK
             TableField col = db_col.Field;
-            ConAttrPK attr_pk = _parse_pk(col);
+            ConAttrPK attr_pk = _parse_pk(db_col);
             if (attr_pk == null)
                 return;
 
@@ -243,57 +249,70 @@ namespace ExportExcel
             }
 
             //5. 检查第二个key
-            string sec_key_name = attr_pk._sec_key_col_name;
-            if (sec_key_name == col.Name)
+            foreach (var p in attr_pk.SubKeys)
             {
-                ErrSet.E(db_col, $"{attr_pk} 第二个key 不能是自己");
-                return;
+                if (p == col)
+                {
+                    ErrSet.E(db_col, $"{attr_pk} 第二个key 不能是自己");
+                }
+                p.AttrBlankForbid = ConAttrBlankForbid.Inst; //不允许为空
             }
-            TableField sec_col = db_col.Table.Header[sec_key_name];
-            if (sec_col == null)
-            {
-                ErrSet.E(db_col, $"{attr_pk} 第二个key 找不到");
-                return;
-            }
-            attr_pk._sec_key = sec_col;
-            attr_pk._sec_key_idx = db_col.Table.Header.IndexOfCol(sec_key_name);
-            sec_col.AttrBlankForbid = ConAttrBlankForbid.Inst; //不允许为空
 
-            if (!_is_data_type_combine(col) || !_is_data_type_combine(sec_col))
-                ErrSet.E(db_col, $"组合PK, 只能支持 int/uint");
+            if (!_check_pk_data_type(col))
+                ErrSet.E(db_col, $"组合PK, 只能支持 int,uint,int64,uint64,string, 不支持alias, tuple, list  ");
         }
 
-        private static bool _is_data_type_combine(TableField header_item)
+        private static bool _check_pk_data_type(TableField header_item)
         {
             if (header_item.DataType.IsTuple || header_item.DataType.IsList)
                 return false;
-            if (header_item.AttrEnum != null)
-                return false;
 
-            if (header_item.DataType.type0 == EDataType.Int32 || header_item.DataType.type0 == EDataType.UInt32)
+            var t = header_item.DataType.type0;
+            if (t == EDataType.Int32 || t == EDataType.UInt32 || t == EDataType.Int64 || t == EDataType.UInt64 || t == EDataType.String)
                 return true;
             return false;
         }
 
-        private static ConAttrPK _parse_pk(TableField col)
+        private static ConAttrPK _parse_pk(TableCol col)
         {
-            foreach (var p in col.StrConstraints)
+            string key = null;
+            foreach (var p in col.Field.StrConstraints)
             {
-                string f = p.ToLower().Trim();
+                string p2 = p.Trim();
+                string f = p2.ToLower();
                 if (f == "pk")
-                    return new ConAttrPK();
+                    return new ConAttrPK(col.Field);
 
                 if (!f.StartsWith("pk["))
                     continue;
-                int start_index = "pk[".Length;
-                int end_index = p.Length - 1;
-                var ret = p.Substring(start_index, end_index - start_index);
-                return new ConAttrPK()
-                {
-                    _sec_key_col_name = ret
-                };
+                key = p2;
+                break;
             }
-            return null;
+
+            if (key == null)
+                return null;
+
+            int start_index = "pk[".Length;
+            int end_index = key.Length - 1;
+            var sub_keys = key.Substring(start_index, end_index - start_index).Split(',', StringSplitOptions.RemoveEmptyEntries);
+            List<TableField> sub_fields = new List<TableField>();
+            foreach (var p in sub_keys)
+            {
+                var field = col.Table.Header[p.Trim()];
+                if (field == null)
+                {
+                    ErrSet.E(col, $"组合PK, 找不到 {p} ");
+                }
+                else if (sub_fields.IndexOf(field) >= 0)
+                {
+                    ErrSet.E(col, $"组合PK, 重复 {p} ");
+                }
+                else
+                {
+                    sub_fields.Add(field);
+                }
+            }
+            return new ConAttrPK(col.Field, sub_fields.ToArray());
         }
     }
 

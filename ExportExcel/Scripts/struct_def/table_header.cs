@@ -39,7 +39,8 @@ namespace ExportExcel
     {
         public string Name;
         public string Desc;
-        public int ExcelColIdx;
+        public int ExcelColIdx; //读取&合并用的
+        public int FieldIndex; 
         public string[] StrConstraints;
 
         public EExportFlagMask ExportFlag = EExportFlagMask.All; //默认全部导出
@@ -79,6 +80,7 @@ namespace ExportExcel
                 Name = Name,
                 Desc = Desc,
                 ExcelColIdx = ExcelColIdx,
+                FieldIndex = FieldIndex,
                 StrConstraints = StrConstraints,
                 ExportFlag = ExportFlag,
                 DataType = DataType,
@@ -202,6 +204,12 @@ namespace ExportExcel
                 Dict.TryGetValue(name, out var ret);
                 return ret;
             }
+        }
+
+        public void FormatColIndex()
+        {
+            for (int i = 0; i < List.Count; i++)
+                List[i].FieldIndex = i;
         }
 
         public int Count { get { return List.Count; } }

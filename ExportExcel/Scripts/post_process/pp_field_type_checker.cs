@@ -283,7 +283,7 @@ namespace ExportExcel
                     return EFtcResult.invalid;
             }
 
-            var temp = v.Split(ConstDef.C_TUPLE_SPLIT);
+            var temp = v.Split(ConstDef.SeparatorTuple);
             if (temp.Length != _types.Count)
             {
                 return EFtcResult.invalid;
@@ -303,7 +303,7 @@ namespace ExportExcel
             {
                 if (p != EFtcResult.valid)
                 {
-                    v = string.Join(ConstDef.C_TUPLE_SPLIT, temp);
+                    v = string.Join(ConstDef.SeparatorTuple, temp);
                     return EFtcResult.valid_modify;
                 }
             }
@@ -322,10 +322,9 @@ namespace ExportExcel
         {
             if (string.IsNullOrEmpty(v))
                 return EFtcResult.valid;
-            var temp = v.Split(ConstDef.C_LIST_SPLIT);
+            var temp = v.Split(ConstDef.SeparatorList);
             _result.Clear();
 
-            EFtcResult ret = EFtcResult.valid;
             for (int i = 0; i < temp.Length; i++)
             {
                 var sub_result = _type.Valid(false, ref temp[i]);
@@ -338,7 +337,7 @@ namespace ExportExcel
             {
                 if (p != EFtcResult.valid)
                 {
-                    v = string.Join(ConstDef.C_LIST_SPLIT, temp);
+                    v = string.Join(ConstDef.SeparatorList, temp);
                     return EFtcResult.valid_modify;
                 }
             }

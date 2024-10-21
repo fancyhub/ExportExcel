@@ -77,7 +77,9 @@ namespace ExportExcel
             public int descRowIndex = 2;
             public int dataStartRowIndex = 3;
             public bool calculateFormula = true;
-            public string emptyPlaceholder = "null";
+            public string emptyPlaceholder = "";
+            public string separatorTuple = "|";
+            public string separatorList = ";";
         }
 
         public class LocalizationConfig
@@ -189,12 +191,12 @@ namespace ExportExcel
         {
             public bool enable;
             public string className = "TableMgr";
-            public bool useStatic = false;
         }
 
         public class CSharpLoaderConfig
         {
-            public bool enable;
+            public bool csv = false;
+            public bool json = false;
         }
 
         public class CSharpLocIdConfig
@@ -207,19 +209,19 @@ namespace ExportExcel
         {
             public bool enable;
             public string namespaceName = "";
-            public string parentClass = "";
-            public string classPrefix = "";
-            public string classSuffix = "";
+            public string itemParentClass = "";
+            public string itemClassPrefix = "";
+            public string itemClassSuffix = "";            
+            public string tableMgrName = "TableMgr";
             public string dir = "Output";
             public string header = @"using System;\nusing System.Collections;\nusing System.Collections.Generic;";
 
             public CSharpLoaderConfig loader = new CSharpLoaderConfig();
-            public CSharpGetterConfig getter = new CSharpGetterConfig();
             public CSharpLocIdConfig locId = new CSharpLocIdConfig();
 
             public string GetClassName(string sheet_name)
             {
-                return classPrefix + sheet_name + classSuffix;
+                return itemClassPrefix + sheet_name + itemClassSuffix;
             }
         }
 

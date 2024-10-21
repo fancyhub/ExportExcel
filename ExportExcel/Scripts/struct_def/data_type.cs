@@ -67,7 +67,6 @@ namespace ExportExcel
 
                 default:
                     throw new Exception("超出了最大上限");
-                    break;
             }
         }
 

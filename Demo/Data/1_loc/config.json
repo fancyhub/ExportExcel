@@ -24,6 +24,9 @@
 		"descRowIndex":2,
 		"dataStartRowIndex":3,
         "calculateFormula":false,
+		"emptyPlaceholder":"",
+		"separatorTuple": "|",
+		"separatorList": ";",
 	},
     "exportCommon": {
         "localizationTranslate": {
@@ -52,19 +55,17 @@
         "csharp": {
             "enable": true,
             "namespaceName": "Test",
-            "classPrefix": "T",
-            "classSuffix": "",
+            "itemParentClass": "",
+			"itemClassPrefix": "T",
+			"itemClassSuffix": "",
+			"tableMgrName": "TableMgr",
             "dir": "Output/Client/CS",
             "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
 
             "loader": {
-                "enable": true,
-            },
-            "getter": {
-                "enable": true,
-                "className": "TableMgr",
-                "useStatic": false,
-            },
+                "csv": true,
+				"json": true,
+            },        
             "locId": {
                 "enable": true,
                 "locIdStartWith": "",
@@ -90,19 +91,17 @@
         "csharp": {
             "enable": true,
             "namespaceName": "Test",
-            "classPrefix": "T",
-            "classSuffix": "",
+            "itemParentClass": "",
+			"itemClassPrefix": "T",
+			"itemClassSuffix": "",
+			"tableMgrName": "TableMgr",
             "dir": "Output/Server/CS",
             "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
 
             "loader": {
-                "enable": true,
-            },
-            "getter": {
-                "enable": true,
-                "className": "TableMgr",
-                "useStatic": false,
-            },
+                "csv": true,
+				"json": true,
+            },            
             "locId": {
                 "enable": true,
                 "locIdStartWith": "",

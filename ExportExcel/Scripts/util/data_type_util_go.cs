@@ -38,11 +38,21 @@ namespace ExportExcel
         {
             if (field.DataType.IsTuple)
             {
-                if (field.AttrAlias != null && field.AttrAlias.Go != null)
+                if (field.AttrAlias != null)
                 {
-                    if (field.DataType.IsList)
-                        return field.AttrAlias.Go + "[]";
-                    return field.AttrAlias.Go;
+                    if (field.AttrAlias.Go != null)
+                    {
+                        if (field.DataType.IsList)
+                            return "[]" + field.AttrAlias.Go;
+                        return field.AttrAlias.Go;
+                    }
+                    else
+                    {
+                        if (field.DataType.IsList)
+                            return "[]" + field.AttrAlias.Name;
+                        return field.AttrAlias.Name;
+                    }
+
                 }
             }
             else if (field.DataType.type0 == EDataType.String)
@@ -50,7 +60,7 @@ namespace ExportExcel
                 if (field.AttrAlias != null && field.AttrAlias.Go != null)
                 {
                     if (field.DataType.IsList)
-                        return field.AttrAlias.Go + "[]";
+                        return "[]" + field.AttrAlias.Go;
                     return field.AttrAlias.Go;
                 }
             }
@@ -80,6 +90,18 @@ namespace ExportExcel
             }
 
             return _sb.ToString();
+        }
+
+        public static string GoUpFirstCase(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return name;
+
+            if ('a' <= name[0] && name[0] <= 'z')
+            {
+                return name.Substring(0, 1).ToUpper() + name.Substring(1);
+            }
+            return name;
         }
 
         public static string ToGoStr(this DataType data_type)

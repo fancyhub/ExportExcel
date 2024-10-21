@@ -19,7 +19,7 @@ namespace ExportExcel
         }
 
         public static int Main(string[] args)
-        {            
+        {
             ECmdArg arg = ParseArgs(args);
             switch (arg)
             {
@@ -39,6 +39,15 @@ namespace ExportExcel
                     {
                         DisplayUsage();
                         return -2;
+                    }                    
+
+                    if(!string.IsNullOrEmpty(config.tableDataRule.separatorList.Trim()))
+                    {
+                        ConstDef.SeparatorList = config.tableDataRule.separatorList.Trim()[0];
+                    }
+                    if (!string.IsNullOrEmpty(config.tableDataRule.separatorTuple.Trim()))
+                    {
+                        ConstDef.SeparatorTuple = config.tableDataRule.separatorTuple.Trim()[0];
                     }
 
                     PipeLine pipeline = PipelineBuilder.CreatePipeLine(config);

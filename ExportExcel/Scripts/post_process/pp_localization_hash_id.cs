@@ -51,7 +51,7 @@ namespace ExportExcel
                 {
                     col.ForeachCell((cell) =>
                     {
-                        var tt = cell.Value.Split(ConstDef.C_LIST_SPLIT, StringSplitOptions.RemoveEmptyEntries);
+                        var tt = cell.Value.Split(ConstDef.SeparatorList, StringSplitOptions.RemoveEmptyEntries);
                         if (tt.Length == 0)
                         {
                             cell.Value = string.Empty;
@@ -65,7 +65,7 @@ namespace ExportExcel
                             }
 
                             
-                            cell.Value = string.Join(ConstDef.C_LIST_SPLIT, temp.ToArray());
+                            cell.Value = string.Join(ConstDef.SeparatorList, temp.ToArray());
                         }
                     });
                 }

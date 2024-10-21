@@ -115,8 +115,14 @@ namespace ExportExcel
                 }
                 wk.Close();
             }
-        }
 
+
+            foreach (var p in data_base.Tables)
+            {
+                p.Value.Header.FormatColIndex();
+            }
+
+        }
 
         private static ETableNameType _ParseSheetName(ISheet sheet, out string table_name, out EExportFlagMask flag)
         {

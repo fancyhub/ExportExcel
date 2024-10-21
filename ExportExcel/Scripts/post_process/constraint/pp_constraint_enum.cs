@@ -42,7 +42,7 @@ namespace ExportExcel
         {
             //1. 先把string 转换成list int
             temp_list.Clear();
-            var temp = v.Split(ConstDef.C_LIST_SPLIT);
+            var temp = v.Split(ConstDef.SeparatorList);
             EnumType enum_table = header_item.AttrEnum;
             foreach (var p in temp)
             {
@@ -54,7 +54,7 @@ namespace ExportExcel
 
             //2.如果是list 类型, 直接join
             if (header_item.DataType.IsList)
-                return string.Join(ConstDef.C_LIST_SPLIT, temp_list);
+                return string.Join(ConstDef.SeparatorList, temp_list);
 
             //3. 按位合并
             int enum_val = 0;

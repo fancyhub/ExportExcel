@@ -102,7 +102,7 @@ namespace ExportExcel
                                         if (v == string.Empty)
                                             return;
 
-                                        string[] tt = v.Split(ConstDef.C_LIST_SPLIT, StringSplitOptions.RemoveEmptyEntries);
+                                        string[] tt = v.Split(ConstDef.SeparatorList, StringSplitOptions.RemoveEmptyEntries);
                                         foreach (var t in tt)
                                         {
                                             bool contain = data_base.LangDefault.ContainsKey(t);
@@ -360,8 +360,10 @@ namespace ExportExcel
         public Dictionary<string, string> _val_2_key = new Dictionary<string, string>(10000);
         public TableCol _col;
         public bool _can_merge = false;
-        public int _pk_idx = -1;
-        public int _pk_sec_idx = -1;
+
+        public ConAttrPK _attr_pk;
+
+        private static List<string> _temp = new List<string>();
         private Config.LocalizationConfig _config;
         public PPLangKeyData(Config.LocalizationConfig loc_config)
         {
@@ -379,11 +381,7 @@ namespace ExportExcel
 
             _col = col;
             _can_merge = false;
-            _pk_idx = col.Table.Header.PkIdx;
-            var attr_pk = col.Table.Header.Pk.AttrPK;
-            _pk_sec_idx = -1;
-            if (attr_pk != null && attr_pk._sec_key != null)
-                _pk_sec_idx = attr_pk._sec_key_idx;
+            _attr_pk = col.Table.Header.Pk.AttrPK;
         }
 
         public string GenKey(TableCell cell)
@@ -398,19 +396,34 @@ namespace ExportExcel
 
             if (_config.useHashId) //如果要生成 hash id, 需要把这个弄长一些
             {
-                if (_pk_sec_idx >= 0)
-                    key = $"{cell.SheetName}_{cell.ColName}_{cell.Table.Header[_pk_idx].Name}_{cell.GetCellValue(_pk_idx)}_{cell.Table.Header[_pk_sec_idx].Name}_{cell.GetCellValue(_pk_sec_idx)}";
+                if (_attr_pk.IsCompose())
+                {
+                    _temp.Clear();
+                    foreach (var p in _attr_pk.SubKeys)
+                    {
+                        _temp.Add(p.Name);
+                        _temp.Add(cell.GetCellValue(p.FieldIndex));
+                    }
+                    key = $"{cell.SheetName}_{cell.ColName}_{_attr_pk.Field.Name}_{cell.GetCellValue(_attr_pk.Field.FieldIndex)}_{string.Join("_", _temp)}";
+                }
                 else
-                    key = $"{cell.SheetName}_{cell.ColName}_{cell.Table.Header[_pk_idx].Name}_{cell.GetCellValue(_pk_idx)}";
+                    key = $"{cell.SheetName}_{cell.ColName}_{_attr_pk.Field.Name}_{cell.GetCellValue(_attr_pk.Field.FieldIndex)}";
 
                 key = key + "_" + (uint)key.GetHashCode();
             }
             else
             {
-                if (_pk_sec_idx >= 0)
-                    key = $"{cell.SheetName}_{cell.ColName}_{cell.GetCellValue(_pk_idx)}_{cell.GetCellValue(_pk_sec_idx)}";
+                if (_attr_pk.IsCompose())
+                {
+                    _temp.Clear();
+                    foreach (var p in _attr_pk.SubKeys)
+                    {
+                        _temp.Add(cell.GetCellValue(p.FieldIndex));
+                    }
+                    key = $"{cell.SheetName}_{cell.ColName}_{cell.GetCellValue(_attr_pk.Field.FieldIndex)}_{string.Join("_", _temp)}";
+                }
                 else
-                    key = $"{cell.SheetName}_{cell.ColName}_{cell.GetCellValue(_pk_idx)}";
+                    key = $"{cell.SheetName}_{cell.ColName}_{cell.GetCellValue(_attr_pk.Field.FieldIndex)}";
             }
 
             key = key.ToUpper();

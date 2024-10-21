@@ -476,8 +476,8 @@ static Table* _Load{sheet_name}(Table* table, std::string lang, ITableReaderCrea
 				}
 				else
 				{
-                    _formater["pk_sec_name"] = pk.AttrPK._sec_key.Name;
-                    _formater["pk_sec_type"] = pk.AttrPK._sec_key.ToCppStr();
+                    //_formater["pk_sec_name"] = pk.AttrPK._sec_key.Name;
+                    //_formater["pk_sec_type"] = pk.AttrPK._sec_key.ToCppStr();
                     sw.WriteLineExt(_formater, @"
 		auto tableDict= dynamic_cast<TableDict<std::tuple<{pk_type},{pk_sec_type}>,{class_name}>*>(table);
 		tableDict->Dict.clear();

@@ -58,35 +58,34 @@ namespace ExportExcel
                 _AddExporter(node_list, EExportFlag.Server, config.exportServer);
 
 
-                node_list.Add(new Exporter_LangTrans(config.exportCommon.localizationTranslate));
-                node_list.Add(new Exporter_Rule(config.exportCommon.ruleExcel,config.tableDataRule));
-                node_list.Add(new Exporter_Schema(config.exportCommon.schema));
+                node_list.Add(new Exporter_ExcelLangTrans(config.exportCommon.localizationTranslate,config.tableDataRule));
+                node_list.Add(new Exporter_RuleExcel(config.exportCommon.ruleExcel,config.tableDataRule));
+                node_list.Add(new Exporter_RuleSchema(config.exportCommon.schema));
             }
             return ret;
         }
 
         private static void _AddExporter(ProcessNodeList node_list, EExportFlag flag, Config.ExportConfig config)
         {
-            node_list.Add(new Exporter_CSStruct(flag, config.csharp));
-            node_list.Add(new Exporter_CSLoader(flag, config.csharp));
-            node_list.Add(new Exporter_CSGetter(flag, config.csharp));
-            node_list.Add(new Exporter_CSIds(flag, config.csharp));
+            node_list.Add(new Exporter_CSStructItem(flag, config.csharp));
+            node_list.Add(new Exporter_CSStructTable(flag, config.csharp));
+            node_list.Add(new Exporter_CSLoaderFromCsv(flag, config.csharp));
+            node_list.Add(new Exporter_CSLoaderFromJson(flag, config.csharp));            
+            node_list.Add(new Exporter_CSLocDef(flag, config.csharp));
 
             node_list.Add(new Exporter_CppStruct(flag, config.cpp));
             node_list.Add(new Exporter_CppLoader(flag, config.cpp));
             node_list.Add(new Exporter_CppGetter(flag, config.cpp));
 
             node_list.Add(new Exporter_LuaIds(flag, config.lua));
-            node_list.Add(new Exporter_LuaGetter(flag, config.lua));
-            node_list.Add(new Exporter_LuaLoader(flag, config.lua));
             node_list.Add(new Exporter_LuaStructDef(flag, config.lua));
 
-            node_list.Add(new Exporter_CSV(flag, config.csv));
-            node_list.Add(new Exporter_BinData(flag, config.bin));
-            node_list.Add(new Exporter_Json(flag, config.json));
-            node_list.Add(new Exporter_Bson(flag, config.bson));
+            node_list.Add(new Exporter_DataCSV(flag, config.csv));
+            node_list.Add(new Exporter_DataBinCsv(flag, config.bin));
+            node_list.Add(new Exporter_DataJson(flag, config.json));
+            node_list.Add(new Exporter_DataBson(flag, config.bson));
 
-            node_list.Add(new Exporter_GoStruct(flag, config.go));
+            node_list.Add(new Exporter_GoStructItem(flag, config.go));
 
         }
     }

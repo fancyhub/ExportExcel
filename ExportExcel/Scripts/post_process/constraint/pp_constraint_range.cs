@@ -111,7 +111,7 @@ namespace ExportExcel
             {
                 if (string.IsNullOrEmpty(v))
                     return true;
-                var list = v.Split(ConstDef.C_LIST_SPLIT);
+                var list = v.Split(ConstDef.SeparatorList);
                 foreach (var t in list)
                 {
                     //如果是list类型, 中间不允许为 空?
@@ -163,7 +163,7 @@ namespace ExportExcel
             {
                 if (string.IsNullOrEmpty(v))
                     return true;
-                var list = v.Split(ConstDef.C_LIST_SPLIT);
+                var list = v.Split(ConstDef.SeparatorList);
                 foreach (var t in list)
                 {
                     //如果是list类型, 中间不允许为 空?
@@ -214,7 +214,7 @@ namespace ExportExcel
             {
                 if (string.IsNullOrEmpty(v))
                     return true;
-                var list = v.Split(ConstDef.C_LIST_SPLIT);
+                var list = v.Split(ConstDef.SeparatorList);
                 foreach (var t in list)
                 {
                     //如果是list类型, 中间不允许为 空?
@@ -265,7 +265,7 @@ namespace ExportExcel
             {
                 if (string.IsNullOrEmpty(v))
                     return true;
-                var list = v.Split(ConstDef.C_LIST_SPLIT);
+                var list = v.Split(ConstDef.SeparatorList);
                 foreach (var t in list)
                 {
                     //如果是list类型, 中间不允许为 空?
@@ -316,7 +316,7 @@ namespace ExportExcel
             {
                 if (string.IsNullOrEmpty(v))
                     return true;
-                var list = v.Split(ConstDef.C_LIST_SPLIT);
+                var list = v.Split(ConstDef.SeparatorList);
                 foreach (var t in list)
                 {
                     //如果是list类型, 中间不允许为 空?
@@ -367,7 +367,7 @@ namespace ExportExcel
             {
                 if (string.IsNullOrEmpty(v))
                     return true;
-                var list = v.Split(ConstDef.C_LIST_SPLIT);
+                var list = v.Split(ConstDef.SeparatorList);
                 foreach (var t in list)
                 {
                     //如果是list类型, 中间不允许为 空?
