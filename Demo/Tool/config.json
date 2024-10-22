@@ -91,9 +91,9 @@
     "cpp": {
       "enable": false,
       "namespaceName": "",
-      "parentClass": "",
-      "classPrefix": "",
-      "classSuffix": "",
+      "itemParentClass": "",
+      "itemClassPrefix": "",
+      "itemClassSuffix": "",
       "dir": "Output",
       "header": "",
       "loader": {
@@ -156,9 +156,9 @@
     "cpp": {
       "enable": false,
       "namespaceName": "",
-      "parentClass": "",
-      "classPrefix": "",
-      "classSuffix": "",
+      "itemParentClass": "",
+      "itemClassPrefix": "",
+      "itemClassSuffix": "",
       "dir": "Output",
       "header": "",
       "loader": {

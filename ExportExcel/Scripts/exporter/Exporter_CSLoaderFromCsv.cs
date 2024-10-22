@@ -80,7 +80,7 @@ namespace ExportExcel
     public partial class Table
     {
         protected static List<System.Object> _tempItemsForCsv = new List<System.Object>({row_count_max});
-        public abstract bool LoadFromCsv(Test.ITableReader reader);
+        public abstract bool LoadFromCsv(ITableReader reader);
     }
 ");
         }
@@ -411,7 +411,8 @@ namespace ExportExcel
 
             //转换数据
             List.Clear();
-            List.EnsureCapacity(_tempItemsForCsv.Count);
+            if (List.Capacity < _tempItemsForCsv.Count)
+                List.Capacity = _tempItemsForCsv.Count;
             foreach (var p in _tempItemsForCsv)
             {
                 List.Add(p as {class_name});
