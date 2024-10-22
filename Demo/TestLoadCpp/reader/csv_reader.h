@@ -1,5 +1,5 @@
 #pragma once
-#include "../gen/table_loader.h"
+#include "../gen/table_loader_csv.h"
 using namespace Test;
 
 class TableTupleReaderCsv : public ITableTupleReader

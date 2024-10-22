@@ -55,11 +55,11 @@ namespace ExportExcel
             try
             {
                 File.WriteAllText(file_path, JsonConvert.SerializeObject(this, Formatting.Indented));
-                Console.WriteLine("创建配置成功 " + file_path);
+                Console.WriteLine("config saved " + file_path);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("创建文件失败 " + file_path + " " + ex.Message);
+                Console.WriteLine("create config failed " + file_path + " " + ex.Message);
             }
         }
 
@@ -72,12 +72,12 @@ namespace ExportExcel
 
         public class TableDataLoaderConfig
         {
-            public int nameRowIndex = 0;
-            public int typeRowIndex = 1;
-            public int descRowIndex = 2;
-            public int dataStartRowIndex = 3;
+            public int nameRowIndex = 1;
+            public int typeRowIndex = 2;
+            public int descRowIndex = 3;
+            public int dataStartRowIndex = 4;
             public bool calculateFormula = true;
-            public string emptyPlaceholder = "";
+            public string emptyPlaceholder = null;
             public string separatorTuple = "|";
             public string separatorList = ";";
         }
@@ -176,15 +176,9 @@ namespace ExportExcel
             public CppConfig cpp = new CppConfig();
         }
 
-
-        public class CppGetterConfig
-        {
-            public bool enable;
-        }
-
         public class CppLoaderConfig
         {
-            public bool enable;
+            public bool csv = true;
         }
 
         public class CSharpGetterConfig
@@ -211,7 +205,7 @@ namespace ExportExcel
             public string namespaceName = "";
             public string itemParentClass = "";
             public string itemClassPrefix = "";
-            public string itemClassSuffix = "";            
+            public string itemClassSuffix = "";
             public string tableMgrName = "TableMgr";
             public string dir = "Output";
             public string header = @"using System;\nusing System.Collections;\nusing System.Collections.Generic;";
@@ -229,18 +223,17 @@ namespace ExportExcel
         {
             public bool enable;
             public string namespaceName = "";
-            public string parentClass = "";
-            public string classPrefix = "";
-            public string classSuffix = "";
+            public string itemParentClass = "";
+            public string itemClassPrefix = "";
+            public string itemClassSuffix = "";
             public string dir = "Output";
             public string header = "";
 
             public CppLoaderConfig loader = new CppLoaderConfig();
-            public CppGetterConfig getter = new CppGetterConfig();
 
             public string GetClassName(string sheet_name)
             {
-                return classPrefix + sheet_name + classSuffix;
+                return itemClassPrefix + sheet_name + itemClassSuffix;
             }
         }
 

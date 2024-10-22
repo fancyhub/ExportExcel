@@ -249,11 +249,17 @@ namespace ExportExcel
             }
 
             //5. 检查第二个key
+            var pk_visible = attr_pk.Field.ExportFlag;
             foreach (var p in attr_pk.SubKeys)
             {
                 if (p == col)
                 {
                     ErrSet.E(db_col, $"{attr_pk} 第二个key 不能是自己");
+                }
+
+                if (p.ExportFlag != pk_visible)
+                {
+                    ErrSet.E(db_col, $"{attr_pk} PK 的Export Flag 不一致");
                 }
                 p.AttrBlankForbid = ConAttrBlankForbid.Inst; //不允许为空
             }

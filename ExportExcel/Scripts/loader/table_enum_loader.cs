@@ -40,7 +40,7 @@ namespace ExportExcel
             {
                 IRow row = sheet.GetRow(i);
                 string enum_name = row.CellStrExt(0);
-                if (string.IsNullOrEmpty(enum_name) || enum_name.StartsWith("#"))
+                if (string.IsNullOrEmpty(enum_name) || enum_name.StartsWith(ConstDef.Comment))
                     continue;
 
                 string enum_field_name = row.CellStrExt(1);

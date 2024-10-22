@@ -5,9 +5,9 @@
 #include <filesystem>
 
 
-#include "gen/table_struct.h"
-#include "gen/table_getter.h"
-#include "gen/table_loader.h"
+#include "gen/struct_item.h"
+#include "gen/struct_table.h"
+#include "gen/table_loader_csv.h"
 #include "reader/csv_reader.h"
 using namespace Test;
 
@@ -40,13 +40,15 @@ public:
 		return &_reader;
 	}
 };
+
+
 int main()
 {
 	TableMgr mgr;
-	TableLoaderMgr loaderMgr;	
+	TableLoaderMgrCsv loaderMgr;	
 	TableReaderCreator readerCreator(std::filesystem::absolute(dir2));
 
-	std::string lang_name = TableLoaderMgr::LangList[0];
+	std::string lang_name = TableMgr::LangList[0];
 
 	TableLoader loader;
 	for (auto it = mgr.AllTableDict.begin(); it != mgr.AllTableDict.end(); it++)
@@ -54,9 +56,8 @@ int main()
 		if (!loaderMgr.FindLoader(it->first, loader))
 			continue;
 		loader(it->second, lang_name, readerCreator);
-	}
-	
-	auto item = mgr.GetTTestComposeKey(1, 1);
+	}	
+	auto item1 = mgr.TestComposeKey.Find(1, 1, 1);
 
 	std::cout << "Hello World!\n";
 }

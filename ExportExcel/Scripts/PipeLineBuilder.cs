@@ -25,28 +25,24 @@ namespace ExportExcel
                 ret.Add(new PPconstraintParser());
             }
             
-            //3. 处理引用
+            //3. 处理转换
             {
-                ret.Add(new PPConstraintDefault());                
-                ret.Add(new PostProcessRef());
-            }
-
-            //3. 处理多语言
-            {
-                ret.Add(new PPLocalization());
-            }
-
-            //4. 检查
-            {
+                ret.Add(new PPConstraintDefault()); //默认值的检查
+                ret.Add(new PostProcessRef());      //
                 ret.Add(new PPConstraintEnum());
-                ret.Add(new PPConstraint_Unique_LoopUp_BlankForbid());
+            }
+ 
+            //4. 检查
+            {                
                 ret.Add(new PPFieldTypeChecker());
+                ret.Add(new PPConstraint_Unique_LoopUp_BlankForbid());
                 ret.Add(new PPConstraintRange());
                 ret.Add(new PPConstraintFilePath(config.validation.searchFileRoot));
             }
 
             //5. 多语言到LocId
             {
+                ret.Add(new PPLocalization());
                 ret.Add(new PPLocalizationHashId());
             }
 
@@ -58,8 +54,8 @@ namespace ExportExcel
                 _AddExporter(node_list, EExportFlag.Server, config.exportServer);
 
 
-                node_list.Add(new Exporter_ExcelLangTrans(config.exportCommon.localizationTranslate,config.tableDataRule));
-                node_list.Add(new Exporter_RuleExcel(config.exportCommon.ruleExcel,config.tableDataRule));
+                node_list.Add(new Exporter_ExcelLangTrans(config.exportCommon.localizationTranslate));
+                node_list.Add(new Exporter_RuleExcel(config.exportCommon.ruleExcel));
                 node_list.Add(new Exporter_RuleSchema(config.exportCommon.schema));
             }
             return ret;
@@ -73,9 +69,9 @@ namespace ExportExcel
             node_list.Add(new Exporter_CSLoaderFromJson(flag, config.csharp));            
             node_list.Add(new Exporter_CSLocDef(flag, config.csharp));
 
-            node_list.Add(new Exporter_CppStruct(flag, config.cpp));
-            node_list.Add(new Exporter_CppLoader(flag, config.cpp));
-            node_list.Add(new Exporter_CppGetter(flag, config.cpp));
+            node_list.Add(new Exporter_CppStructItem(flag, config.cpp));
+            node_list.Add(new Exporter_CppStructTable(flag, config.cpp));
+            node_list.Add(new Exporter_CppLoaderFromCsv(flag, config.cpp));
 
             node_list.Add(new Exporter_LuaIds(flag, config.lua));
             node_list.Add(new Exporter_LuaStructDef(flag, config.lua));

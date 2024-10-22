@@ -1,0 +1,172 @@
+{
+  "excelPaths": [],
+  "validation": {
+    "searchFileRoot": "./",
+    "sheetNameReg": "^[A-Z][a-zA-Z0-9]*$",
+    "colNameReg": "^[A-Z][a-zA-Z0-9_]*$",
+    "enumNameReg": "^E[A-Z][a-zA-Z0-9_]*$",
+    "enumFieldNameReg": "^[A-Z][a-zA-Z0-9_]*$"
+  },
+  "tableDataRule": {
+    "nameRowIndex": 1,
+    "typeRowIndex": 2,
+    "descRowIndex": 3,
+    "dataStartRowIndex": 4,
+    "calculateFormula": true,
+    "emptyPlaceholder": null,
+    "separatorTuple": "|",
+    "separatorList": ";"
+  },
+  "localization": {
+    "enable": false,
+    "sheetName": "",
+    "defaultLang": "",
+    "useHashId": true,
+    "autoGenKey": false,
+    "checkKeyExist": true
+  },
+  "exportCommon": {
+    "localizationTranslate": {
+      "enable": false,
+      "dir": "Output"
+    },
+    "ruleExcel": {
+      "enable": false,
+      "dir": "Output"
+    },
+    "schema": {
+      "enable": false,
+      "dir": "Output"
+    }
+  },
+  "exportClient": {
+    "csv": {
+      "enable": false,
+      "utf8bom": true,
+      "dir": ""
+    },
+    "bin": {
+      "enable": false,
+      "dir": "Output"
+    },
+    "json": {
+      "enable": false,
+      "header": false,
+      "dir": ""
+    },
+    "bson": {
+      "enable": false,
+      "dir": ""
+    },
+    "csharp": {
+      "enable": false,
+      "namespaceName": "",
+      "itemParentClass": "",
+      "itemClassPrefix": "",
+      "itemClassSuffix": "",
+      "tableMgrName": "TableMgr",
+      "dir": "Output",
+      "header": "using System;\\nusing System.Collections;\\nusing System.Collections.Generic;",
+      "loader": {
+        "csv": false,
+        "json": false
+      },
+      "locId": {
+        "enable": false,
+        "locIdStartWith": ""
+      }
+    },
+    "lua": {
+      "enable": false,
+      "classPrefix": "",
+      "dir": "Output",
+      "locIdStartWith": "~"
+    },
+    "go": {
+      "enable": false,
+      "packageName": "config",
+      "classPrefix": "",
+      "dir": "Output"
+    },
+    "cpp": {
+      "enable": false,
+      "namespaceName": "",
+      "parentClass": "",
+      "classPrefix": "",
+      "classSuffix": "",
+      "dir": "Output",
+      "header": "",
+      "loader": {
+        "enable": false
+      },
+      "getter": {
+        "enable": false
+      }
+    }
+  },
+  "exportServer": {
+    "csv": {
+      "enable": false,
+      "utf8bom": true,
+      "dir": ""
+    },
+    "bin": {
+      "enable": false,
+      "dir": "Output"
+    },
+    "json": {
+      "enable": false,
+      "header": false,
+      "dir": ""
+    },
+    "bson": {
+      "enable": false,
+      "dir": ""
+    },
+    "csharp": {
+      "enable": false,
+      "namespaceName": "",
+      "itemParentClass": "",
+      "itemClassPrefix": "",
+      "itemClassSuffix": "",
+      "tableMgrName": "TableMgr",
+      "dir": "Output",
+      "header": "using System;\\nusing System.Collections;\\nusing System.Collections.Generic;",
+      "loader": {
+        "csv": false,
+        "json": false
+      },
+      "locId": {
+        "enable": false,
+        "locIdStartWith": ""
+      }
+    },
+    "lua": {
+      "enable": false,
+      "classPrefix": "",
+      "dir": "Output",
+      "locIdStartWith": "~"
+    },
+    "go": {
+      "enable": false,
+      "packageName": "config",
+      "classPrefix": "",
+      "dir": "Output"
+    },
+    "cpp": {
+      "enable": false,
+      "namespaceName": "",
+      "parentClass": "",
+      "classPrefix": "",
+      "classSuffix": "",
+      "dir": "Output",
+      "header": "",
+      "loader": {
+        "enable": false
+      },
+      "getter": {
+        "enable": false
+      }
+    }
+  }
+}

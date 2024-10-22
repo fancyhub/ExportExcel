@@ -67,7 +67,7 @@ import (
 
                 for (int i = 0; i < p.Count; i++)
                 {
-                    sw.WriteLine($"\tItem{i} {p.Get(i).ToGoStr()}");
+                    sw.WriteLine("\tItem{0} {1} `json:\"Item{0}\"`", i, p.Get(i).ToGoStr());
                 }
                 sw.WriteLine("}\n");
             }
@@ -80,7 +80,7 @@ import (
                 int count = Math.Min(aliasItem.Fields.Length, p.Value.Count);
                 for (int i = 0; i < count; i++)
                 {
-                    sw.WriteLine($"\t{aliasItem.Fields[i]} {p.Value.Get(i).ToGoStr()}");
+                    sw.WriteLine("\t{0} {1} `json:\"{2}\"`", DataTypeUtil.GoUpFirstCase(aliasItem.Fields[i]), p.Value.Get(i).ToGoStr(), aliasItem.Fields[i]);
                 }
                 sw.WriteLine("}\n");
             }

@@ -1,122 +1,175 @@
 {
-	"excelPaths": [
-		"../0_no_loc/data",
-		"data"
-	],
-	"validation": {
-		"searchFileRoot": "../../Client/Resources",
-		"sheetNameReg": "^[A-Z][a-zA-Z0-9]*$",
-		"colNameReg": "^[A-Z][a-zA-Z0-9_]*$",
-		"enumNameReg": "^E[A-Z][A-Za-z0-9_]*$",
-		"enumFieldNameReg": "[A-Z][a-zA-Z0-9_]*$"
-	},
-	"localization": {
-		"enable": true,
-		"sheetName": "Loc",
-		"defaultLang": "zh-Hans",
-		"useHashId": true,
-		"autoGenKey": true,
-		"checkKeyExist": true
-	},
-	"tableDataRule": {
-		"nameRowIndex": 0,
-		"typeRowIndex": 1,
-		"descRowIndex": 2,
-		"dataStartRowIndex": 3,
-		"calculateFormula": false,
-		"emptyPlaceholder":"",
-		"separatorTuple": "|",
-		"separatorList": ";",
-	},
-	"exportCommon": {
-		"localizationTranslate": {
-			"enable": true,
-			"dir": "Output"
-		},
-		"ruleExcel": {
-			"enable": true,
-			"dir": "Output/Rule"
-		},
-		"schema": {
-			"enable": true,
-			"dir": "Output/Rule"
-		}
-	},
-	"exportClient": {
-		"csv": {
-			"enable": true,
-			"utf8bom": true,
-			"dir": "Output/Client/Data"
-		},
-		"bin": {
-			"enable": true,
-			"dir": "Output/Client/Data"
-		},
-		"json": {
-			"enable": true,
-			"header": false,
-			"dir": "Output/Client/Data"
-		},
-		"bson": {
-			"enable": true,
-			"dir": "Output/Client/Data"
-		},
-		"csharp": {
-			"enable": true,
-			"namespaceName": "Test",
-			"itemParentClass": "",
-			"itemClassPrefix": "T",
-			"itemClassSuffix": "",
-			"tableMgrName": "TableMgr",
-			"dir": "Output/Client/CS",
-			"header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
-			"loader": {
-				"csv": true,
-				"json": true,
-			},
-			"locId": {
-				"enable": true,
-				"locIdStartWith": ""
-			}
-		},
-		"lua": {
-			"enable": true,
-			"classPrefix": "T",
-			"dir": "Output/Client/Lua",
-			"locIdStartWith": "TC_"
-		},
-		"cpp": {
-			"enable": true,
-			"namespaceName": "Test",
-			"parentClass": "",
-			"classPrefix": "T",
-			"classSuffix": "",
-			"dir": "Output/Client/Cpp",
-			"header": "#include \"../dep/loc_str.h\"",
-			"loader": {
-				"enable": true
-			},
-			"getter": {
-				"enable": true
-			}
-		}
-	},
-	"exportServer": {
-		"csv": {
-			"enable": true,
-			"utf8bom": true,
-			"dir": "Output/Server/Data"
-		},
-		"json": {
-			"enable": true,
-			"header": false,
-			"dir": "Output/Server/Data"
-		},
-		"go": {
-			"enable": true,
-			"packageName": "config",
-			"classPrefix": "T",
-			"dir": "Output/Server/Go"
-		}
-	}
+  "excelPaths": [
+    "../0_no_loc/data",
+    "data"
+  ],
+  "validation": {
+    "searchFileRoot": "../../Client/Resources",
+    "sheetNameReg": "^[A-Z][a-zA-Z0-9]*$",
+    "colNameReg": "^[A-Z][a-zA-Z0-9_]*$",
+    "enumNameReg": "^E[A-Z][A-Za-z0-9_]*$",
+    "enumFieldNameReg": "[A-Z][a-zA-Z0-9_]*$"
+  },
+  "tableDataRule": {
+    "nameRowIndex": 1,
+    "typeRowIndex": 2,
+    "descRowIndex": 3,
+    "dataStartRowIndex": 4,
+    "calculateFormula": false,
+    "emptyPlaceholder": "",
+    "separatorTuple": "|",
+    "separatorList": ";"
+  },
+  "localization": {
+    "enable": true,
+    "sheetName": "Loc",
+    "defaultLang": "zh-Hans",
+    "useHashId": true,
+    "autoGenKey": true,
+    "checkKeyExist": true
+  },
+  "exportCommon": {
+    "localizationTranslate": {
+      "enable": true,
+      "dir": "Output"
+    },
+    "ruleExcel": {
+      "enable": true,
+      "dir": "Output/Rule"
+    },
+    "schema": {
+      "enable": true,
+      "dir": "Output/Rule"
+    }
+  },
+  "exportClient": {
+    "csv": {
+      "enable": true,
+      "utf8bom": true,
+      "dir": "Output/Client/Data"
+    },
+    "bin": {
+      "enable": true,
+      "dir": "Output/Client/Data"
+    },
+    "json": {
+      "enable": true,
+      "header": false,
+      "dir": "Output/Client/Data"
+    },
+    "bson": {
+      "enable": true,
+      "dir": "Output/Client/Data"
+    },
+    "csharp": {
+      "enable": true,
+      "namespaceName": "Test",
+      "itemParentClass": "",
+      "itemClassPrefix": "T",
+      "itemClassSuffix": "",
+      "tableMgrName": "TableMgr",
+      "dir": "Output/Client/CS",
+      "header": "using System;\nusing System.Collections;\nusing System.Collections.Generic;",
+      "loader": {
+        "csv": true,
+        "json": true
+      },
+      "locId": {
+        "enable": true,
+        "locIdStartWith": ""
+      }
+    },
+    "lua": {
+      "enable": true,
+      "classPrefix": "T",
+      "dir": "Output/Client/Lua",
+      "locIdStartWith": "TC_"
+    },
+    "go": {
+      "enable": false,
+      "packageName": "config",
+      "classPrefix": "",
+      "dir": "Output"
+    },
+    "cpp": {
+      "enable": true,
+      "namespaceName": "Test",
+      "itemParentClass": "",
+      "itemClassPrefix": "T",
+      "itemClassSuffix": "",
+      "dir": "Output/Client/Cpp",
+      "header": "#include \"../dep/loc_str.h\"",
+      "loader": {
+        "enable": true
+      },
+      "getter": {
+        "enable": true
+      }
+    }
+  },
+  "exportServer": {
+    "csv": {
+      "enable": true,
+      "utf8bom": true,
+      "dir": "Output/Server/Data"
+    },
+    "bin": {
+      "enable": false,
+      "dir": "Output"
+    },
+    "json": {
+      "enable": true,
+      "header": false,
+      "dir": "Output/Server/Data"
+    },
+    "bson": {
+      "enable": false,
+      "dir": ""
+    },
+    "csharp": {
+      "enable": false,
+      "namespaceName": "",
+      "itemParentClass": "",
+      "itemClassPrefix": "",
+      "itemClassSuffix": "",
+      "tableMgrName": "TableMgr",
+      "dir": "Output",
+      "header": "using System;\\nusing System.Collections;\\nusing System.Collections.Generic;",
+      "loader": {
+        "csv": false,
+        "json": false
+      },
+      "locId": {
+        "enable": false,
+        "locIdStartWith": ""
+      }
+    },
+    "lua": {
+      "enable": false,
+      "classPrefix": "",
+      "dir": "Output",
+      "locIdStartWith": "~"
+    },
+    "go": {
+      "enable": true,
+      "packageName": "config",
+      "classPrefix": "T",
+      "dir": "Output/Server/Go"
+    },
+    "cpp": {
+      "enable": false,
+      "namespaceName": "",
+      "itemParentClass": "",
+      "itemClassPrefix": "",
+      "itemClassSuffix": "",
+      "dir": "Output",
+      "header": "",
+      "loader": {
+        "enable": false
+      },
+      "getter": {
+        "enable": false
+      }
+    }
+  }
 }

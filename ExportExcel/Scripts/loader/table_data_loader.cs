@@ -55,7 +55,7 @@ namespace ExportExcel
             List<List<string>> out_data)
         {
             out_data.Clear();
-            int start_row = _config.tableDataRule.dataStartRowIndex;
+            int start_row = ConstDef.DataStartRowIndex;
             int end_row = sheet.RowCount;
 
             if (out_data.Capacity < end_row)
@@ -83,7 +83,7 @@ namespace ExportExcel
                 }
 
                 empty_row_count = 0;
-                if (first_col_cell_str.StartsWith("#"))
+                if (first_col_cell_str.StartsWith(ConstDef.Comment))
                     continue;
 
                 List<string> row_data = new List<string>(header.Count);
@@ -91,7 +91,7 @@ namespace ExportExcel
                 for (int c = 0; c < header.Count; c++)
                 {
                     string cell_str = row.CellStrExt(header[c].ExcelColIdx);
-                    if (cell_str == _config.tableDataRule.emptyPlaceholder)
+                    if (cell_str == ConstDef.EmptyPlaceholder)
                         cell_str = string.Empty;
                     row_data.Add(cell_str);
                 }
@@ -109,9 +109,9 @@ namespace ExportExcel
             rule_table.TableExportFlag = export_flag;
 
             //4. 获取各行,以及多少列
-            IRow row_name = sheet.GetRow(_config.tableDataRule.nameRowIndex);   //名字那一行
-            IRow row_type = sheet.GetRow(_config.tableDataRule.typeRowIndex);   //类型哪一行
-            IRow row_desc = sheet.GetRow(_config.tableDataRule.descRowIndex);   //描述行
+            IRow row_name = sheet.GetRow(ConstDef.NameRowIndex);   //名字那一行
+            IRow row_type = sheet.GetRow(ConstDef.TypeRowIndex);   //类型哪一行
+            IRow row_desc = sheet.GetRow(ConstDef.DescRowIndex);   //描述行
             IRow row_first = sheet.GetRow(0);//首行
             int col_count = row_name.ColCount;
 
@@ -120,18 +120,19 @@ namespace ExportExcel
             for (int i = 0; i < col_count; i++)
             {
                 //5.1 检查,获取字段名,如果名字以#开始,说明不导出
-                string detected_value = row_first.CellStrExt(i);
+                string first_row_value = row_first.CellStrExt(i);
                 string field_name = row_name.CellStrExt(i);
+                string field_type = row_type.CellStrExt(i);
                 bool field_name_empty = string.IsNullOrEmpty(field_name);
-                bool detected_value_empty = string.IsNullOrEmpty(detected_value);
-                if (detected_value_empty && field_name_empty)
+                bool first_row_value_empty = string.IsNullOrEmpty(first_row_value);
+                if (first_row_value_empty && field_name_empty)
                 {
                     empty_col_count++;
                     if (empty_col_count > CEmptyColCountToEnd)
                         break;
                 }
                 empty_col_count = 0;
-                if (field_name_empty || detected_value_empty || detected_value.StartsWith("#") || field_name.StartsWith("#"))
+                if (field_name_empty || string.IsNullOrEmpty(field_type) || first_row_value.StartsWith(ConstDef.Comment) || field_name.StartsWith(ConstDef.Comment))
                     continue;
 
                 //5.2 检查名字是否合法, 多语言表的字段名不检查
@@ -150,12 +151,12 @@ namespace ExportExcel
 
                 //5.4 获取列的类型
                 string cell_val_type = row_type.CellStrExt(i);
-                DataType field_type = new DataType();
+                DataType data_type = new DataType();
                 string[] StrConstraints = null;
                 try
                 {
-                    field_type = DataTypeUtilCsv.ParseDataType(cell_val_type, out StrConstraints);
-                    if (!field_type.Valid())
+                    data_type = DataTypeUtilCsv.ParseDataType(cell_val_type, out StrConstraints);
+                    if (!data_type.Valid())
                     {
                         ErrSet.E($"{rule_table.SheetName}.{field_name} {cell_val_type} 数据类型未知", sheet.Workbook.FilePath);
                         continue;
@@ -169,7 +170,7 @@ namespace ExportExcel
 
                 TableField col = new TableField();
                 col.Name = field_name;
-                col.DataType = field_type;
+                col.DataType = data_type;
                 col.Desc = row_desc.CellStrExt(i);
                 col.StrConstraints = StrConstraints;
                 col.ExcelColIdx = i;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,7 +23,7 @@ namespace ExportExcel
                     string field_name = row_ids.CellStrExt(i);
                     if (string.IsNullOrEmpty(field_name))
                         continue;
-                    if (field_name.StartsWith("#"))
+                    if (field_name.StartsWith(ConstDef.Comment))
                         continue;
 
                     if (col_set.Contains(field_name))
@@ -48,7 +48,7 @@ namespace ExportExcel
                         continue;
 
                     string key = row.CellStrExt(0);
-                    if (string.IsNullOrEmpty(key) || key.StartsWith("#"))
+                    if (string.IsNullOrEmpty(key) || key.StartsWith(ConstDef.Comment))
                         continue;
 
                     if (!data_base.RefDB.AddKey(key))

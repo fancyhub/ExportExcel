@@ -13,12 +13,9 @@ namespace ExportExcel
     public class Exporter_ExcelLangTrans : IProcessNode
     {
         public Config.LocTransConfig _config;
-        public Config.TableDataLoaderConfig _tableDataLoaderConfig;
-        public Exporter_ExcelLangTrans(Config.LocTransConfig config, Config.TableDataLoaderConfig tableDataLoaderConfig)
+        public Exporter_ExcelLangTrans(Config.LocTransConfig config)
         {
             _config = config;
-            _tableDataLoaderConfig = tableDataLoaderConfig;
-
         }
         public string GetName()
         {
@@ -46,9 +43,9 @@ namespace ExportExcel
             //3. 写表头
             foreach (var p in table_trans.Header.List)
             {
-                _set_value(work_sheet, _tableDataLoaderConfig.nameRowIndex, p.FieldIndex, p.Name);
-                _set_value(work_sheet, _tableDataLoaderConfig.typeRowIndex, p.FieldIndex, p.DataType.ToCsvStr());
-                _set_value(work_sheet, _tableDataLoaderConfig.descRowIndex, p.FieldIndex, p.Desc);
+                _set_value(work_sheet, ConstDef.NameRowIndex, p.FieldIndex, p.Name);
+                _set_value(work_sheet, ConstDef.TypeRowIndex, p.FieldIndex, p.DataType.ToCsvStr());
+                _set_value(work_sheet, ConstDef.DescRowIndex, p.FieldIndex, p.Desc);
             }
 
 
@@ -58,7 +55,7 @@ namespace ExportExcel
             int col_count = table_trans.Header.Count;
             for (int r = 0; r < row_count; r++)
             {
-                IRow row = work_sheet.GetRow(r + _tableDataLoaderConfig.dataStartRowIndex);
+                IRow row = work_sheet.GetRow(r + ConstDef.DataStartRowIndex);
 
                 for (int c = 0; c < col_count; c++)
                 {

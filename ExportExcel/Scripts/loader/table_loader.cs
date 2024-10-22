@@ -22,8 +22,7 @@ namespace ExportExcel
             Invalid,
         }
 
-        private const char CSheetNameConstraintSplit = '|'; //export_client, export_server 的分隔符
-        private const char CSheetNamePartialSplit = '_';   // 表格分表专用的分隔符
+        
 
         //表名的检查
         private static Regex S_SHEET_NAME_REGEX = new Regex("^[A-Z][a-zA-Z0-9]*$");
@@ -75,25 +74,25 @@ namespace ExportExcel
                                 break;
 
                             case ETableNameType.RefTable:
-                                if (data_base.Config.tableDataRule.calculateFormula)
+                                if (ConstDef.CalculateFormula)
                                     sheet.CalculateFormula();
                                 _ref_loader.Load(data_base, sheet);
                                 break;
 
                             case ETableNameType.TupleAliasTable:
-                                if (data_base.Config.tableDataRule.calculateFormula)
+                                if (ConstDef.CalculateFormula)
                                     sheet.CalculateFormula();
                                 _alias_loader.Load(data_base, sheet);
                                 break;
 
                             case ETableNameType.EnumConfig:
-                                if (data_base.Config.tableDataRule.calculateFormula)
+                                if (ConstDef.CalculateFormula)
                                     sheet.CalculateFormula();
                                 _enum_loader.Load(data_base, sheet);
                                 break;
 
                             case ETableNameType.DataTable:
-                                if (data_base.Config.tableDataRule.calculateFormula)
+                                if (ConstDef.CalculateFormula)
                                     sheet.CalculateFormula();
                                 _data_loader.Load(data_base, sheet, table_name, flag);
                                 break;
@@ -137,29 +136,27 @@ namespace ExportExcel
                 return ETableNameType.Ignore;
             name = name.Trim();
 
-            if (name.StartsWith("#"))
+            if (name.StartsWith(ConstDef.Comment))
                 return ETableNameType.Ignore;
 
 
-            string[] table_names = name.Split(CSheetNamePartialSplit, StringSplitOptions.RemoveEmptyEntries);
-            table_name = table_names[0].Trim();
+            string[] str_array_1 = name.Split(ConstDef.SheetNameConstraintSeparator, StringSplitOptions.RemoveEmptyEntries);
+            string[] str_array_2 = str_array_1[0].Split(ConstDef.SheetNamePartialSeparator, StringSplitOptions.RemoveEmptyEntries);
+            table_name = str_array_2[0].Trim();
 
             switch (table_name)
             {
-                case "@EnumConfig":
+                case ConstDef.SpecSheetNameEnum:
                     return ETableNameType.EnumConfig;
 
-                case "@RefTable":
+                case ConstDef.SpecSheetNameRef:
                     return ETableNameType.RefTable;
 
-                case "@Alias":
+                case ConstDef.SpecSheetNameAlias:
                     return ETableNameType.TupleAliasTable;
 
                 default:
-                    string[] str_arrays = table_name.Split(CSheetNameConstraintSplit, StringSplitOptions.RemoveEmptyEntries);
-                    table_name = str_arrays[0].Trim();
-                    flag = _ParseTableExportFlag(str_arrays);
-
+                    flag = _ParseTableExportFlag(str_array_1);
                     if (!S_SHEET_NAME_REGEX.IsMatch(table_name))
                     {
                         ErrSet.E($"{sheet.SheetName} 表名不符合命名规范", sheet.Workbook.FilePath);

@@ -19,31 +19,31 @@
     <ClCompile Include="TestLoadCpp.cpp">
       <Filter>main</Filter>
     </ClCompile>
-    <ClCompile Include="gen\table_loader.cpp">
-      <Filter>gen</Filter>
-    </ClCompile>
     <ClCompile Include="reader\csv_reader.cpp">
       <Filter>reader</Filter>
+    </ClCompile>
+    <ClCompile Include="gen\table_loader_csv.cpp">
+      <Filter>gen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dep\loc_str.h">
       <Filter>dep</Filter>
     </ClInclude>
-    <ClInclude Include="gen\table_getter.h">
-      <Filter>gen</Filter>
-    </ClInclude>
-    <ClInclude Include="gen\table_loader.h">
-      <Filter>gen</Filter>
-    </ClInclude>
-    <ClInclude Include="gen\table_struct.h">
-      <Filter>gen</Filter>
-    </ClInclude>
     <ClInclude Include="reader\csv.h">
       <Filter>reader</Filter>
     </ClInclude>
     <ClInclude Include="reader\csv_reader.h">
       <Filter>reader</Filter>
+    </ClInclude>
+    <ClInclude Include="gen\struct_item.h">
+      <Filter>gen</Filter>
+    </ClInclude>
+    <ClInclude Include="gen\struct_table.h">
+      <Filter>gen</Filter>
+    </ClInclude>
+    <ClInclude Include="gen\table_loader_csv.h">
+      <Filter>gen</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

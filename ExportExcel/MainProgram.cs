@@ -7,6 +7,7 @@ namespace ExportExcel
         WatchMode,
         ShowUsage,
         CreateConfig,
+        FormatConfig,
     }
 
     public class MainProgram
@@ -32,31 +33,48 @@ namespace ExportExcel
                     new Config().Save(GetConfigFilePath());
                     return 0;
 
+                case ECmdArg.FormatConfig:
+                    {
+                        Config config = Config.Load(GetConfigFilePath());
+                        if (config == null)
+                            config = new Config();
+                        config.Save(GetConfigFilePath());
+                    }
+                    return 0;
+
                 case ECmdArg.WatchMode:
                 case ECmdArg.NormalMode:
-                    Config config = Config.Load(GetConfigFilePath());
-                    if (config == null)
                     {
-                        DisplayUsage();
-                        return -2;
-                    }                    
+                        Config config = Config.Load(GetConfigFilePath());
+                        if (config == null)
+                        {
+                            DisplayUsage();
+                            return -2;
+                        }
 
-                    if(!string.IsNullOrEmpty(config.tableDataRule.separatorList.Trim()))
-                    {
-                        ConstDef.SeparatorList = config.tableDataRule.separatorList.Trim()[0];
+                        if (!string.IsNullOrEmpty(config.tableDataRule.separatorList.Trim()))
+                        {
+                            ConstDef.SeparatorList = config.tableDataRule.separatorList.Trim()[0];
+                        }
+                        if (!string.IsNullOrEmpty(config.tableDataRule.separatorTuple.Trim()))
+                        {
+                            ConstDef.SeparatorTuple = config.tableDataRule.separatorTuple.Trim()[0];
+                        }
+                        ConstDef.NameRowIndex = config.tableDataRule.nameRowIndex - 1;
+                        ConstDef.TypeRowIndex = config.tableDataRule.typeRowIndex - 1;
+                        ConstDef.DescRowIndex = config.tableDataRule.descRowIndex - 1;
+                        ConstDef.DataStartRowIndex = config.tableDataRule.dataStartRowIndex - 1;
+                        ConstDef.CalculateFormula = config.tableDataRule.calculateFormula;
+                        ConstDef.EmptyPlaceholder = config.tableDataRule.emptyPlaceholder;
+
+                        PipeLine pipeline = PipelineBuilder.CreatePipeLine(config);
+
+                        if (arg != ECmdArg.WatchMode)
+                            return pipeline.Process(false);
+
+                        FileWatcher watcher = FileWatcher.Create(config);
+                        Watch(watcher, pipeline);
                     }
-                    if (!string.IsNullOrEmpty(config.tableDataRule.separatorTuple.Trim()))
-                    {
-                        ConstDef.SeparatorTuple = config.tableDataRule.separatorTuple.Trim()[0];
-                    }
-
-                    PipeLine pipeline = PipelineBuilder.CreatePipeLine(config);
-
-                    if (arg != ECmdArg.WatchMode)
-                        return pipeline.Process(false);
-
-                    FileWatcher watcher = FileWatcher.Create(config);
-                    Watch(watcher, pipeline);
                     return 0;
             }
         }
@@ -100,6 +118,10 @@ namespace ExportExcel
                 case "-createconfig":
                 case "createconfig":
                     return ECmdArg.CreateConfig;
+
+                case "-formatconfig":
+                case "formatconfig":
+                    return ECmdArg.FormatConfig;
             }
         }
 
@@ -115,6 +137,7 @@ Usage:
     {exeName}                       simplest export excel
     {exeName} -watch                export exel with watching mode
     {exeName} -createconfig         create config.json
+    {exeName} -formatconfig         format config.json
     {exeName} -help                 show this usage    
 ");
         }

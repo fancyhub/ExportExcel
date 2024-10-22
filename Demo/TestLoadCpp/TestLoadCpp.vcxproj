@@ -129,15 +129,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="gen\table_loader.cpp" />
+    <ClCompile Include="gen\table_loader_csv.cpp" />
     <ClCompile Include="reader\csv_reader.cpp" />
     <ClCompile Include="TestLoadCpp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dep\loc_str.h" />
-    <ClInclude Include="gen\table_getter.h" />
-    <ClInclude Include="gen\table_loader.h" />
-    <ClInclude Include="gen\table_struct.h" />
+    <ClInclude Include="gen\struct_item.h" />
+    <ClInclude Include="gen\struct_table.h" />
+    <ClInclude Include="gen\table_loader_csv.h" />
     <ClInclude Include="reader\csv.h" />
     <ClInclude Include="reader\csv_reader.h" />
   </ItemGroup>

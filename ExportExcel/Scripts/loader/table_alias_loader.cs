@@ -26,7 +26,7 @@ namespace ExportExcel
                 IRow row = sheet.GetRow(i);
 
                 string name = row.CellStrExt(0);
-                if (string.IsNullOrEmpty(name) || name.StartsWith("#"))
+                if (string.IsNullOrEmpty(name) || name.StartsWith(ConstDef.Comment))
                     continue;
 
                 string[] fields = row.CellStrExt(fields_index).Split("|", StringSplitOptions.RemoveEmptyEntries);

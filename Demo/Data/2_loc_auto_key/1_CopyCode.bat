@@ -4,7 +4,7 @@ cd /d %~dp0
 
  
 echo ========== copy client cs files ===================
-xcopy /S /Y Output\Client\CS\*.cs ..\..\TestLoadCS\gen\
+::xcopy /S /Y Output\Client\CS\*.cs ..\..\TestLoadCS\gen\
 echo.
 
 echo ========== copy client Lua files ===================
@@ -12,8 +12,8 @@ echo ========== copy client Lua files ===================
 echo.
 
 echo ========== copy client Cpp files ===================
-::xcopy /S /Y Output\Client\Cpp\*.cpp ..\..\TestLoadCpp\gen\
-::xcopy /S /Y Output\Client\Cpp\*.h ..\..\TestLoadCpp\gen\
+xcopy /S /Y Output\Client\Cpp\*.cpp ..\..\TestLoadCpp\gen\
+xcopy /S /Y Output\Client\Cpp\*.h ..\..\TestLoadCpp\gen\
 echo.
 
 echo ========== copy sever Go files ===================
