@@ -409,7 +409,7 @@ namespace ExportExcel
                 else
                     key = $"{cell.SheetName}_{cell.ColName}_{_attr_pk.Field.Name}_{cell.GetCellValue(_attr_pk.Field.FieldIndex)}";
 
-                key = key + "_" + (uint)key.GetHashCode();
+                //key = key + "_" + (uint)key.GetHashCode();
             }
             else
             {
