@@ -70,7 +70,7 @@ namespace ExportExcel
                         PipeLine pipeline = PipelineBuilder.CreatePipeLine(config);
 
                         if (arg != ECmdArg.WatchMode)
-                            return pipeline.Process(false);
+                            return pipeline.Process(true);
 
                         FileWatcher watcher = FileWatcher.Create(config);
                         Watch(watcher, pipeline);

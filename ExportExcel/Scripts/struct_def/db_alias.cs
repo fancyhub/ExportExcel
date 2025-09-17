@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -27,7 +28,7 @@ namespace ExportExcel
         }
     }
 
-    public sealed class DBAlias
+    public sealed class DBAlias : IEnumerable<KeyValuePair<string, AliasItem>>
     {
         public Dictionary<string, AliasItem> _Dict;
 
@@ -44,6 +45,21 @@ namespace ExportExcel
         {
             _Dict.TryGetValue(name, out AliasItem item);
             return item;
+        }
+
+        public Dictionary<string, AliasItem>.Enumerator GetEnumerator()
+        {
+            return _Dict.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _Dict.GetEnumerator();
+        }
+
+        IEnumerator<KeyValuePair<string, AliasItem>> IEnumerable<KeyValuePair<string, AliasItem>>.GetEnumerator()
+        {
+            return _Dict.GetEnumerator();
         }
     }
 }

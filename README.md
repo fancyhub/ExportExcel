@@ -54,6 +54,8 @@ Support Csv, Bin, Json, Bson
     比如 Item                              //物品表, 都需要
 
 
+    表名前有@, 比如@Item, 这个表是转置表, 要竖过来写, 第一行的字段名要写成第一列,第二行的类型和约束写到第二列,依次类推
+
 # 类型
 ## 基础数据类型
 | 类型名|描述|
@@ -108,7 +110,7 @@ list 用 ; 作为连接符, 和 tuple 类似, 任意类型都可以, 就是locst
  
 
 # Alias 表格
-表名 @Alias 或者 @Alias_xxx , 可以分表  
+表名 @@Alias 或者 @@Alias_xxx , 可以分表  
 
 |Name|Fields|CSharp|Go|Cpp
 |------|------|------|-----|-----|
@@ -122,7 +124,7 @@ Cpp没有实现
 
 
  # 引用表
-表名 @RefTable, 或者 @RefTable_xxx , 可以分表
+表名 @@RefTable, 或者 @@RefTable_xxx , 可以分表
 表结构如下
 
 |该cell留空|SubKeyName1|SubKeyName2|#yyy #开头不读取该列|
@@ -142,7 +144,7 @@ Cpp没有实现
 比如填写 R(火,伤害1)  相当于填写 1  
 
 # 枚举表
-表名 @EnumConfig  或者 @EnumConfig_xxxx , 可以分表  
+表名 @EnumConfig  或者 @@EnumConfig_xxxx , 可以分表  
 样例:
 |EnumName|EnumFieldName|ExcelVal|Val|
 |------|------|------|-----|

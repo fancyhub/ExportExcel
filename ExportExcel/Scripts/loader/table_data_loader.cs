@@ -29,10 +29,10 @@ namespace ExportExcel
             S_COL_NAME_REGEX = new Regex(config.validation.colNameReg);
         }
 
-        public void Load(DataBase data_base, ISheet sheet, string sheet_name, EExportFlagMask export_flag)
-        {
+        public void Load(DataBase data_base, ISheet sheet, string sheet_name, bool transpose, EExportFlagMask export_flag)
+        {            
             Table rule_table = data_base.FindTable(sheet_name);
-            Table data_table = _create_rule_table(sheet, sheet_name, export_flag);
+            Table data_table = _create_rule_table(sheet, sheet_name, transpose, export_flag);
 
             if (rule_table == null)
             {
@@ -45,18 +45,21 @@ namespace ExportExcel
                 return;
             }
 
-            _load_sheet_data(sheet, data_table.Header, _temp_data);
+            _load_sheet_data(sheet, data_table.Header, transpose, _temp_data);
             _merge_data(rule_table, data_table.Header, _temp_data, sheet.Workbook.FilePath);
         }
 
         public void _load_sheet_data(
             ISheet sheet,
             TableHeader header,
+            bool transpose,
             List<List<string>> out_data)
         {
             out_data.Clear();
             int start_row = ConstDef.DataStartRowIndex;
             int end_row = sheet.RowCount;
+            if (transpose)
+                end_row = sheet.ColCount;
 
             if (out_data.Capacity < end_row)
                 out_data.Capacity = end_row;
@@ -64,7 +67,7 @@ namespace ExportExcel
             int empty_row_count = 0;
             for (int i = start_row; i < end_row; i++)
             {
-                var row = sheet.GetRow(i);
+                var row = transpose ? sheet.GetCol(i) : sheet.GetRow(i);
                 if (row == null)
                 {
                     empty_row_count++;
@@ -72,7 +75,7 @@ namespace ExportExcel
                         break;
                     continue;
                 }
-                string first_col_cell_str = row.CellStrExt(0);
+                string first_col_cell_str = row.GetCell(0).GetStrExt();
                 if (string.IsNullOrEmpty(first_col_cell_str))
                 {
 
@@ -90,7 +93,7 @@ namespace ExportExcel
 
                 for (int c = 0; c < header.Count; c++)
                 {
-                    string cell_str = row.CellStrExt(header[c].ExcelColIdx);
+                    string cell_str = row.GetCell(header[c].ExcelColIdx).GetStrExt();
                     if (cell_str == ConstDef.EmptyPlaceholder)
                         cell_str = string.Empty;
                     row_data.Add(cell_str);
@@ -100,7 +103,7 @@ namespace ExportExcel
             }
         }
 
-        public Table _create_rule_table(ISheet sheet, string sheet_name, EExportFlagMask export_flag)
+        public Table _create_rule_table(ISheet sheet, string sheet_name, bool transpose, EExportFlagMask export_flag)
         {
             //1. 先生成表格
             Table rule_table = new Table();
@@ -109,20 +112,20 @@ namespace ExportExcel
             rule_table.TableExportFlag = export_flag;
 
             //4. 获取各行,以及多少列
-            IRow row_name = sheet.GetRow(ConstDef.NameRowIndex);   //名字那一行
-            IRow row_type = sheet.GetRow(ConstDef.TypeRowIndex);   //类型哪一行
-            IRow row_desc = sheet.GetRow(ConstDef.DescRowIndex);   //描述行
-            IRow row_first = sheet.GetRow(0);//首行
-            int col_count = row_name.ColCount;
+            ICellArray row_name = transpose ? sheet.GetCol(ConstDef.NameRowIndex) : sheet.GetRow(ConstDef.NameRowIndex);   //名字那一行
+            ICellArray row_type = transpose ? sheet.GetCol(ConstDef.TypeRowIndex) : sheet.GetRow(ConstDef.TypeRowIndex);   //类型哪一行
+            ICellArray row_desc = transpose ? sheet.GetCol(ConstDef.DescRowIndex) : sheet.GetRow(ConstDef.DescRowIndex);   //描述行
+            ICellArray row_first = transpose ? sheet.GetCol(0) : sheet.GetRow(0);//首行
+            int row_count = row_name.Count;
 
             int empty_col_count = 0;
             //5. 开始每列的操作
-            for (int i = 0; i < col_count; i++)
+            for (int i = 0; i < row_count; i++)
             {
                 //5.1 检查,获取字段名,如果名字以#开始,说明不导出
-                string first_row_value = row_first.CellStrExt(i);
-                string field_name = row_name.CellStrExt(i);
-                string field_type = row_type.CellStrExt(i);
+                string first_row_value = row_first.GetCell(i).GetStrExt();
+                string field_name = row_name.GetCell(i).GetStrExt();
+                string field_type = row_type.GetCell(i).GetStrExt();
                 bool field_name_empty = string.IsNullOrEmpty(field_name);
                 bool first_row_value_empty = string.IsNullOrEmpty(first_row_value);
                 if (first_row_value_empty && field_name_empty)
@@ -150,7 +153,7 @@ namespace ExportExcel
                 }
 
                 //5.4 获取列的类型
-                string cell_val_type = row_type.CellStrExt(i);
+                string cell_val_type = row_type.GetCell(i).GetStrExt();
                 DataType data_type = new DataType();
                 string[] StrConstraints = null;
                 try
@@ -171,7 +174,7 @@ namespace ExportExcel
                 TableField col = new TableField();
                 col.Name = field_name;
                 col.DataType = data_type;
-                col.Desc = row_desc.CellStrExt(i);
+                col.Desc = row_desc.GetCell(i).GetStrExt();
                 col.StrConstraints = StrConstraints;
                 col.ExcelColIdx = i;
                 rule_table.Header.Add(col);

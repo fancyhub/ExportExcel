@@ -13,7 +13,7 @@ namespace ExportExcel
             //1. 读取表头
             List<(string key, int col_idx)> col_list = new List<(string, int)>();
             {
-                IRow row_ids = sheet.GetRow(0);
+                ICellArray row_ids = sheet.GetRow(0);
                 int cell_num = row_ids.ColCount;
                 if (cell_num <= 1)
                     return;

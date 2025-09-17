@@ -1,24 +1,21 @@
 
 using System;
 using System.Collections.Generic;
+using WorkBookImp = ExportExcel.ExcelEPPlus.WorkBookImp;
+//using WorkBookImp = ExportExcel.ExcelNPOI.WorkBookImp;
 
 namespace ExportExcel
 {
     public static class ExcelUtil
     {
-        public static List<string> ExtSupport_Epplus = new List<string>() { ".xlsx", ".xls", ".xlsm" };
-        public static List<string> ExtSupport_Npoi = new List<string>() { ".xlsx", ".xls", ".xlsm" };
-
         public static IWorkbook CreateWorkBook()
         {
-            return ExcelEPPlus.WorkBookImp.CreateNew();
-            //return ExcelNPOI.WorkBookImp.CreateNew();
+            return WorkBookImp.CreateNew();
         }
 
         public static IWorkbook Load(string file_path)
         {
-            return ExcelEPPlus.WorkBookImp.Load(file_path);
-            //return ExcelNPOI.WorkBookImp.Load(file_path);
+            return WorkBookImp.Load(file_path);
         }
 
         public static List<string> CollectExcelFiles(List<string> path_list)
@@ -68,9 +65,7 @@ namespace ExportExcel
             if (System.IO.Path.GetFileName(file_path).StartsWith("~"))
                 return false;
 
-            var support_list = ExtSupport_Epplus;
-            //var support_list = ExtSupport_Npoi;
-            foreach (string p in support_list)
+            foreach (string p in WorkBookImp.SupportFileExts)
             {
                 if (file_path.EndsWith(p, true, null))
                     return true;

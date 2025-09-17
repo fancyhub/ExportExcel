@@ -15,24 +15,6 @@ namespace ExportExcel
     /// </summary>
     public class PPConstraint_Unique_LoopUp_BlankForbid : IProcessNode
     {
-        [StructLayout(LayoutKind.Explicit)]
-        public struct ValUnion
-        {
-            [FieldOffset(0)] public ulong _u64;
-            [FieldOffset(0)] public int _i32_0;
-            [FieldOffset(4)] public int _i32_1;
-
-            public static ulong Convert(int hi, int low)
-            {
-                var v = new ValUnion()
-                {
-                    _i32_0 = hi,
-                    _i32_1 = low,
-                };
-                return v._u64;
-            }
-        }
-
         public string GetName()
         {
             return "约束 Unique & LookUp & BlankForbid 的检查";

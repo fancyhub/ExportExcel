@@ -259,7 +259,7 @@ namespace ExportExcel
         {
             foreach (var new_col in _new_list)
             {
-                ErrSet.E($"+{sheet_name}.{new_col} 比规则表多了字段", data_file_path);
+                //ErrSet.E($"+{sheet_name}.{new_col} 比规则表多了字段", data_file_path);
             }
 
             foreach (var missing_col in _miss_list)
@@ -269,7 +269,7 @@ namespace ExportExcel
 
             foreach (var item in _mismatch_list)
             {
-                ErrSet.E($"{sheet_name}.{item.col_name} 数据类型不一致,规则表 {item.rule_type.ToCsvStr()}, 数据表 {item.data_type.ToCsvStr()}", data_file_path);
+                //ErrSet.E($"{sheet_name}.{item.col_name} 数据类型不一致,规则表 {item.rule_type.ToCsvStr()}, 数据表 {item.data_type.ToCsvStr()}", data_file_path);
             }
         }
     }

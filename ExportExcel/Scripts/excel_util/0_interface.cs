@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,32 +26,52 @@ namespace ExportExcel
         /// </summary>
         ISheet GetSheetAt(int sheet_idx);
 
-        void Write(System.IO.Stream stream);
-        void Write(System.IO.Stream stream, bool level_open);
+        void SaveTo(System.IO.Stream stream, bool level_open);
+        void SaveAs(string file_path);
+        bool Save();
         void Close();
     }
 
     public interface ISheet
     {
-        string SheetName { get; }
+        string SheetName { get; set; }
         IWorkbook Workbook { get; }
 
         int RowCount { get; }
+        int ColCount { get; }
+
         /// <summary>
         /// [0,RowCount)
         /// </summary>
-        IRow GetRow(int row_index);
+        ICellArray GetRow(int row_index);
+
+        /// <summary>
+        /// [0,ColCount)
+        /// </summary>
+        ICellArray GetCol(int col_index);
 
         bool IsVisible();
 
         void CalculateFormula();
     }
 
-    public interface IRow
+
+    public enum ECellArrayType
     {
-        int ColCount { get; }
+        Row,
+        Col,
+    }
+
+    public interface ICellArray
+    {
+        int Count { get; }        
+
+        ECellArrayType ArrayType { get; }
+        int ColCount { get; } // = Count when ArrayType = Row
+        int RowCount { get; } // = Count when ArrayType = Col
+
         /// <summary>
-        /// [0,ColCount)
+        /// [0,Count)
         /// </summary>
         ICell GetCell(int cell_index);
     }

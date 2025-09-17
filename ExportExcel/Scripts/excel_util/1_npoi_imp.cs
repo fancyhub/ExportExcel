@@ -1,4 +1,4 @@
-﻿//#define NPOI
+//#define NPOI
 
 using System;
 using System.IO;
@@ -8,15 +8,12 @@ using System.IO;
  */
 
 namespace ExportExcel.ExcelNPOI
-{
-    public partial class WorkBookImp
-    {
-
-    }
-
+{    
 #if NPOI
     public partial class WorkBookImp : IWorkbook
     {
+        public static System.Collections.Generic.List<string> SupportFileExts = new() { ".xlsx", ".xls", ".xlsm" };
+
         public string FilePath { get; private set; }
         public NPOI.SS.UserModel.IWorkbook _work_book;
         public NPOI.XSSF.UserModel.XSSFWorkbook _work_book_xssf;
@@ -93,15 +90,26 @@ namespace ExportExcel.ExcelNPOI
             return CellStyleImp.Create(_work_book.CreateCellStyle());
         }
 
-        public void Write(System.IO.Stream stream)
-        {
-            _work_book.Write(stream, false);
-        }
-
-        public void Write(System.IO.Stream stream, bool level_open)
+        public void SaveTo(System.IO.Stream stream, bool level_open)
         {
             _work_book_xssf?.Write(stream, level_open);
             _work_book_hssf?.Write(stream);
+        }
+
+        public void SaveAs(string file_path)
+        {
+            using var fs = System.IO.File.OpenWrite(file_path);
+            _work_book_xssf?.Write(fs, true);
+            _work_book_hssf?.Write(fs);
+        }
+
+        public bool Save()
+        {
+            if (string.IsNullOrEmpty(FilePath))
+                return false;
+
+            SaveAs(FilePath);
+            return true;
         }
 
         public int SheetCount
@@ -111,6 +119,7 @@ namespace ExportExcel.ExcelNPOI
 
         public ISheet GetSheetAt(int sheet_idx)
         {
+
             return SheetImp.Create(this, _work_book.GetSheetAt(sheet_idx));
         }
 
@@ -140,7 +149,17 @@ namespace ExportExcel.ExcelNPOI
 
         public IWorkbook Workbook => _work_book;
 
-        public string SheetName => _sheet.SheetName;
+        public string SheetName
+        {
+            get { return _sheet.SheetName; }
+            set
+            {
+                int index = _sheet.Workbook.GetSheetIndex(_sheet);
+                if (index < 0)
+                    return;
+                _sheet.Workbook.SetSheetName(index, value);
+            }
+        }
 
         public void CalculateFormula()
         {
@@ -158,12 +177,26 @@ namespace ExportExcel.ExcelNPOI
             }
         }
 
-        public IRow GetRow(int row_index)
+        public int ColCount
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public ICellArray GetRow(int row_index)
         {
             var row = _sheet.GetRow(row_index);
             if (row == null)
                 row = _sheet.CreateRow(row_index);
-            return RowImp.Create(row);
+            return CellArrayImp.CreateRow(row);
+        }
+
+
+        public ICellArray GetCol(int col_index)
+        {
+            throw new NotImplementedException();
         }
 
         public bool IsVisible()
@@ -174,7 +207,7 @@ namespace ExportExcel.ExcelNPOI
         }
     }
 
-    public class RowImp : IRow
+    public class CellArrayImp : ICellArray
     {
         public NPOI.SS.UserModel.IRow _row;
 
@@ -189,15 +222,22 @@ namespace ExportExcel.ExcelNPOI
             }
         }
 
-        private RowImp(NPOI.SS.UserModel.IRow row)
+        public int RowCount => 1;
+
+        public int Count => ColCount;
+
+        public ECellArrayType ArrayType => ECellArrayType.Row;
+
+        private CellArrayImp(NPOI.SS.UserModel.IRow row)
         {
             _row = row;
         }
-        public static RowImp Create(NPOI.SS.UserModel.IRow row)
+
+        public static CellArrayImp CreateRow(NPOI.SS.UserModel.IRow row)
         {
             if (row == null)
                 return null;
-            return new RowImp(row);
+            return new CellArrayImp(row);
         }
 
         public ICell GetCell(int cell_index)
@@ -207,7 +247,6 @@ namespace ExportExcel.ExcelNPOI
                 row = _row.CreateCell(cell_index);
             return CellImp.Create(row);
         }
-
     }
 
     public class CellImp : ICell

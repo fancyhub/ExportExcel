@@ -16,13 +16,14 @@ namespace ExportExcel
         {
             Ignore,
             DataTable,
+            DataTableTranspose,
             EnumConfig,
             RefTable,
             TupleAliasTable,
             Invalid,
         }
 
-        
+
 
         //表名的检查
         private static Regex S_SHEET_NAME_REGEX = new Regex("^[A-Z][a-zA-Z0-9]*$");
@@ -94,7 +95,13 @@ namespace ExportExcel
                             case ETableNameType.DataTable:
                                 if (ConstDef.CalculateFormula)
                                     sheet.CalculateFormula();
-                                _data_loader.Load(data_base, sheet, table_name, flag);
+                                _data_loader.Load(data_base, sheet, table_name, false, flag);
+                                break;
+
+                            case ETableNameType.DataTableTranspose:
+                                if (ConstDef.CalculateFormula)
+                                    sheet.CalculateFormula();
+                                _data_loader.Load(data_base, sheet, table_name, true, flag);
                                 break;
 
                             case ETableNameType.Invalid:
@@ -157,11 +164,17 @@ namespace ExportExcel
 
                 default:
                     flag = _ParseTableExportFlag(str_array_1);
+                    bool transpose = table_name.StartsWith("@");
+                    if (transpose)
+                        table_name = table_name.TrimStart('@');
+
                     if (!S_SHEET_NAME_REGEX.IsMatch(table_name))
                     {
                         ErrSet.E($"{sheet.SheetName} 表名不符合命名规范", sheet.Workbook.FilePath);
                         return ETableNameType.Invalid;
                     }
+                    if (transpose)
+                        return ETableNameType.DataTableTranspose;
                     return ETableNameType.DataTable;
             }
         }

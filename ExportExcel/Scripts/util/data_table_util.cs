@@ -190,7 +190,7 @@ namespace ExportExcel
         #endregion
 
 
-        public static string CellStrExt(this IRow row, int cell_index)
+        public static string CellStrExt(this ICellArray row, int cell_index)
         {
             if (row == null)
                 return string.Empty;

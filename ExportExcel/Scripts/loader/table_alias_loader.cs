@@ -23,7 +23,7 @@ namespace ExportExcel
             int row_count = sheet.RowCount;
             for (int i = 1; i < row_count; i++)
             {
-                IRow row = sheet.GetRow(i);
+                ICellArray row = sheet.GetRow(i);
 
                 string name = row.CellStrExt(0);
                 if (string.IsNullOrEmpty(name) || name.StartsWith(ConstDef.Comment))
@@ -44,7 +44,7 @@ namespace ExportExcel
             }
         }
 
-        private static string _GetLang(IRow row, int[] lang_index_map, int index)
+        private static string _GetLang(ICellArray row, int[] lang_index_map, int index)
         {
             int index_map = lang_index_map[index];
             if (index_map < 0)
@@ -67,7 +67,7 @@ namespace ExportExcel
                 return false;
 
             int name_index = -1;
-            IRow header_row = sheet.GetRow(0);
+            ICellArray header_row = sheet.GetRow(0);
             int count = header_row.ColCount;
             for (int i = 0; i < count; i++)
             {
@@ -87,7 +87,10 @@ namespace ExportExcel
             }
 
             if (name_index != 0)
+            {
+                ErrSet.E($"{sheet.SheetName} 找不到列 \"Name\"", sheet.Workbook.FilePath);
                 return false;
+            }
 
             if (name_index >= 0 && fields_index >= 0)
                 return true;

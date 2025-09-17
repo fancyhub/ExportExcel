@@ -11,6 +11,8 @@ namespace ExportExcel.ExcelEPPlus
 {
     public class WorkBookImp : IWorkbook
     {
+        public static System.Collections.Generic.List<string> SupportFileExts = new() { ".xlsx", ".xls", ".xlsm" };
+
         public string _file_path;
         public OfficeOpenXml.ExcelPackage _work_book;
 
@@ -21,8 +23,8 @@ namespace ExportExcel.ExcelEPPlus
         }
 
         public static WorkBookImp CreateNew()
-        {            
-            OfficeOpenXml.ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;            
+        {
+            OfficeOpenXml.ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
             OfficeOpenXml.ExcelPackage book = new OfficeOpenXml.ExcelPackage();
             return new WorkBookImp(null, book);
         }
@@ -72,14 +74,22 @@ namespace ExportExcel.ExcelEPPlus
             return CellStyleImp.Create(_work_book.Workbook.Styles.CreateNamedStyle(name));
         }
 
-        public void Write(System.IO.Stream stream)
+        public void SaveTo(System.IO.Stream stream, bool level_open)
         {
             _work_book.SaveAs(stream);
         }
 
-        public void Write(System.IO.Stream stream, bool level_open)
+        public void SaveAs(string file_path)
         {
-            _work_book.SaveAs(stream);            
+            _work_book.SaveAs(file_path);
+        }
+
+        public bool Save()
+        {
+            if (string.IsNullOrEmpty(FilePath))
+                return false;
+            SaveAs(FilePath);
+            return true;
         }
 
         public int SheetCount
@@ -89,7 +99,7 @@ namespace ExportExcel.ExcelEPPlus
 
         public string FilePath => _file_path;
 
-       
+
 
         public ISheet GetSheetAt(int sheet_idx)
         {
@@ -97,7 +107,7 @@ namespace ExportExcel.ExcelEPPlus
         }
 
         public void Close()
-        {            
+        {
             _work_book.Dispose();
         }
     }
@@ -127,7 +137,11 @@ namespace ExportExcel.ExcelEPPlus
             return _sheet.Hidden == OfficeOpenXml.eWorkSheetHidden.Visible;
         }
 
-        public string SheetName => _sheet.Name;
+        public string SheetName
+        {
+            get { return _sheet.Name; }
+            set { _sheet.Name = value; }
+        }
 
         public void CalculateFormula()
         {
@@ -148,30 +162,63 @@ namespace ExportExcel.ExcelEPPlus
             }
         }
 
-        public IRow GetRow(int row_index)
+        public int ColCount
         {
-            return RowImp.Create(_sheet, row_index + 1);
+            get
+            {
+                var d = _sheet.Dimension;
+                if (d == null)
+                    return 0;
+                return d.Columns;
+            }
+        }
+
+        public ICellArray GetRow(int row_index)
+        {
+            return CellArrayImp.CreateRow(_sheet, row_index + 1);
+        }
+
+        public ICellArray GetCol(int col_index)
+        {
+            return CellArrayImp.CreateCol(_sheet, col_index + 1);
         }
     }
 
-    public class RowImp : IRow
+    public class CellArrayImp : ICellArray
     {
         public OfficeOpenXml.ExcelWorksheet _sheet;
-        public int _row_idx;
-        private RowImp(OfficeOpenXml.ExcelWorksheet sheet, int row_idx)
+        public int _index;
+        public bool _is_row;
+
+        private CellArrayImp(OfficeOpenXml.ExcelWorksheet sheet, int index, bool row)
         {
             _sheet = sheet;
-            _row_idx = row_idx;
+            _index = index;
+            _is_row = row;
+
         }
-        public static RowImp Create(OfficeOpenXml.ExcelWorksheet sheet, int row_idx)
+        public static CellArrayImp CreateRow(OfficeOpenXml.ExcelWorksheet sheet, int row_idx)
         {
-            return new RowImp(sheet, row_idx);
+            return new CellArrayImp(sheet, row_idx, true);
         }
 
-        public int ColCount => _sheet.Dimension.Columns;
+        public static CellArrayImp CreateCol(OfficeOpenXml.ExcelWorksheet sheet, int col_idx)
+        {
+            return new CellArrayImp(sheet, col_idx, false);
+        }
+
+        public ECellArrayType ArrayType => _is_row ? ECellArrayType.Row : ECellArrayType.Col;
+        public int ColCount => _is_row ? _sheet.Dimension.Columns : 1;
+        public int RowCount => _is_row ? 1 : _sheet.Dimension.Rows;
+        public int Count => _is_row ? _sheet.Dimension.Columns : _sheet.Dimension.Rows;
+
+
         public ICell GetCell(int cell_index)
         {
-            return CellImp.Create(_sheet, _row_idx, cell_index + 1);
+            if (_is_row)
+                return CellImp.Create(_sheet, _index, cell_index + 1);
+            else
+                return CellImp.Create(_sheet, cell_index + 1, _index);
         }
     }
 

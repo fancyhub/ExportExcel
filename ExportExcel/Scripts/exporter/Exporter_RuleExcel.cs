@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 /*************************************************************************************
  * Author  : cunyu.fan
@@ -21,44 +22,13 @@ namespace ExportExcel
         {
             return "Export Rule Excel File";
         }
+
         public void Process(DataBase data)
         {
             if (_config == null || !_config.enable)
                 return;
-
-            {
-                IWorkbook work_book = ExcelUtil.CreateWorkBook();
-                ISheet work_sheet = work_book.CreateSheet($"@EnumConfig");
-
-                var cell_style = work_book.CreateCellStyle();
-                cell_style.WrapText = true;
-
-                _SetValue(work_sheet, 0, 0, "EnumName");
-                _SetValue(work_sheet, 0, 1, "EnumFieldName");
-                _SetValue(work_sheet, 0, 2, "ExcelVal");
-                _SetValue(work_sheet, 0, 3, "Val");
-
-                int row_index = 1;
-                foreach (var p in data.EnumDB)
-                {
-                    foreach (var f in p.Value.Dict)
-                    {
-                        _SetValue(work_sheet, row_index, 0, p.Key);
-                        _SetValue(work_sheet, row_index, 1, f.Key);
-                        _SetValue(work_sheet, row_index, 2, f.Value.ExcelVal);
-                        _SetValue(work_sheet, row_index, 3, f.Value.Val.ToString());
-                        row_index++;
-                    }
-
-                    row_index++;
-                }
-
-                string file_path = System.IO.Path.Combine(_config.dir, "EnumConfig.xlsx");
-                FileUtil.CreateFileDir(file_path);
-                work_book.Write(System.IO.File.OpenWrite(file_path), false);
-                work_book.Close();
-            }
-
+            _ExportEnumConfig(data);
+            _ExportAliasConfig(data);
 
             List<Table> tables = new List<Table>();
             foreach (var p in data.Tables)
@@ -103,12 +73,80 @@ namespace ExportExcel
                 //4. 保存
                 string file_path = System.IO.Path.Combine(_config.dir, "R_" + table.SheetName + ".xlsx");
                 FileUtil.CreateFileDir(file_path);
-                work_book.Write(System.IO.File.OpenWrite(file_path), false);
+                work_book.SaveTo(System.IO.File.OpenWrite(file_path), false);
                 work_book.Close();
             }
         }
 
+        private void _ExportAliasConfig(DataBase data)
+        {
+            IWorkbook work_book = ExcelUtil.CreateWorkBook();
+            ISheet work_sheet = work_book.CreateSheet(ConstDef.SpecSheetNameAlias);
 
+            var cell_style = work_book.CreateCellStyle();
+            cell_style.WrapText = true;
+
+            _SetValue(work_sheet, 0, 0, "Name");
+            _SetValue(work_sheet, 0, 1, "Fields");
+
+            int lang_col_index = 2;
+            _SetValue(work_sheet, 0, lang_col_index++, "CSharp");
+            _SetValue(work_sheet, 0, lang_col_index++, "Go");
+            _SetValue(work_sheet, 0, lang_col_index++, "Cpp");
+            
+
+            int row_index = 1;
+            foreach (var p in data.AliasDB)
+            {
+                _SetValue(work_sheet, row_index, 0, p.Key);
+                _SetValue(work_sheet, row_index, 1, string.Join('|', p.Value.Fields));
+
+                lang_col_index = 2;
+                _SetValue(work_sheet, row_index, lang_col_index++, p.Value.CSharp);
+                _SetValue(work_sheet, row_index, lang_col_index++, p.Value.Go);
+                _SetValue(work_sheet, row_index, lang_col_index++, p.Value.Cpp);
+                row_index++;
+            }
+
+            string file_path = System.IO.Path.Combine(_config.dir, "AliasConfig.xlsx");
+            FileUtil.CreateFileDir(file_path);
+            work_book.SaveTo(System.IO.File.OpenWrite(file_path), false);
+            work_book.Close();
+        }
+
+        private void _ExportEnumConfig(DataBase data)
+        {
+            IWorkbook work_book = ExcelUtil.CreateWorkBook();
+            ISheet work_sheet = work_book.CreateSheet(ConstDef.SpecSheetNameEnum);
+
+            var cell_style = work_book.CreateCellStyle();
+            cell_style.WrapText = true;
+
+            _SetValue(work_sheet, 0, 0, "EnumName");
+            _SetValue(work_sheet, 0, 1, "EnumFieldName");
+            _SetValue(work_sheet, 0, 2, "ExcelVal");
+            _SetValue(work_sheet, 0, 3, "Val");
+
+            int row_index = 1;
+            foreach (var p in data.EnumDB)
+            {
+                foreach (var f in p.Value.Dict)
+                {
+                    _SetValue(work_sheet, row_index, 0, p.Key);
+                    _SetValue(work_sheet, row_index, 1, f.Key);
+                    _SetValue(work_sheet, row_index, 2, f.Value.ExcelVal);
+                    _SetValue(work_sheet, row_index, 3, f.Value.Val.ToString());
+                    row_index++;
+                }
+
+                row_index++;
+            }
+
+            string file_path = System.IO.Path.Combine(_config.dir, "EnumConfig.xlsx");
+            FileUtil.CreateFileDir(file_path);
+            work_book.SaveTo(System.IO.File.OpenWrite(file_path), false);
+            work_book.Close();
+        }
 
         public string _BuildSheetName(Table table)
         {
@@ -147,12 +185,16 @@ namespace ExportExcel
             {
                 ret.Add(string.Format("Enum[{0}]", col.AttrEnum.Name));
             }
+            if (col.AttrAlias != null)
+            {
+                ret.Add(string.Format("Alias[{0}]", col.AttrAlias.Name));
+            }
             return ret;
         }
 
         public ICell _SetValue(ISheet sheet, int row_idx, int col_idx, string v)
         {
-            IRow row = sheet.GetRow(row_idx);
+            ICellArray row = sheet.GetRow(row_idx);
             ICell cell = row.GetCell(col_idx);
             cell.SetCellValue(v);
             return cell;

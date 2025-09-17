@@ -55,7 +55,7 @@ namespace ExportExcel
             int col_count = table_trans.Header.Count;
             for (int r = 0; r < row_count; r++)
             {
-                IRow row = work_sheet.GetRow(r + ConstDef.DataStartRowIndex);
+                ICellArray row = work_sheet.GetRow(r + ConstDef.DataStartRowIndex);
 
                 for (int c = 0; c < col_count; c++)
                 {
@@ -66,16 +66,13 @@ namespace ExportExcel
             }
 
             //5.最后写入
-            using (var fs_out = System.IO.File.OpenWrite(file_path))
-            {
-                work_book.Write(fs_out);
-                work_book.Close();
-            };
+            work_book.SaveAs(file_path);
+            work_book.Close();            
         }
 
         private void _set_value(ISheet sheet, int row_idx, int col_idx, string v)
         {
-            IRow row = sheet.GetRow(row_idx);
+            ICellArray row = sheet.GetRow(row_idx);
             ICell cell = row.GetCell(col_idx);
             cell.SetCellValue(v);
         }

@@ -38,7 +38,7 @@ namespace ExportExcel
             int row_count = sheet.RowCount;
             for (int i = 1; i < row_count; i++)
             {
-                IRow row = sheet.GetRow(i);
+                ICellArray row = sheet.GetRow(i);
                 string enum_name = row.CellStrExt(0);
                 if (string.IsNullOrEmpty(enum_name) || enum_name.StartsWith(ConstDef.Comment))
                     continue;

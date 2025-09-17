@@ -21,9 +21,9 @@ namespace ExportExcel
         public const char SheetNameConstraintSeparator = '|'; //export_client, export_server 的分隔符
         public const char SheetNamePartialSeparator = '_';   // 表格分表专用的分隔符
 
-        public const string SpecSheetNameEnum = "@EnumConfig";
-        public const string SpecSheetNameRef= "@RefTable";
-        public const string SpecSheetNameAlias= "@Alias";
+        public const string SpecSheetNameEnum = "@@EnumConfig";
+        public const string SpecSheetNameRef= "@@RefTable";
+        public const string SpecSheetNameAlias= "@@Alias";
 
     }
 }
